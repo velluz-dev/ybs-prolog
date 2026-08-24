@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Spring Boot 3.5.x rather than 3.2.x: this machine runs Temurin JDK 25, and Spring
+      Boot 3.2 (Spring Framework 6.1) predates Java 25 - its bundled ASM/CGLIB bytecode
+      reader rejects class-file major version 69. 3.5.x is Java 25 ready. Still Spring
+      Boot 3, so annotations, jakarta.* imports and project layout are unchanged.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.6</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.ybs</groupId>
+    <artifactId>ybs-demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ybs-demo</name>
+    <description>YBS AI transit demo</description>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <java.version>25</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          Classic tuProlog: a pure-Java Prolog engine running in-JVM, so there is no
+          native SWI-Prolog install and nothing to configure at demo time. Chosen over
+          the newer 2p-kt because its Java API (new Prolog(); setTheory(); solve())
+          keeps the Java<->Prolog bridge short enough to read aloud in a viva.
+        -->
+        <dependency>
+            <groupId>it.unibo.alice.tuprolog</groupId>
+            <artifactId>tuprolog</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

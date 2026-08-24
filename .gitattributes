@@ -1,0 +1,14 @@
+# Normalise to LF in the repository. Without this, Git on Windows would commit CRLF
+# and the mvnw shell script would fail to run on Linux and macOS.
+* text=auto eol=lf
+
+# Windows-only scripts must keep CRLF to run under cmd.exe.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Never touch binaries.
+*.jar  binary
+*.wav  binary
+*.mp3  binary
+*.png  binary
+*.jpg  binary

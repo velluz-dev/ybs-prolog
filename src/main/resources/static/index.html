@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YBS — ခရီးစဉ်ရှာဖွေမှု (AI Demo)</title>
+    <!-- Leaflet is vendored, not loaded from a CDN: the demo must run with the
+         network cable unplugged. Map TILES still need the internet; if they fail
+         the routes and buses stay visible on a plain background. -->
+    <link rel="stylesheet" href="/vendor/leaflet.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="brand">
+        <h1>YBS ခရီးစဉ်ရှာဖွေမှု</h1>
+        <p class="sub">Yangon Bus Service — journey planner</p>
+    </div>
+    <div class="header-actions">
+        <div id="sim-controls"></div>
+        <a class="ops-link" href="/ops.html">📊 Ops dashboard</a>
+    </div>
+</header>
+
+<main class="layout">
+
+    <!-- LEFT: the decision surface — ask, constrain, choose ------------------->
+    <div class="col">
+
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">🚏</span>
+                <h2>ခရီးစဉ် ရွေးပါ <span class="en">Choose your trip</span></h2>
+            </div>
+
+            <div class="voice-row">
+                <button type="button" id="voice-btn" class="mic-btn">🎤 ပြောပါ</button>
+                <select id="voice-sample" title="Sample Burmese query" aria-label="Sample Burmese query"></select>
+            </div>
+            <div id="voice-status" class="muted">ဥပမာ ရွေးပြီး ခလုတ်ကို နှိပ်ပါ။ <span class="en">Pick a sample and press speak.</span></div>
+            <div id="voice-entities"></div>
+
+            <div class="trip-field first">
+                <span class="ic">🔵</span>
+                <div class="grow">
+                    <label class="en" for="from-stop">မှ · from</label>
+                    <select id="from-stop"></select>
+                </div>
+            </div>
+            <div class="trip-field">
+                <span class="ic">📍</span>
+                <div class="grow">
+                    <label class="en" for="to-stop">ကို · to</label>
+                    <select id="to-stop"></select>
+                </div>
+            </div>
+
+            <button type="button" id="search-btn" class="btn-primary">
+                🔍 ရှာမည် <span class="en">Search</span>
+            </button>
+        </section>
+
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">👤</span>
+                <h2>ခရီးသည် အချက်အလက်
+                    <span class="en">Rider profile — results are re-filtered live by the Prolog rule base</span>
+                </h2>
+            </div>
+            <div id="profile" class="chips"></div>
+            <div class="disruption-row">
+                <span class="ic">🌊</span>
+                <div class="grow">
+                    <div class="my">တာမွေ ရေကြီးမှု ထည့်သွင်းရန်</div>
+                    <div class="en">Inject a flood at Tamwe — asserts flooded(s15) into the rule base</div>
+                </div>
+                <button type="button" id="flood-btn" class="alt-btn">ရေကြီး</button>
+                <button type="button" id="clear-btn" class="alt-btn">✖ ရှင်း</button>
+            </div>
+        </section>
+
+        <section>
+            <div class="results-head">
+                <h2>ခရီးစဉ် ရွေးချယ်မှု <span class="en">Journey options</span></h2>
+                <span class="pareto-badge" id="pareto-badge"></span>
+            </div>
+            <div id="results" class="muted">ခရီးစဉ် ရွေးပြီး “ရှာမည်” ကို နှိပ်ပါ။</div>
+        </section>
+
+    </div>
+
+    <!-- RIGHT: the evidence — what the AI did -------------------------------->
+    <div class="col">
+
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">🗺️</span>
+                <h2>လမ်းကြောင်းမြေပုံ <span class="en">Network map — buses update every second</span></h2>
+            </div>
+            <div id="map"></div>
+            <div id="map-note" class="muted hidden">
+                ⚠️ မြေပုံအကြောင်းအရာ မရနိုင်ပါ (offline) — လမ်းကြောင်းများသာ ပြသည်။
+                <span class="en">Map tiles unavailable (offline) — routes, stops and buses still shown.</span>
+            </div>
+            <div id="trip-countdown" class="countdown muted">
+                ခရီးစဉ်တစ်ခု ရွေးပါ။ <span class="en">Pick a journey to start a trip — then click any stop for its arrivals board.</span>
+            </div>
+            <div id="legend" class="legend"></div>
+        </section>
+
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">🔍</span>
+                <h2>A* ရှာဖွေမှု အခြေအနေ
+                    <span class="en">A* search trace — every expanded node with its g, h and f</span>
+                </h2>
+            </div>
+            <div id="search-stats" class="stats"></div>
+            <div id="trace-panel" class="trace muted">Run a search to watch the frontier expand.</div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Arrival banner: hidden until the 400 m geofence fires -->
+<div id="arrival-banner" class="arrival hidden">
+    <div class="arrival-inner">
+        <div class="arrival-icon">🔔</div>
+        <div>
+            <div class="arrival-my">ဆင်းရန် အဆင်သင့်ဖြစ်ပါ</div>
+            <div class="arrival-stop" id="arrival-stop"></div>
+            <div class="en">Get ready to alight</div>
+        </div>
+        <button type="button" id="arrival-close" class="alt-btn">✖</button>
+    </div>
+</div>
+
+<script src="/vendor/leaflet.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

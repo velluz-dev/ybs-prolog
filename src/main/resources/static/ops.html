@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YBS — Ops dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="brand">
+        <h1>YBS Ops Dashboard</h1>
+        <p class="sub">Bonus eligibility is computed live by the Prolog engine — watch the server console</p>
+    </div>
+    <div class="header-actions">
+        <a class="ops-link" href="/">← ခရီးစဉ်ရှာဖွေမှု</a>
+    </div>
+</header>
+
+<main class="layout ops">
+    <div class="col">
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">🚨</span>
+                <h2>Bunching alert <span class="en">Headway has collapsed on one route</span></h2>
+            </div>
+            <div id="bunching"></div>
+        </section>
+
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">📈</span>
+                <h2>Incidents <span class="en">By route and hour</span></h2>
+            </div>
+            <table id="incidents" class="grid"></table>
+        </section>
+    </div>
+
+    <div class="col">
+        <section class="card">
+            <div class="card-head">
+                <span class="ic">🏅</span>
+                <h2>Driver bonus eligibility
+                    <span class="en">Each badge is one bonus_eligible(D, M) goal sent to tuProlog</span>
+                </h2>
+            </div>
+            <p class="muted rule-note">
+                The seeded database column is <code>false</code> for every driver, so anything
+                showing “eligible” was derived by the rule base just now — not read from storage.
+            </p>
+            <table id="drivers" class="grid"></table>
+        </section>
+    </div>
+</main>
+
+<script>
+async function load() {
+    const d = await (await fetch('/api/ops/dashboard')).json();
+
+    document.getElementById('bunching').innerHTML = d.bunchingAlerts.map(a =>
+        `<div class="alert-row">
+            <div class="alert-my">${a.messageMy}</div>
+            <div class="en">${a.messageEn}</div>
+            <div class="action">→ ${a.action}</div>
+         </div>`).join('');
+
+    document.getElementById('drivers').innerHTML =
+        `<tr><th>Driver</th><th>Headway</th><th>Harsh</th><th>Complaints</th><th>Bonus</th></tr>` +
+        d.drivers.map(r => `<tr>
+            <td>${r.driverName}</td>
+            <td>${r.headwayScore}</td>
+            <td>${r.harshEvents}</td>
+            <td>${r.upheldComplaints}</td>
+            <td>${r.bonusEligible
+                ? '<span class="badge yes">✔ eligible</span>'
+                : '<span class="badge no">✖ not eligible</span>'}</td>
+        </tr>`).join('');
+
+    document.getElementById('incidents').innerHTML =
+        `<tr><th>Route</th><th>Hour</th><th>Type</th><th>Count</th></tr>` +
+        d.incidentCounts.map(r => `<tr>
+            <td>${r.routeId}</td><td>${String(r.hour).padStart(2, '0')}:00</td>
+            <td>${r.type}</td><td>${r.count}</td>
+        </tr>`).join('');
+}
+load();
+</script>
+</body>
+</html>

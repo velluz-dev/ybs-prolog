@@ -1,0 +1,357 @@
+/* ============================================================================
+   YBS demo — design system
+   ----------------------------------------------------------------------------
+   Built from the Pencil design (pencil-new.pen). Three rules drive everything,
+   all from the brief's "design for low literacy":
+     1. Fare is the largest element on screen — it is what riders decide on.
+     2. Burmese is primary, English is the secondary line, never a replacement.
+     3. Every control pairs an icon with words. Icons never stand alone.
+   ========================================================================== */
+
+:root {
+    --bg:          #EEF1F5;
+    --surface:     #FFFFFF;
+    --ink:         #0B1220;
+    --ink-2:       #475569;
+    --line:        #D8DEE7;
+    --accent:      #1D4ED8;
+    --accent-soft: #DBEAFE;
+    --accent-ink:  #1E3A8A;
+    --ok:          #15803D;
+    --ok-soft:     #DCFCE7;
+    --ok-ink:      #065F46;
+    --warn:        #B45309;
+    --warn-soft:   #FFF7ED;
+    --danger:      #B91C1C;
+    --danger-soft: #FEE2E2;
+    --danger-ink:  #7F1D1D;
+    --panel-dark:  #0B1220;
+
+    --r36: #E11D48;
+    --r43: #059669;
+    --r61: #4338CA;
+
+    --font-my: "Padauk", "Noto Sans Myanmar", "Myanmar Text", system-ui, sans-serif;
+    --font-en: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(11, 18, 32, .05);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-my);
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+.en { font-family: var(--font-en); color: var(--ink-2); font-size: 12px; font-weight: 400; }
+.muted { color: var(--ink-2); }
+.hidden { display: none !important; }
+
+/* ------------------------------------------------------------------ header */
+.app-header {
+    background: var(--panel-dark);
+    color: #fff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.brand h1 { margin: 0; font-size: 23px; font-weight: 700; line-height: 1.2; }
+.brand .sub { margin: 2px 0 0; font-family: var(--font-en); font-size: 13px; color: #94A3B8; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+.ops-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 10px;
+    border: 1px solid #334155; color: #E2E8F0;
+    text-decoration: none; font-family: var(--font-en); font-size: 14px; font-weight: 600;
+}
+.ops-link:hover { background: #1E293B; }
+
+/* -------------------------------------------------------------- structure */
+/* Two zones: the decision surface on the left, the evidence on the right.
+   The examiner needs the results and the A* trace visible at the same time. */
+.layout {
+    display: grid;
+    grid-template-columns: 560px minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px;
+    align-items: start;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+@media (max-width: 1100px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+.card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.card-head .ic { font-size: 20px; line-height: 1; }
+.card-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.card-head .en { display: block; margin-top: 1px; }
+
+/* ------------------------------------------------------------------ voice */
+.voice-row {
+    display: flex; align-items: center; gap: 10px;
+    background: #F1F5F9; border-radius: 12px; padding: 10px; margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.mic-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #fff; border: 0; cursor: pointer;
+    border-radius: 10px; padding: 12px 16px;
+    font-family: var(--font-my); font-size: 15px; font-weight: 700;
+}
+.mic-btn:active { transform: translateY(1px); }
+#voice-sample {
+    flex: 1 1 220px; min-width: 0;
+    font: inherit; font-size: 14px; padding: 10px;
+    border: 1px solid var(--line); border-radius: 10px; background: #fff;
+}
+#voice-status { font-size: 13px; }
+
+/* Parsed-entity chips — the NLP step made visible rather than implied. */
+#voice-entities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.entity {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--ok-soft); border: 1px solid #86EFAC;
+    border-radius: 20px; padding: 7px 13px; font-size: 13px; color: var(--ok-ink);
+}
+.entity .mark { color: var(--ok); font-size: 12px; }
+.entity b { font-weight: 700; }
+
+/* ------------------------------------------------------------ trip select */
+.trip-field {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px;
+}
+/* First field sits below the voice block, which needs a little more air. */
+.trip-field.first { margin-top: 14px; }
+.trip-field .ic { font-size: 18px; }
+.trip-field label { display: block; }
+.trip-field select {
+    font: inherit; font-size: 15px; font-weight: 600; color: var(--ink);
+    border: 0; background: transparent; width: 100%; padding: 2px 0; cursor: pointer;
+}
+.trip-field select:focus { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.grow { flex: 1; min-width: 0; }
+
+.btn-primary {
+    width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    background: var(--accent); color: #fff; border: 0; cursor: pointer;
+    border-radius: 12px; padding: 15px;
+    font-family: var(--font-my); font-size: 17px; font-weight: 700;
+}
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary .en { color: #BFDBFE; }
+
+/* ---------------------------------------------------------------- profile */
+.chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.chip {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 8px; border-radius: 24px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface);
+    font: inherit; text-align: left;
+}
+.chip .ic { font-size: 17px; }
+.chip .my { font-size: 12px; font-weight: 600; display: block; }
+.chip .en { font-size: 10px; display: block; }
+.chip.on { background: var(--accent-soft); border: 2px solid var(--accent); }
+.chip.on .my { color: var(--accent-ink); }
+
+/* Disruption injection — the one control that writes a fact into the rule base. */
+.disruption-row {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px;
+    background: var(--warn-soft); border: 1px solid #FDBA74;
+    border-radius: 12px; padding: 10px;
+}
+.disruption-row .ic { font-size: 18px; }
+.disruption-row .my { font-size: 13px; font-weight: 600; color: #7C2D12; }
+.disruption-row .en { font-size: 11px; color: #9A3412; }
+.alt-btn {
+    font: inherit; font-size: 14px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; border-radius: 9px;
+}
+.alt-btn:hover { background: #F8FAFC; }
+
+/* ---------------------------------------------------------------- results */
+.results-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.results-head h2 { margin: 0; font-size: 16px; font-weight: 700; }
+.pareto-badge {
+    background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 6px; padding: 3px 9px;
+    font-family: var(--font-en); font-size: 11px; font-weight: 600;
+}
+
+.journey {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+}
+.journey.unsuitable { opacity: .62; }
+
+.journey-top { display: flex; align-items: center; gap: 16px; }
+/* Fare first and largest. This is the number the rider decides on. */
+.fare {
+    font-family: var(--font-en); font-size: 44px; font-weight: 800;
+    line-height: 1.05; letter-spacing: -.02em;
+}
+.fare-unit { font-size: 13px; color: var(--ink-2); }
+.journey-meta { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.meta-row { display: flex; align-items: center; gap: 8px; }
+.meta-row .ic { font-size: 17px; }
+.mins { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.band { font-family: var(--font-en); font-size: 12px; color: var(--ink-2); }
+
+.route-badges { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.route-badge {
+    background: #64748B; color: #fff; border-radius: 7px; padding: 5px 11px;
+    font-family: var(--font-en); font-size: 14px; font-weight: 700;
+}
+.route-badge[data-route="36"] { background: var(--r36); }
+.route-badge[data-route="43"] { background: var(--r43); }
+.route-badge[data-route="61"] { background: var(--r61); }
+.route-sep { color: var(--ink-2); }
+.walk-badge { background: #E2E8F0; color: var(--ink); }
+
+/* Status strip: every journey states its verdict, suitable or not. Silence
+   would leave the rider guessing why an option vanished. */
+.verdict {
+    display: flex; align-items: center; gap: 8px; margin-top: 12px;
+    border-radius: 10px; padding: 10px; font-size: 12px;
+}
+.verdict.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.verdict.bad { background: var(--danger-soft); color: var(--danger-ink); }
+.verdict .ic { font-size: 16px; }
+
+.pick {
+    width: 100%; margin-top: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: transparent; border: 2px solid var(--accent); color: var(--accent);
+    border-radius: 11px; padding: 12px;
+    font-family: var(--font-my); font-size: 15px; font-weight: 700;
+}
+.pick:hover { background: var(--accent-soft); }
+.pick[disabled] { border-color: var(--line); color: var(--ink-2); cursor: not-allowed; }
+
+/* -------------------------------------------------------------------- map */
+#map {
+    height: 520px; border-radius: 12px; border: 1px solid var(--line);
+    background: #E2E6EB;   /* visible as a map even when tiles fail offline */
+}
+#map-note { margin-top: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.legend .item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.legend .swatch { width: 22px; height: 5px; border-radius: 3px; }
+
+.bus-pill {
+    background: var(--panel-dark); color: #fff; border: 2px solid #fff;
+    border-radius: 11px; width: 34px; height: 22px;
+    font-family: var(--font-en); font-size: 13px; font-weight: 700;
+    text-align: center; line-height: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+/* A bus standing at a stop. Amber and ringed so a stationary marker reads as
+   "loading passengers" rather than "the simulation has frozen". */
+.bus-pill.waiting {
+    background: var(--warn); border-color: #FDE68A;
+    box-shadow: 0 0 0 4px rgba(180, 83, 9, .25);
+}
+
+/* Arrivals board inside a stop popup. */
+.board-head { font-size: 15px; margin-bottom: 8px; }
+.board { display: flex; flex-direction: column; gap: 6px; }
+.board-row { display: flex; align-items: center; gap: 8px; }
+.board-eta { font-weight: 700; font-size: 15px; }
+
+.countdown {
+    margin-top: 12px; padding: 10px 12px;
+    background: #F1F5F9; border-radius: 10px; font-size: 14px;
+}
+
+/* ------------------------------------------------------------ speed / sim */
+.speed-row { display: flex; align-items: center; gap: 6px; background: #1E293B; border-radius: 10px; padding: 6px; }
+.speed-row > span { color: #94A3B8; font-size: 13px; padding: 0 6px; }
+.speed-btn {
+    font-family: var(--font-en); font-size: 14px; font-weight: 600;
+    padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    border: 0; background: transparent; color: #94A3B8;
+}
+.speed-btn.on { background: var(--accent); color: #fff; }
+
+/* ------------------------------------------------------------ A* evidence */
+.stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.stat {
+    background: #F1F5F9; border-radius: 10px; padding: 8px 12px;
+    font-family: var(--font-en); font-size: 12px; color: var(--ink-2);
+}
+.stat b { display: block; font-size: 19px; color: var(--ink); font-weight: 700; }
+.stat.hero { background: var(--accent-soft); color: var(--accent-ink); }
+.stat.hero b { color: var(--accent-ink); }
+
+.trace {
+    height: 260px; overflow-y: auto;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px;
+    background: var(--panel-dark); color: #D1E0FF;
+    border-radius: 10px; padding: 12px;
+}
+.trace .ord { color: #64748B; }
+.trace .rc { color: #7DD3FC; }
+.trace b { color: #FDE68A; }
+
+/* --------------------------------------------------------- arrival banner */
+/* Deliberately unmissable: a rider glances at this in a moving, crowded bus. */
+.arrival {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+    background: var(--danger); color: #fff;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.35);
+}
+.arrival-inner {
+    max-width: 1600px; margin: 0 auto; padding: 20px 28px;
+    display: flex; align-items: center; gap: 20px;
+}
+.arrival-icon { font-size: 46px; line-height: 1; }
+.arrival-my { font-size: 30px; font-weight: 800; line-height: 1.15; }
+.arrival-stop { font-size: 22px; font-weight: 700; }
+.arrival .en { color: rgba(255,255,255,.85); }
+.arrival .alt-btn { margin-left: auto; background: transparent; color: #fff; border-color: rgba(255,255,255,.5); }
+
+/* --------------------------------------------------------- ops dashboard */
+/* The ops page has no single dominant panel, so it splits evenly rather than
+   borrowing the planner's 560px decision column. */
+.layout.ops { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 1100px) { .layout.ops { grid-template-columns: minmax(0, 1fr); } }
+.rule-note { font-size: 13px; margin: 0 0 14px; }
+.rule-note code { font-family: var(--font-en); background: #F1F5F9; padding: 1px 5px; border-radius: 4px; }
+
+.grid { border-collapse: collapse; width: 100%; }
+.grid th, .grid td { border-bottom: 1px solid var(--line); padding: 11px 12px; text-align: left; }
+.grid th {
+    font-family: var(--font-en); font-size: 11px; color: var(--ink-2);
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+}
+.grid td { font-size: 15px; }
+.badge { padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 14px; }
+.badge.yes { background: var(--ok-soft); color: var(--ok); }
+.badge.no  { background: var(--danger-soft); color: var(--danger); }
+.alert-row {
+    background: var(--warn-soft); border: 1px solid #FDBA74;
+    border-radius: 12px; padding: 14px 16px;
+}
+.alert-my { font-size: 19px; font-weight: 700; color: #7C2D12; }
+.alert-row .action { margin-top: 6px; font-weight: 700; color: #9A3412; }
