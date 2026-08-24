@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system — YBS</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+    .swatch { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); }
+    .swatch .fill { height: 66px; }
+    .swatch .meta { padding: 9px 12px; background: var(--surface); }
+    .swatch .nm { font-size: 13px; font-weight: 700; }
+    .swatch .hx { font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); }
+    .rule { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; }
+    .rule + .rule { border-top: 1px solid var(--line-soft); }
+    .rule .no {
+        font-family: var(--f-display); font-size: 22px; line-height: 1;
+        color: var(--accent); min-width: 34px;
+    }
+    .rule h3 { font-size: 16px; margin-bottom: 3px; }
+    .rule p { margin: 0; font-size: 14px; color: var(--ink-2); }
+    .spec { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); }
+    section.block { margin-bottom: 26px; }
+    .demo { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+    <aside class="rail">
+        <div class="mark">
+            <span class="plate sm" data-route="36">36</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Design system</span>
+            </div>
+        </div>
+        <nav aria-label="Sections">
+            <a href="#rules" aria-current="page"><span class="ic" aria-hidden="true">📐</span>စည်းမျဉ်း</a>
+            <a href="#color"><span class="ic" aria-hidden="true">🎨</span>အရောင်</a>
+            <a href="#type"><span class="ic" aria-hidden="true">🔤</span>စာလုံး</a>
+            <a href="#plate"><span class="ic" aria-hidden="true">🚌</span>နံပါတ်ပြား</a>
+            <a href="#controls"><span class="ic" aria-hidden="true">🎛️</span>ခလုတ်နှင့် ကွက်လပ်</a>
+            <a href="#surfaces"><span class="ic" aria-hidden="true">🗂️</span>ကတ်နှင့် ဇယား</a>
+            <a href="#states"><span class="ic" aria-hidden="true">⚠️</span>အခြေအနေများ</a>
+            <a href="#a11y"><span class="ic" aria-hidden="true">♿</span>လက်လှမ်းမီမှု</a>
+        </nav>
+        <div class="foot">
+                <a class="btn btn-ghost-navy btn-block" href="home.html"></a>
+                <span aria-hidden="true">←</span> စာမျက်နှာများ
+            </a>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <h1>Design system</h1>
+            <div class="spacer"></div>
+            <span class="badge info">v2 · ဩဂုတ် 2026</span>
+        </header>
+
+        <div class="content">
+
+            <!-- =========================================== RULES ========= -->
+            <section class="block" id="rules">
+                <div class="page-intro">
+                    <h2>စည်းမျဉ်း ခြောက်ချက်</h2>
+                    <p>ဒီဇိုင်း ဆုံးဖြတ်ချက် တိုင်းက ဒီခြောက်ချက်ထဲက တစ်ခုကို ပြန်ညွှန်းနိုင်ရပါမယ်</p>
+                </div>
+
+                <div class="card">
+                    <div class="rule">
+                        <span class="no">1</span>
+                        <div>
+                            <h3>ခ က မျက်နှာပြင်ပေါ်မှာ အကြီးဆုံး</h3>
+                            <p>ခရီးသည် ဆုံးဖြတ်တာက ကိန်းဂဏန်းတစ်ခုပါ။ ကိန်းဂဏန်းက စာလုံးထက် အမြဲ လွယ်ပါတယ်။</p>
+                            <span class="spec">.fare — 48px / Arial Black</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no">2</span>
+                        <div>
+                            <h3>မြန်မာစာက အဓိက၊ အင်္ဂလိပ်က ဒုတိယ</h3>
+                            <p>အင်္ဂလိပ်စာက မြန်မာစာကို ဘယ်တော့မှ အစားမထိုးပါ။ ဒါပေမဲ့ မြန်မာစာ မဖတ်တတ်သူအတွက် တစ်ခုတည်းသော လမ်းညွှန်ဖြစ်လို့ 12px အောက် ဘယ်တော့မှ မငယ်ရပါ။</p>
+                            <span class="spec">.en — 12px minimum, never smaller</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no">3</span>
+                        <div>
+                            <h3>Icon တစ်ခုတည်း ဘယ်တော့မှ မထား</h3>
+                            <p>ခလုတ်တိုင်းမှာ icon နဲ့ စာလုံး တွဲပါတယ်။ Icon က အဓိပ္ပာယ်ကို သယ်ဆောင်တာ မဟုတ်ဘဲ အလျင်မြန် ရှာတွေ့စေဖို့ပါ။</p>
+                            <span class="spec">aria-hidden="true" on every icon</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no">4</span>
+                        <div>
+                            <h3>နံပါတ်ပြားက အမှတ်အသား</h3>
+                            <p>ရန်ကုန်ခရီးသည်က ဘတ်စ်ကားကို လမ်းတစ်ဖက်ကနေ နံပါတ်နဲ့ အရောင်နဲ့ မှတ်မိပါတယ်။ Interface ကလည်း အတူတူပဲ လုပ်ပါတယ်။</p>
+                            <span class="spec">.plate — sm / default / lg</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no">5</span>
+                        <div>
+                            <h3>ဘောင်က နက်ပြာ၊ အလယ်က စာရွက်</h3>
+                            <p>Sidebar နဲ့ auth စာမျက်နှာက နက်ပြာ။ Content က အလင်း။ နံပါတ်ပြားတွေက အနက်ပေါ်မှာမှ ထင်းပါတယ်။</p>
+                            <span class="spec">--navy-800 chrome / --paper content</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no">6</span>
+                        <div>
+                            <h3>မရနိုင်တာကို မှိန်မပြ — စကားနဲ့ ပြော</h3>
+                            <p><code>opacity</code> က စာသား၊ နောက်ခံ၊ ဘောင် အားလုံးကို တစ်ပြိုင်နက် မှိန်စေလို့ အရေးအကြီးဆုံး အချက်အလက် — အကြောင်းရင်း — ပါ မှိန်သွားပါတယ်။ ဘေးဘောင်နဲ့ စာသားနဲ့ ပြောပါတယ်။</p>
+                            <span class="spec">.is-blocked — no opacity anywhere in the system</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =========================================== COLOR ========= -->
+            <section class="block" id="color">
+                <div class="page-intro">
+                    <h2>အရောင်</h2>
+                    <p>လမ်းကြောင်း အရောင်တွေက ဆုံးဖြတ်ချက် သယ်ဆောင်ပါတယ် — အလှဆင်တာ မဟုတ်ပါ</p>
+                </div>
+
+                <h3 style="font-size:15px;margin-bottom:10px">လမ်းကြောင်း <span class="en" style="display:inline">Routes — always paired with the number, never colour alone</span></h3>
+                <div class="grid-3" style="margin-bottom:22px">
+                    <div class="swatch"><div class="fill" style="background:var(--r36)"></div>
+                        <div class="meta"><div class="nm">Route 36</div><div class="hx">#E11D48</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--r43)"></div>
+                        <div class="meta"><div class="nm">Route 43</div><div class="hx">#059669</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--r61)"></div>
+                        <div class="meta"><div class="nm">Route 61</div><div class="hx">#4338CA</div></div></div>
+                </div>
+
+                <h3 style="font-size:15px;margin-bottom:10px">ဘောင် <span class="en" style="display:inline">Navy chrome</span></h3>
+                <div class="grid-4" style="margin-bottom:22px">
+                    <div class="swatch"><div class="fill" style="background:var(--navy-900)"></div>
+                        <div class="meta"><div class="nm">navy-900</div><div class="hx">#060A14</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--navy-800)"></div>
+                        <div class="meta"><div class="nm">navy-800</div><div class="hx">#0B1220</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--navy-700)"></div>
+                        <div class="meta"><div class="nm">navy-700</div><div class="hx">#141E33</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--navy-600)"></div>
+                        <div class="meta"><div class="nm">navy-600</div><div class="hx">#1F2C47</div></div></div>
+                </div>
+
+                <h3 style="font-size:15px;margin-bottom:10px">အဓိပ္ပာယ်ရှိ အရောင် <span class="en" style="display:inline">Semantic — each has exactly one job</span></h3>
+                <div class="grid-4">
+                    <div class="swatch"><div class="fill" style="background:var(--accent)"></div>
+                        <div class="meta"><div class="nm">Accent — actions</div><div class="hx">#1D4ED8</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--ok)"></div>
+                        <div class="meta"><div class="nm">OK — allowed</div><div class="hx">#15803D</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--warn)"></div>
+                        <div class="meta"><div class="nm">Warn — disruption</div><div class="hx">#B45309</div></div></div>
+                    <div class="swatch"><div class="fill" style="background:var(--danger)"></div>
+                        <div class="meta"><div class="nm">Danger — blocked</div><div class="hx">#B91C1C</div></div></div>
+                </div>
+
+                <div class="notice info" style="margin-top:16px">
+                    <span class="ic" aria-hidden="true">🎖️</span>
+                    <div>
+                        <div class="t">သတ္တုရောင် (brass) — တစ်နေရာတည်းသာ</div>
+                        <div>လူတစ်ယောက် <b>ကြိုးစားပြီး ရရှိလာတာ</b> ကို အမှတ်အသားပြုဖို့ပဲ သုံးပါတယ် — ယာဉ်မောင်း ဘောနပ်စ်။
+                            ဒါက စနစ်တစ်ခုလုံးမှာ တစ်ခုတည်းသော နွေးထွေးတဲ့ အရောင်ဖြစ်လို့ ဘယ်တော့မှ အလှဆင်ဖို့ မသုံးပါဘူး။</div>
+                        <span class="en">#B8863B — earned status only. Never decorative.</span>
+                    </div>
+                </div>
+                <div style="margin-top:14px" class="demo">
+                    <span class="seal"><span class="dot" aria-hidden="true"></span>ဘောနပ်စ် ရရှိ</span>
+                </div>
+            </section>
+
+            <!-- ============================================ TYPE ========= -->
+            <section class="block" id="type">
+                <div class="page-intro">
+                    <h2>စာလုံး</h2>
+                    <p>စာလုံးသုံးမျိုး — တစ်မျိုးစီ တာဝန်တစ်ခုစီ</p>
+                </div>
+
+                <div class="card">
+                    <div class="rule">
+                        <span class="no" style="font-size:15px;font-family:var(--f-en)">My</span>
+                        <div style="flex:1">
+                            <h3 style="font-size:22px">မြန်မာစာ — Padauk</h3>
+                            <p>စာသား အားလုံး။ Line-height <b>1.85</b> — မြန်မာစာက အထက်အောက် သင်္ကေတတွေ ထပ်နေလို့
+                                1.55 ဆိုရင် <span style="font-weight:700">ကျွန်ုပ်</span> နဲ့
+                                <span style="font-weight:700">မြို့</span> တို့မှာ ထိပါတယ်။</p>
+                            <span class="spec">--f-my · fallback: Myanmar Text, Noto Sans Myanmar</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" style="font-size:15px;font-family:var(--f-en)">En</span>
+                        <div style="flex:1">
+                            <h3 style="font-family:var(--f-en);font-size:19px">English — Inter</h3>
+                            <p>ဒုတိယလိုင်း၊ ကိန်းဂဏန်း၊ label။ အနိမ့်ဆုံး 12px။</p>
+                            <span class="spec">--f-en · fallback: Segoe UI, system-ui</span>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" style="font-size:15px;font-family:var(--f-en)">Dp</span>
+                        <div style="flex:1">
+                            <h3 style="font-family:var(--f-display);font-size:26px;letter-spacing:-.02em">36 · 400 Ks · 94%</h3>
+                            <p>နံပါတ်ပြားနဲ့ ခေါင်းစီး ကိန်းဂဏန်းများသာ။ ဆိုင်းဘုတ်ဆိုတာ သပ်ရပ်ဖို့ မဟုတ်ဘဲ
+                                အဝေးကနေ ဖတ်လို့ရဖို့ပါ — ဒါကြောင့် ထူထဲပြီး ကျဉ်းတဲ့ စာလုံးကို သုံးပါတယ်။</p>
+                            <span class="spec">--f-display · Arial Black. Used sparingly, never for prose.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =========================================== PLATE ========= -->
+            <section class="block" id="plate">
+                <div class="page-intro">
+                    <h2>နံပါတ်ပြား <span class="en" style="display:inline">The route plate — the signature element</span></h2>
+                    <p>ရုပ်ပုံသဏ္ဌာန်က မှတ်တိုင်ဆိုင်းဘုတ်က လာပါတယ် — ချိတ်ဆွဲရာ အက်ကွက်၊ အပေါ်မှာ အလင်းတန်း၊ အောက်မှာ အရိပ်</p>
+                </div>
+
+                <div class="card">
+                    <div class="demo" style="gap:26px;margin-bottom:20px">
+                        <div style="text-align:center">
+                            <span class="plate sm" data-route="36">36</span>
+                            <div class="spec" style="margin-top:8px">.plate.sm — 15px<br>ဇယား၊ စာကြောင်း</div>
+                        </div>
+                        <div style="text-align:center">
+                            <span class="plate" data-route="43">43</span>
+                            <div class="spec" style="margin-top:8px">.plate — 22px<br>ကတ်၊ ရလဒ်</div>
+                        </div>
+                        <div style="text-align:center">
+                            <span class="plate lg" data-route="61">61</span>
+                            <div class="spec" style="margin-top:8px">.plate.lg — 44px<br>ခေါင်းစီး</div>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <p class="muted" style="font-size:14px;margin:0 0 16px">
+                        ပြားတွေကို ချိတ်တန်းပေါ်မှာ စီလိုက်ရင် <b>မှတ်တိုင်ဆိုင်းဘုတ်</b> ဖြစ်သွားပါတယ် —
+                        login စာမျက်နှာရဲ့ ခေါင်းစီး ဒါပါပဲ။
+                    </p>
+                    <div style="background:var(--navy-900);border-radius:var(--r-md);padding:26px 24px 24px">
+                        <div class="board">
+                            <div class="rail-bar" aria-hidden="true"></div>
+                            <div class="hangers">
+                                <span class="plate lg" data-route="36">36</span>
+                                <span class="plate lg" data-route="43">43</span>
+                                <span class="plate lg" data-route="61">61</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================================== CONTROLS ========= -->
+            <section class="block" id="controls">
+                <div class="page-intro">
+                    <h2>ခလုတ်နှင့် ကွက်လပ်</h2>
+                    <p>အနိမ့်ဆုံး ထိတွေ့ဧရိယာ <b>44 × 44 px</b> — WCAG 2.5.5</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size:15px;margin-bottom:12px">ခလုတ် <span class="en" style="display:inline">Buttons</span></h3>
+                    <div class="demo" style="margin-bottom:20px">
+                        <button class="btn btn-primary"><span aria-hidden="true">→</span> အဓိက</button>
+                        <button class="btn btn-outline"><span aria-hidden="true">＋</span> အနားသတ်</button>
+                        <button class="btn btn-quiet"><span aria-hidden="true">✎</span> တိတ်ဆိတ်</button>
+                        <button class="btn btn-danger"><span aria-hidden="true">⏻</span> အန္တရာယ်</button>
+                        <button class="btn" disabled><span aria-hidden="true">✓</span> မရနိုင်</button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3 style="font-size:15px;margin-bottom:12px">အပိုင်းခွဲ ခလုတ် <span class="en" style="display:inline">Segmented control — 2 to 3 options only</span></h3>
+                    <div class="seg" style="max-width:400px;margin-bottom:20px" role="tablist">
+                        <button type="button" role="tab" aria-selected="true">ခရီးသည်<span class="en">Passenger</span></button>
+                        <button type="button" role="tab" aria-selected="false">ယာဉ်မောင်း<span class="en">Driver</span></button>
+                        <button type="button" role="tab" aria-selected="false">စီမံခန့်ခွဲသူ<span class="en">Admin</span></button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3 style="font-size:15px;margin-bottom:12px">ရွေးချယ်မှု chip <span class="en" style="display:inline">Toggle chips — icon and word, always both</span></h3>
+                    <div class="chips" style="margin-bottom:20px">
+                        <button type="button" class="chip" aria-pressed="true">
+                            <span class="ic" aria-hidden="true">🎓</span>ကျောင်းသား<span class="en">Student</span>
+                        </button>
+                        <button type="button" class="chip" aria-pressed="false">
+                            <span class="ic" aria-hidden="true">🧡</span>သံဃာ<span class="en">Monk</span>
+                        </button>
+                        <button type="button" class="chip" aria-pressed="false">
+                            <span class="ic" aria-hidden="true">♿</span>သွားလာမှု အခက်အခဲ<span class="en">Wheelchair</span>
+                        </button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3 style="font-size:15px;margin-bottom:12px">ကွက်လပ် <span class="en" style="display:inline">Fields</span></h3>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="d1">ပုံမှန် <span class="en">Default</span></label>
+                            <div class="control">
+                                <span class="ic" aria-hidden="true">🚏</span>
+                                <input id="d1" type="text" placeholder="မှတ်တိုင် ရွေးပါ">
+                            </div>
+                            <div class="field-msg hint"><span aria-hidden="true">↪</span><span>လမ်းညွှန်ချက် ဒီနေရာမှာ</span></div>
+                        </div>
+                        <div class="field">
+                            <label for="d2">အမှား <span class="en">Error — says what to do, not sorry</span></label>
+                            <div class="control err">
+                                <span class="ic" aria-hidden="true">📱</span>
+                                <input id="d2" type="tel" value="09-77" aria-invalid="true" aria-describedby="d2e">
+                            </div>
+                            <div class="field-msg err" id="d2e">
+                                <span aria-hidden="true">✕</span><span>ဖုန်းနံပါတ်က ဂဏန်း ၁၁ လုံး ဖြစ်ရပါမယ်</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================================== SURFACES ========= -->
+            <section class="block" id="surfaces">
+                <div class="page-intro">
+                    <h2>ကတ်၊ ကိန်းဂဏန်းနှင့် ဇယား</h2>
+                </div>
+
+                <div class="grid-3" style="margin-bottom:16px">
+                    <div class="stat accent">
+                        <div class="k">အလေးထားချက်<span class="en">Highlighted stat</span></div>
+                        <div class="v">24</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">ပုံမှန်<span class="en">Regular stat</span></div>
+                        <div class="v">4,800<small> ကျပ်</small></div>
+                    </div>
+                    <div class="card" style="display:flex;align-items:center;justify-content:center">
+                        <div style="text-align:center">
+                            <div class="fare">400<small> ကျပ်</small></div>
+                            <span class="en">.fare — the largest thing on any screen it appears on</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo" style="margin-bottom:16px">
+                    <span class="badge">ပုံမှန်</span>
+                    <span class="badge info">သတင်းအချက်</span>
+                    <span class="badge ok"><span aria-hidden="true">✓</span>ခွင့်ပြု</span>
+                    <span class="badge warn"><span aria-hidden="true">!</span>သတိပြုရန်</span>
+                    <span class="badge bad"><span aria-hidden="true">✕</span>ပိတ်ပင်</span>
+                    <span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိထားသည်</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="grid">
+                        <thead><tr><th>Driver</th><th>Route</th><th>On time</th><th>Bonus</th></tr></thead>
+                        <tbody>
+                            <tr><td>ဦးမြင့်ဆွေ</td><td><span class="plate sm" data-route="36">36</span></td>
+                                <td class="num">94%</td><td><span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိ</span></td></tr>
+                            <tr><td>ဦးဇော်လင်း</td><td><span class="plate sm" data-route="61">61</span></td>
+                                <td class="num">89%</td><td><span class="badge bad">၉၀% အောက်</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========================================== STATES ========= -->
+            <section class="block" id="states">
+                <div class="page-intro">
+                    <h2>အခြေအနေများ</h2>
+                    <p>အလွတ်၊ စောင့်ဆိုင်း၊ အမှား၊ ပိတ်ပင် — လေးမျိုးလုံး ဒီဇိုင်းဆွဲထားရပါမယ်</p>
+                </div>
+
+                <div class="grid-2" style="margin-bottom:16px">
+                    <div class="empty">
+                        <div class="ic" aria-hidden="true">🚏</div>
+                        <h3>ခရီးစဉ် မတွေ့ပါ</h3>
+                        <p>ဒီမှတ်တိုင်နှစ်ခုကြား တိုက်ရိုက် လမ်းကြောင်း မရှိပါ။
+                            အနီးအနားက မှတ်တိုင်တစ်ခု စမ်းကြည့်ပါ။</p>
+                        <button class="btn btn-outline"><span aria-hidden="true">🔍</span> အခြားမှတ်တိုင် ရွေးမည်</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="row" style="gap:14px;margin-bottom:14px">
+                            <div class="skel" style="width:96px;height:76px"></div>
+                            <div style="flex:1">
+                                <div class="skel" style="height:15px;width:74%;margin-bottom:9px"></div>
+                                <div class="skel" style="height:15px;width:52%"></div>
+                            </div>
+                        </div>
+                        <div class="skel" style="height:15px;width:88%;margin-bottom:9px"></div>
+                        <div class="skel" style="height:15px;width:60%"></div>
+                        <p class="muted" style="font-size:13px;margin:14px 0 0">
+                            ရှာနေသည်… <span class="en">Skeletons keep the layout still — content
+                            arrives into a shape the eye has already found.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stack" style="margin-bottom:16px">
+                    <div class="notice bad">
+                        <span class="ic" aria-hidden="true">✕</span>
+                        <div>
+                            <div class="t">ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ</div>
+                            <div>ခဏအကြာမှာ ထပ်စမ်းပါ။ Internet ချိတ်ဆက်မှု စစ်ကြည့်ပါ။</div>
+                            <span class="en">Errors say what happened and what to do. They never apologise
+                                and they are never vague.</span>
+                        </div>
+                    </div>
+                    <div class="notice warn">
+                        <span class="ic" aria-hidden="true">🌊</span>
+                        <div>
+                            <div class="t">တာမွေ လမ်းပိုင်း ရေကြီးနေသည်</div>
+                            <span class="en">Disruption — advisory, not an error</span>
+                        </div>
+                    </div>
+                    <div class="notice ok">
+                        <span class="ic" aria-hidden="true">✓</span>
+                        <div>
+                            <div class="t">ဒီခရီးစဉ်က သင့်နဲ့ ကိုက်ညီပါတယ်</div>
+                            <span class="en">Every option states its verdict — nothing disappears silently</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card is-blocked">
+                    <div class="row" style="gap:20px;align-items:flex-start">
+                        <div class="fare">1,400<small> ကျပ်</small></div>
+                        <div style="flex:1;min-width:180px">
+                            <div class="row" style="gap:6px">
+                                <span class="plate sm" data-route="36">36</span>
+                                <span class="muted">→</span>
+                                <span class="plate sm" data-route="43">43</span>
+                                <span class="muted">→</span>
+                                <span class="plate sm" data-route="61">61</span>
+                            </div>
+                            <div class="en" style="margin-top:8px">77 min · 3 transfers</div>
+                        </div>
+                    </div>
+                    <div class="notice bad" style="margin-top:14px">
+                        <span class="ic" aria-hidden="true">✕</span>
+                        <div>
+                            <div class="t">ကိုယ်ဝန်ဆောင်အတွက် ကူးပြောင်းမှု များလွန်းသည်</div>
+                            <span class="en">Rule 6 in action — the card is set apart by a bar and a
+                                plain surface, but the reason stays at full contrast.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================ A11Y ========= -->
+            <section class="block" id="a11y">
+                <div class="page-intro">
+                    <h2>လက်လှမ်းမီမှု <span class="en" style="display:inline">Accessibility floor</span></h2>
+                    <p>ဒါတွေက ရွေးချယ်စရာ မဟုတ်ပါ — အနိမ့်ဆုံး စံပါ</p>
+                </div>
+
+                <div class="card">
+                    <div class="rule">
+                        <span class="no" aria-hidden="true">⌨</span>
+                        <div>
+                            <h3>Keyboard focus မြင်ရမယ်</h3>
+                            <p>ခလုတ်တိုင်း၊ link တိုင်း၊ ကွက်လပ်တိုင်းမှာ <code>:focus-visible</code> ရှိပါတယ် —
+                                နက်ပြာပေါ်မှာ ပိုလင်းတဲ့ အပြာ သုံးပါတယ်။ Tab ခေါက်ကြည့်ပါ။</p>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" aria-hidden="true">👆</span>
+                        <div>
+                            <h3>ထိတွေ့ဧရိယာ 44px</h3>
+                            <p>လက်ချောင်းအတွက် အနိမ့်ဆုံးပါ။ ဘတ်စ်ကား လှုပ်နေချိန်မှာ နှိပ်ရမှာဖြစ်လို့
+                                တင်းကျပ်စွာ လိုက်နာပါတယ်။</p>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" aria-hidden="true">🎨</span>
+                        <div>
+                            <h3>အရောင်တစ်ခုတည်းကို ဘယ်တော့မှ မမှီ</h3>
+                            <p>လမ်းကြောင်း အနီ (36) နဲ့ အစိမ်း (43) က အရောင်မကွဲသူ အများဆုံး အမျိုးအစားပါ။
+                                ဒါကြောင့် ပြားတိုင်းမှာ <b>နံပါတ်</b> ရေးထားပါတယ်။ Badge တိုင်းမှာ စာသား ပါပါတယ်။</p>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" aria-hidden="true">🔊</span>
+                        <div>
+                            <h3>အသိပေးချက်ကို screen reader ဖတ်ပါတယ်</h3>
+                            <p>ဆင်းရမယ့် မှတ်တိုင် အသိပေးချက်မှာ <code>role="alert"</code> နဲ့
+                                <code>aria-live="assertive"</code> ရှိလို့ ရုတ်တရက် ပေါ်လာတာကို ဖတ်ပြပါတယ်။</p>
+                        </div>
+                    </div>
+                    <div class="rule">
+                        <span class="no" aria-hidden="true">🎞</span>
+                        <div>
+                            <h3>လှုပ်ရှားမှု လျှော့ချမှုကို လေးစားပါတယ်</h3>
+                            <p><code>prefers-reduced-motion</code> ဖွင့်ထားရင် animation အားလုံး ရပ်ပါတယ်။</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<script src="ui.js"></script>
+</body>
+</html>

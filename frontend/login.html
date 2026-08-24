@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ဝင်ရောက်ရန် — YBS</title>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<div class="auth">
+
+    <!-- ===== The board. Three plates on a rail, the way a stop announces
+              which buses call there. This is the identity of the whole site. -->
+    <div class="authside">
+        <div class="mark">
+            <a href="home.html" style="display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit">
+            <span class="plate sm" data-route="36">36</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Yangon Bus Service</span>
+            </div>
+            </a>
+        </div>
+
+        <div class="pitch">
+            <div class="board" style="margin-bottom:30px">
+                <div class="rail-bar" aria-hidden="true"></div>
+                <div class="hangers">
+                    <span class="plate lg" data-route="36">36</span>
+                    <span class="plate lg" data-route="43">43</span>
+                    <span class="plate lg" data-route="61">61</span>
+                </div>
+            </div>
+
+            <h2>ဘယ်ကားစီးရမလဲ<br>အတိအကျ သိပါစေ</h2>
+            <p>လမ်းကြောင်း၊ အချိန်နဲ့ ခ — သုံးခုလုံးကို တစ်နေရာတည်းမှာ။
+               ဆင်းရမယ့် မှတ်တိုင် နီးလာရင် ကြိုအသိပေးပါတယ်။</p>
+            <span class="en">Plan a trip, watch the bus move, and get told when
+                to get off. Fares follow the concession rules automatically.</span>
+        </div>
+
+        <div class="netline">
+            <div>
+                <div class="n">3</div>
+                <div class="l">Routes</div>
+            </div>
+            <div>
+                <div class="n">28</div>
+                <div class="l">Stops</div>
+            </div>
+            <div>
+                <div class="n">6</div>
+                <div class="l">Buses live</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Forms ===================================================== -->
+    <div class="authmain" data-seg-group>
+
+        <!-- ---------------------------------------------------- SIGN IN -->
+        <div class="authbox" data-panel-id="signin">
+            <h1>ပြန်လည် ကြိုဆိုပါတယ်</h1>
+            <p class="lede en" style="font-size:13px">Sign in to continue</p>
+
+            <div class="field">
+                <label id="role-label">ဘယ်အနေနဲ့ ဝင်မလဲ
+                    <span class="en">Choose your account type</span>
+                </label>
+                <div class="seg" id="role-seg" role="tablist" aria-labelledby="role-label">
+                    <button type="button" role="tab" aria-selected="true"
+                            data-role="passenger" data-id="ဖုန်းနံပါတ်" data-iden="Phone number"
+                            data-ph="09-xxx xxx xxx" data-type="tel">
+                        ခရီးသည်<span class="en">Passenger</span>
+                    </button>
+                    <button type="button" role="tab" aria-selected="false"
+                            data-role="driver" data-id="ယာဉ်မောင်း အမှတ်" data-iden="Driver ID"
+                            data-ph="D-1042" data-type="text">
+                        ယာဉ်မောင်း<span class="en">Driver</span>
+                    </button>
+                    <button type="button" role="tab" aria-selected="false"
+                            data-role="admin" data-id="အီးမေးလ်" data-iden="Work email"
+                            data-ph="name@ybs.gov.mm" data-type="email">
+                        စီမံခန့်ခွဲသူ<span class="en">Admin</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="ident"><span id="ident-my">ဖုန်းနံပါတ်</span>
+                    <span class="en" id="ident-en">Phone number</span>
+                </label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">👤</span>
+                    <input id="ident" type="tel" placeholder="09-xxx xxx xxx" autocomplete="username">
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="pw">စကားဝှက် <span class="en">Password</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">🔒</span>
+                    <input id="pw" type="password" placeholder="••••••••" autocomplete="current-password">
+                    <button type="button" class="reveal" data-reveal="pw" aria-label="စကားဝှက် ပြရန်">👁</button>
+                </div>
+                <div class="field-msg hint">
+                    <span aria-hidden="true">↪</span>
+                    <span>စကားဝှက် မေ့သွားရင် <a href="#" data-goto="reset">ပြန်လည်သတ်မှတ်ပါ</a></span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" id="signin-btn">
+                <span aria-hidden="true">→</span> ဝင်မည် <span class="en">Sign in</span>
+            </button>
+
+            <div class="notice info" style="margin-top:18px">
+                <span class="ic" aria-hidden="true">ⓘ</span>
+                <div>
+                    <div class="t">ဒါက ဒီဇိုင်း နမူနာပါ</div>
+                    <span class="en">Design mockup — no account is checked. Any button
+                        takes you to that role's screens.</span>
+                </div>
+            </div>
+
+            <div class="authfoot">
+                အကောင့် မရှိသေးဘူးလား?
+                <a href="register.html">ခရီးသည်အနေနဲ့ အကောင့်ဖွင့်ပါ</a>
+                <span class="en" style="margin-top:6px">
+                    <a href="home.html">← ပင်မ စာမျက်နှာသို့ ပြန်သွားမည်</a>
+                </span><br>
+                <span class="en" style="margin-top:6px">Driver and admin accounts are
+                    issued by the depot office, not opened here.</span>
+            </div>
+        </div>
+
+        <!-- ----------------------------------------------------- SIGN UP -->
+        <div class="authbox hidden" data-panel-id="signup">
+            <h1>အကောင့်ဖွင့်မည်</h1>
+            <p class="lede">ဖုန်းနံပါတ်နဲ့ အမည်လောက်ပဲ လိုပါတယ်။
+                <span class="en">Two fields, then you can plan a trip.</span>
+            </p>
+
+            <div class="field">
+                <label for="su-name">အမည် <span class="en">Full name</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">👤</span>
+                    <input id="su-name" type="text" placeholder="ဦးကျော်မင်း">
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="su-phone">ဖုန်းနံပါတ် <span class="en">Phone number</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">📱</span>
+                    <input id="su-phone" type="tel" placeholder="09-xxx xxx xxx">
+                </div>
+                <div class="field-msg hint">
+                    <span aria-hidden="true">↪</span>
+                    <span>အတည်ပြုကုဒ် ဒီနံပါတ်ကို ပို့ပါမယ်</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="su-pw">စကားဝှက် <span class="en">Password</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">🔒</span>
+                    <input id="su-pw" type="password" placeholder="အနည်းဆုံး ၈ လုံး">
+                    <button type="button" class="reveal" data-reveal="su-pw" aria-label="စကားဝှက် ပြရန်">👁</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>သက်သာခွင့် ရှိပါသလား?
+                    <span class="en">Concessions — these change your fare. You can set them later.</span>
+                </label>
+                <div class="chips">
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">🎓</span>ကျောင်းသား<span class="en">Student</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">🧡</span>သံဃာ<span class="en">Monk</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">👵</span>သက်ကြီး<span class="en">Elderly</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">♿</span>သွားလာမှု အခက်အခဲ<span class="en">Wheelchair</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" data-goto="passenger">
+                <span aria-hidden="true">→</span> အကောင့်ဖွင့်မည် <span class="en">Create account</span>
+            </button>
+
+            <div class="authfoot">
+                အကောင့် ရှိပြီးသားလား? <a href="#" data-goto="signin">ဝင်မည်</a>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ RESET PASSWORD -->
+        <div class="authbox hidden" data-panel-id="reset">
+            <h1>စကားဝှက် ပြန်သတ်မှတ်မည်</h1>
+            <p class="lede">မှတ်ပုံတင်ထားတဲ့ ဖုန်းနံပါတ်ကို ရိုက်ထည့်ပါ။ ကုဒ် ၆ လုံး ပို့ပါမယ်။
+                <span class="en">We send a six-digit code to the number on the account.</span>
+            </p>
+
+            <div class="field">
+                <label for="rs-phone">ဖုန်းနံပါတ် <span class="en">Phone number</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">📱</span>
+                    <input id="rs-phone" type="tel" placeholder="09-xxx xxx xxx">
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block"
+                    data-mock-submit="ကုဒ် ပို့ပြီးပါပြီ|Code sent — check your messages">
+                <span aria-hidden="true">✉</span> ကုဒ် ပို့မည် <span class="en">Send code</span>
+            </button>
+
+            <div class="authfoot">
+                <a href="#" data-goto="signin">← ဝင်ရောက်ရန် စာမျက်နှာသို့ ပြန်သွားမည်</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="ui.js"></script>
+<script>
+/* The identity field is not one field with a vague label — it is whatever the
+   chosen role actually carries. A driver has a staff ID; a rider has a phone. */
+const seg = document.getElementById('role-seg');
+const ident = document.getElementById('ident');
+let role = 'passenger';
+
+seg.addEventListener('seg:change', e => {
+    role = e.detail.role;
+    document.getElementById('ident-my').textContent = e.detail.id;
+    document.getElementById('ident-en').textContent = e.detail.iden;
+    ident.type = e.detail.type;
+    ident.placeholder = e.detail.ph;
+    ident.value = '';
+});
+
+document.getElementById('signin-btn').addEventListener('click', () => {
+    window.location.href =
+        role === 'driver' ? 'driver.html' :
+        role === 'admin'  ? 'admin.html'  : 'passenger.html';
+});
+
+/* Panel switching for the three auth states. */
+document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', ev => {
+        const to = el.dataset.goto;
+        if (to === 'passenger') { window.location.href = 'passenger.html'; return; }
+        ev.preventDefault();
+        document.querySelectorAll('[data-panel-id]').forEach(p =>
+            p.classList.toggle('hidden', p.dataset.panelId !== to));
+        document.querySelector('.authmain').scrollTop = 0;
+    });
+});
+</script>
+</body>
+</html>

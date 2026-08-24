@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>အကောင့်ဖွင့်ရန် — YBS</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+/* Registration only: a two-step progress marker. The steps are numbered
+   because they genuinely happen in order and the rider needs to know how
+   many are left. */
+.steps { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+.steps .s { display: flex; align-items: center; gap: 9px; }
+.steps .b {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--f-display); font-size: 13px;
+    background: var(--surface-2); color: var(--ink-3);
+    border: 1px solid var(--line);
+}
+.steps .s[data-on="true"] .b { background: var(--accent); color: #fff; border-color: var(--accent); }
+.steps .s[data-on="true"] .t { color: var(--ink); font-weight: 700; }
+.steps .t { font-size: 13px; color: var(--ink-3); }
+.steps .bar { flex: 1; height: 2px; background: var(--line); border-radius: 2px; min-width: 20px; }
+
+.terms { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; }
+.terms input {
+    width: 22px; height: 22px; margin: 2px 0 0;
+    accent-color: var(--accent); cursor: pointer; flex: none;
+}
+.terms label { font-size: 14px; cursor: pointer; }
+
+/* Six-digit code entry. Separate boxes because a rider copies the digits from
+   an SMS one at a time, and losing your place in a single field is the most
+   common way this step fails. */
+.code { display: flex; gap: 10px; }
+.code input {
+    width: 52px; height: 60px;
+    text-align: center;
+    border: 1px solid var(--line); border-radius: var(--r-sm);
+    background: var(--surface);
+    font-family: var(--f-display); font-size: 24px; color: var(--ink);
+    outline: none;
+}
+.code input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+@media (max-width: 420px) { .code input { width: 42px; height: 52px; font-size: 20px; } }
+</style>
+</head>
+<body>
+
+<div class="auth">
+
+    <!-- ===== hero side ================================================== -->
+    <div class="authside">
+        <a class="mark" href="home.html" style="text-decoration:none;color:inherit">
+            <span class="plate sm" data-route="43">43</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Yangon Bus Service</span>
+            </div>
+        </a>
+
+        <div class="pitch">
+            <div class="board" style="margin-bottom:30px">
+                <div class="rail-bar" aria-hidden="true"></div>
+                <div class="hangers">
+                    <span class="plate lg" data-route="36">36</span>
+                    <span class="plate lg" data-route="43">43</span>
+                    <span class="plate lg" data-route="61">61</span>
+                </div>
+            </div>
+
+            <h2>အကောင့်တစ်ခုနဲ့<br>ခရီးစဉ်တွေ သိမ်းထားလို့ရမယ်</h2>
+            <p>ပုံမှန် သွားနေကျ လမ်းကြောင်းတွေ သိမ်းထားပါ။ သက်သာခွင့် တစ်ခါ သတ်မှတ်ထားရင်
+               ခရီးစဉ်တိုင်းမှာ ခ အလိုအလျောက် ကျပါတယ်။</p>
+            <span class="en">Save the trips you take often, and set your concession once —
+                every fare after that is worked out for you.</span>
+        </div>
+
+        <div class="netline">
+            <div><div class="n">3</div><div class="l">Routes</div></div>
+            <div><div class="n">28</div><div class="l">Stops</div></div>
+            <div><div class="n">6</div><div class="l">Buses live</div></div>
+        </div>
+    </div>
+
+    <!-- ===== form side ================================================== -->
+    <div class="authmain">
+
+        <!-- ------------------------------------------------ step 1: details -->
+        <div class="authbox" data-step="1">
+            <div class="steps">
+                <div class="s" data-on="true">
+                    <span class="b" aria-hidden="true">1</span>
+                    <span class="t">အချက်အလက်</span>
+                </div>
+                <span class="bar" aria-hidden="true"></span>
+                <div class="s" data-on="false">
+                    <span class="b" aria-hidden="true">2</span>
+                    <span class="t">အတည်ပြုခြင်း</span>
+                </div>
+            </div>
+
+            <h1>အကောင့်ဖွင့်မည်</h1>
+            <p class="lede">ခရီးသည် အကောင့်ပါ။ ဖုန်းနံပါတ်နဲ့ အမည်လောက်ပဲ လိုပါတယ်။
+                <span class="en">Passenger account. Driver and admin accounts are issued
+                    by the depot office.</span>
+            </p>
+
+            <div class="field">
+                <label for="rg-name">အမည် <span class="en">Full name</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">👤</span>
+                    <input id="rg-name" type="text" placeholder="ဦးကျော်မင်း" autocomplete="name">
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="rg-phone">ဖုန်းနံပါတ် <span class="en">Phone number</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">📱</span>
+                    <input id="rg-phone" type="tel" placeholder="09-xxx xxx xxx" autocomplete="tel">
+                </div>
+                <div class="field-msg hint">
+                    <span aria-hidden="true">↪</span>
+                    <span>အတည်ပြုကုဒ် ၆ လုံး ဒီနံပါတ်ကို ပို့ပါမယ်</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="rg-pw">စကားဝှက် <span class="en">Password</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">🔒</span>
+                    <input id="rg-pw" type="password" placeholder="အနည်းဆုံး ၈ လုံး" autocomplete="new-password">
+                    <button type="button" class="reveal" data-reveal="rg-pw" aria-label="စကားဝှက် ပြရန်">👁</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="rg-pw2">စကားဝှက် ထပ်ရိုက်ပါ <span class="en">Confirm password</span></label>
+                <div class="control">
+                    <span class="ic" aria-hidden="true">🔒</span>
+                    <input id="rg-pw2" type="password" placeholder="••••••••" autocomplete="new-password">
+                    <button type="button" class="reveal" data-reveal="rg-pw2" aria-label="စကားဝှက် ပြရန်">👁</button>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="field">
+                <label id="cc-lbl">သက်သာခွင့် ရှိပါသလား?
+                    <span class="en">Concessions — pick only what applies. You can change these later.</span>
+                </label>
+                <div class="chips" role="group" aria-labelledby="cc-lbl">
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">🎓</span>ကျောင်းသား<span class="en">Student</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">🧡</span>သံဃာ<span class="en">Monk</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">👵</span>သက်ကြီး<span class="en">Elderly</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">🤰</span>ကိုယ်ဝန်ဆောင်<span class="en">Pregnant</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">♿</span>သွားလာမှု အခက်အခဲ<span class="en">Wheelchair</span>
+                    </button>
+                    <button type="button" class="chip" aria-pressed="false">
+                        <span class="ic" aria-hidden="true">💳</span>ကတ်ရှိ<span class="en">Has card</span>
+                    </button>
+                </div>
+                <div class="field-msg hint" style="margin-top:12px">
+                    <span aria-hidden="true">ⓘ</span>
+                    <span>ကျောင်းသား သက်သာခွင့်က <b>ကတ်ရှိမှသာ</b> အလုပ်လုပ်ပါတယ်။ သံဃာက အခမဲ့ဖြစ်ပြီး အခြားစည်းမျဉ်းအားလုံးထက် ဦးစားပေးပါတယ်။</span>
+                </div>
+            </div>
+
+            <div class="terms">
+                <input type="checkbox" id="rg-terms">
+                <label for="rg-terms">စည်းကမ်းချက်များနှင့် ကိုယ်ရေးကိုယ်တာ မူဝါဒကို သဘောတူပါသည်။
+                    <span class="en">I agree to the terms and privacy policy.</span>
+                </label>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" id="to-step2">
+                <span aria-hidden="true">→</span> ဆက်လုပ်မည် <span class="en">Continue</span>
+            </button>
+
+            <div class="authfoot">
+                အကောင့် ရှိပြီးသားလား? <a href="login.html">ဝင်မည်</a>
+                <span class="en" style="margin-top:6px">
+                    <a href="home.html">← ပင်မ စာမျက်နှာသို့ ပြန်သွားမည်</a>
+                </span>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------- step 2: verify -->
+        <div class="authbox hidden" data-step="2">
+            <div class="steps">
+                <div class="s" data-on="true">
+                    <span class="b" aria-hidden="true">✓</span>
+                    <span class="t">အချက်အလက်</span>
+                </div>
+                <span class="bar" style="background:var(--accent)" aria-hidden="true"></span>
+                <div class="s" data-on="true">
+                    <span class="b" aria-hidden="true">2</span>
+                    <span class="t">အတည်ပြုခြင်း</span>
+                </div>
+            </div>
+
+            <h1>ကုဒ် ရိုက်ထည့်ပါ</h1>
+            <p class="lede">ကုဒ် ၆ လုံးကို <b id="sent-to">09-xxx xxx xxx</b> ဆီ ပို့လိုက်ပါပြီ။
+                <span class="en">Enter the six digits we just sent.</span>
+            </p>
+
+            <div class="field">
+                <label id="code-lbl">အတည်ပြုကုဒ် <span class="en">Verification code</span></label>
+                <div class="code" role="group" aria-labelledby="code-lbl">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၁">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၂">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၃">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၄">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၅">
+                    <input type="text" inputmode="numeric" maxlength="1" aria-label="ကုဒ် ၆">
+                </div>
+                <div class="field-msg hint">
+                    <span aria-hidden="true">↪</span>
+                    <span>ကုဒ် မရောက်ဘူးလား? <a href="#" id="resend">ပြန်ပို့ပါ</a></span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" id="finish">
+                <span aria-hidden="true">✓</span> အကောင့် ဖွင့်မည် <span class="en">Create account</span>
+            </button>
+
+            <div class="notice info" style="margin-top:18px">
+                <span class="ic" aria-hidden="true">ⓘ</span>
+                <div>
+                    <div class="t">ဒါက ဒီဇိုင်း နမူနာပါ</div>
+                    <span class="en">Design mockup — no code is sent and none is checked.
+                        Press the button to continue.</span>
+                </div>
+            </div>
+
+            <div class="authfoot">
+                <a href="#" id="back1">← နောက်သို့ ပြန်သွားမည်</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="ui.js"></script>
+<script>
+const step1 = document.querySelector('[data-step="1"]');
+const step2 = document.querySelector('[data-step="2"]');
+
+document.getElementById('to-step2').addEventListener('click', () => {
+    const phone = document.getElementById('rg-phone').value.trim();
+    document.getElementById('sent-to').textContent = phone || '09-xxx xxx xxx';
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+    document.querySelector('.code input').focus();
+});
+
+document.getElementById('back1').addEventListener('click', ev => {
+    ev.preventDefault();
+    step2.classList.add('hidden');
+    step1.classList.remove('hidden');
+});
+
+document.getElementById('finish').addEventListener('click', () => {
+    window.location.href = 'passenger.html';
+});
+
+document.getElementById('resend').addEventListener('click', ev => {
+    ev.preventDefault();
+    toast('ကုဒ် ပြန်ပို့ပြီးပါပြီ', 'Code sent again');
+});
+
+/* Typing advances to the next box; backspace on an empty box goes back. */
+const boxes = [...document.querySelectorAll('.code input')];
+boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+        box.value = box.value.replace(/\D/g, '');
+        if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YBS — ရန်ကုန် ဘတ်စ်ကား ခရီးစဉ်</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+/* ----------------------------------------------------------------------------
+   Landing page only. These styles live here rather than in theme.css because
+   nothing else in the product uses them — a marketing hero is not a component.
+   -------------------------------------------------------------------------- */
+
+/* ---- public top nav ---- */
+.topnav {
+    position: sticky; top: 0; z-index: 80;
+    background: rgba(6,10,20,.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--navy-line);
+    color: var(--on-navy);
+}
+.topnav-in {
+    max-width: 1240px; margin: 0 auto;
+    padding: 12px 26px;
+    display: flex; align-items: center; gap: 26px;
+}
+.topnav .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.topnav .brand .wordmark { font-family: var(--f-display); font-size: 20px; letter-spacing: -.02em; }
+.topnav .brand .sub { font-family: var(--f-en); font-size: 10px; color: var(--on-navy-2); }
+.topnav .links { display: flex; gap: 4px; margin-left: auto; align-items: center; }
+.topnav .links a {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: var(--tap); padding: 9px 15px;
+    border-radius: var(--r-sm);
+    color: var(--on-navy-2); text-decoration: none;
+    font-size: 15px; font-weight: 600;
+}
+.topnav .links a:hover { background: var(--navy-700); color: var(--on-navy); }
+.topnav .links a[aria-current="page"] { color: #fff; background: var(--navy-600); }
+
+/* ---- hero ---- */
+.hero {
+    background: var(--navy-900);
+    background-image:
+        radial-gradient(1100px 520px at 16% 0%, rgba(29,78,216,.34), transparent 62%),
+        radial-gradient(760px 460px at 94% 92%, rgba(67,56,202,.28), transparent 60%);
+    color: var(--on-navy);
+    position: relative; overflow: hidden;
+}
+.hero::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(circle at 42% 42%, #000, transparent 76%);
+    pointer-events: none;
+}
+.hero-in {
+    position: relative;
+    max-width: 1240px; margin: 0 auto;
+    padding: 66px 26px 58px;
+    display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center;
+}
+.hero h1 { font-size: 44px; line-height: 1.45; letter-spacing: -.01em; }
+.hero .lede { font-size: 17px; color: #B7C4DA; margin: 16px 0 0; max-width: 44ch; }
+.hero .lede-en { font-size: 14px; color: #8FA1BE; margin: 10px 0 0; max-width: 56ch; }
+.hero .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+
+.hero-board { display: flex; justify-content: center; }
+.hero-board .board .hangers { gap: 18px; }
+
+/* ---- live strip ---- */
+.strip {
+    background: var(--navy-800);
+    border-top: 1px solid var(--navy-line);
+    color: var(--on-navy);
+}
+.strip-in {
+    max-width: 1240px; margin: 0 auto; padding: 22px 26px;
+    display: flex; gap: 42px; flex-wrap: wrap; align-items: center;
+}
+.strip .n { font-family: var(--f-display); font-size: 30px; line-height: 1.1; }
+.strip .l { font-family: var(--f-en); font-size: 11px; letter-spacing: .07em;
+            text-transform: uppercase; color: var(--on-navy-2); }
+.strip .live { margin-left: auto; }
+
+/* ---- content sections ---- */
+.sec { max-width: 1240px; margin: 0 auto; padding: 58px 26px; }
+.sec-head { margin-bottom: 26px; max-width: 60ch; }
+.sec-head h2 { font-size: 28px; }
+.sec-head p { margin: 8px 0 0; font-size: 15px; color: var(--ink-2); }
+
+/* Numbered steps are used here because the content genuinely is a sequence —
+   a rider does these three things in this order, every trip. */
+.step-n {
+    font-family: var(--f-display); font-size: 15px;
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent-ink);
+    margin-bottom: 14px;
+}
+
+.entry {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-lg); padding: 24px;
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+.entry:hover { border-color: var(--accent); box-shadow: var(--sh-2); transform: translateY(-2px); }
+.entry h3 { font-size: 18px; margin: 14px 0 4px; }
+.entry p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.entry .go { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px;
+             font-size: 14px; font-weight: 700; color: var(--accent); }
+
+.route-card { display: block; text-decoration: none; color: inherit; }
+
+/* ---- footer ---- */
+.foot-site { background: var(--navy-800); color: var(--on-navy); margin-top: 20px; }
+.foot-in { max-width: 1240px; margin: 0 auto; padding: 46px 26px 34px;
+           display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 34px; }
+.foot-in h4 { font-family: var(--f-en); font-size: 11px; letter-spacing: .08em;
+              text-transform: uppercase; color: var(--on-navy-2); margin-bottom: 12px; }
+.foot-in a { display: block; color: #C3D0E4; text-decoration: none;
+             font-size: 14px; padding: 7px 0; }
+.foot-in a:hover { color: #fff; text-decoration: underline; }
+.foot-bar { border-top: 1px solid var(--navy-line); }
+.foot-bar-in { max-width: 1240px; margin: 0 auto; padding: 18px 26px;
+               font-size: 13px; color: var(--on-navy-2); }
+
+@media (max-width: 900px) {
+    .hero-in { grid-template-columns: minmax(0,1fr); gap: 34px; padding: 40px 20px 44px; }
+    .hero h1 { font-size: 30px; }
+    .hero-board { justify-content: flex-start; }
+    .sec { padding: 40px 20px; }
+    .sec-head h2 { font-size: 22px; }
+    .strip-in { gap: 26px; padding: 18px 20px; }
+    .strip .live { margin-left: 0; }
+    .foot-in { grid-template-columns: repeat(2, minmax(0,1fr)); padding: 32px 20px 26px; }
+    .topnav-in { padding: 10px 16px; gap: 12px; }
+    .topnav .brand .sub { display: none; }
+    .topnav .links a { padding: 9px 11px; font-size: 14px; }
+    .topnav .links a .lbl { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================================================== top navigation -->
+<header class="topnav">
+    <div class="topnav-in">
+        <a class="brand" href="home.html">
+            <span class="plate sm" data-route="36">36</span>
+            <span>
+                <span class="wordmark">YBS</span>
+                <span class="sub">Yangon Bus Service</span>
+            </span>
+        </a>
+        <nav class="links" aria-label="အဓိက လမ်းညွှန်">
+            <a href="home.html" aria-current="page"><span aria-hidden="true">🏠</span><span class="lbl">ပင်မ</span></a>
+            <a href="index.html"><span aria-hidden="true">🔍</span><span class="lbl">ခရီးရှာမည်</span></a>
+            <a href="components.html"><span aria-hidden="true">📐</span><span class="lbl">ဒီဇိုင်း</span></a>
+            <a href="login.html"><span aria-hidden="true">→</span><span class="lbl">ဝင်မည်</span></a>
+            <a href="register.html" class="btn btn-primary" style="min-height:40px;padding:8px 16px">
+                <span aria-hidden="true">＋</span> အကောင့်ဖွင့်မည်
+            </a>
+        </nav>
+    </div>
+</header>
+
+<!-- ================================================================ hero -->
+<section class="hero">
+    <div class="hero-in">
+        <div>
+            <h1>ဘယ်ကားစီးရမလဲ<br>အတိအကျ သိပါစေ</h1>
+            <p class="lede">လမ်းကြောင်း၊ အချိန်နဲ့ ခ — သုံးခုလုံးကို တစ်နေရာတည်းမှာ။
+                ဆင်းရမယ့် မှတ်တိုင် နီးလာရင် ကြိုအသိပေးပါတယ်။</p>
+            <p class="lede-en">Plan a trip across the network, watch your bus move on the map,
+                and get told when to get off. Fares follow the concession rules automatically —
+                student, monk, elderly and card holders never have to ask.</p>
+
+            <div class="cta">
+                <a class="btn btn-primary btn-lg" href="index.html">
+                    <span aria-hidden="true">🔍</span> ခရီးရှာမည် 
+                </a>
+                <a class="btn btn-ghost-navy btn-lg" href="register.html">
+                    <span aria-hidden="true">＋</span> အကောင့်ဖွင့်မည်
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-board">
+            <div class="board">
+                <div class="rail-bar" aria-hidden="true"></div>
+                <div class="hangers">
+                    <span class="plate lg" data-route="36">36</span>
+                    <span class="plate lg" data-route="43">43</span>
+                    <span class="plate lg" data-route="61">61</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================= live strip -->
+<div class="strip">
+    <div class="strip-in">
+        <div><div class="n">3</div><div class="l">Routes</div></div>
+        <div><div class="n">28</div><div class="l">Stops</div></div>
+        <div><div class="n">6</div><div class="l">Buses live</div></div>
+        <div><div class="n">400<span style="font-size:15px"> Ks</span></div><div class="l">Base fare</div></div>
+        <span class="badge ok live"><span aria-hidden="true">●</span>ကွန်ရက် ပုံမှန် လည်ပတ်နေသည်</span>
+    </div>
+</div>
+
+<!-- ====================================================== how it works -->
+<section class="sec">
+    <div class="sec-head">
+        <h2>ဘယ်လို အလုပ်လုပ်လဲ</h2>
+        <p>ခရီးစဉ်တိုင်းမှာ သုံးဆင့်ပဲ ရှိပါတယ်</p>
+    </div>
+
+    <div class="grid-3">
+        <div class="card">
+            <div class="step-n" aria-hidden="true">1</div>
+            <h3 style="font-size:18px">ဘယ်ကနေ ဘယ်ကို ပြောပါ</h3>
+            <p class="muted" style="font-size:14px;margin:6px 0 0">
+                မှတ်တိုင်နှစ်ခု ရွေးပါ — ဒါမှမဟုတ် 🎤 နှိပ်ပြီး မြန်မာလို ပြောလိုက်ပါ။
+                ဖြစ်နိုင်တဲ့ လမ်းကြောင်းအားလုံးထဲက အကောင်းဆုံးတွေ ပြပါမယ်။
+            </p>
+            <span class="en" style="margin-top:10px">Type it or say it. Options come back
+                ranked by time, fare and transfers — never one answer pretending to be best.</span>
+        </div>
+
+        <div class="card">
+            <div class="step-n" aria-hidden="true">2</div>
+            <h3 style="font-size:18px">ခ ဘယ်လောက်လဲ ချက်ချင်း သိရမယ်</h3>
+            <p class="muted" style="font-size:14px;margin:6px 0 0">
+                ကျောင်းသား၊ သံဃာ၊ သက်ကြီး — သက်သာခွင့်တွေ အလိုအလျောက် တွက်ပါတယ်။
+                တောင်းစရာ မလိုပါဘူး။
+            </p>
+            <div class="row" style="margin-top:14px;gap:8px">
+                <span class="badge info">🎓 တစ်ဝက်</span>
+                <span class="badge ok">🧡 အခမဲ့</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="step-n" aria-hidden="true">3</div>
+            <h3 style="font-size:18px">ဆင်းရမယ့်အချိန် ကြိုပြောပေးမယ်</h3>
+            <p class="muted" style="font-size:14px;margin:6px 0 0">
+                မှတ်တိုင်နဲ့ ၄၀၀ မီတာ အကွာရောက်တာနဲ့ ဖုန်းမှာ အသိပေးပါတယ်။
+                တစ်ကြိမ်တည်း — ထပ်ခါထပ်ခါ မဟုတ်ပါဘူး။
+            </p>
+            <span class="en" style="margin-top:10px">A 400 m geofence, fired once. You can put
+                the phone away.</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== role entries -->
+<section class="sec" style="padding-top:0">
+    <div class="sec-head">
+        <h2>ဘယ်အနေနဲ့ ဝင်မလဲ</h2>
+        <p>အသုံးပြုသူ သုံးမျိုးအတွက် သီးသန့် စာမျက်နှာ ရှိပါတယ်</p>
+    </div>
+
+    <div class="grid-3">
+        <a class="entry" href="passenger.html">
+            <span class="plate" data-route="43">43</span>
+            <h3>ခရီးသည်</h3>
+            <p>ခရီးစဉ် ရှာမယ်၊ ကားကို မြေပုံပေါ်မှာ ကြည့်မယ်၊ ဆင်းချိန် အသိပေးချက် ရမယ်။
+                သက်သာခွင့် သတ်မှတ်ထားလို့ ခ က အလိုအလျောက် ကျပါတယ်။</p>
+            <span class="go">ခရီးသည် စာမျက်နှာ <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="entry" href="driver.html">
+            <span class="plate" data-route="36">36</span>
+            <h3>ယာဉ်မောင်း</h3>
+            <p>ယနေ့ အလှည့်၊ ကျန်ရှိတဲ့ မှတ်တိုင်၊ လစဉ် အမှတ်နဲ့ ဘောနပ်စ် အခြေအနေ။
+                အဖြစ်အပျက် တစ်ခုခု ရှိရင် ချက်ချင်း တင်ပြလို့ရပါတယ်။</p>
+            <span class="go">ယာဉ်မောင်း စာမျက်နှာ <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="entry" href="admin.html">
+            <span class="plate" data-route="61">61</span>
+            <h3>စီမံခန့်ခွဲသူ</h3>
+            <p>ကွန်ရက် တစ်ခုလုံးရဲ့ အခြေအနေ၊ ကားနှင့် ယာဉ်မောင်း စာရင်း၊ လမ်းကြောင်း စီမံခြင်း၊
+                ရေကြီးမှု ကြေညာခြင်း။</p>
+            <span class="go">စီမံခန့်ခွဲမှု စာမျက်နှာ <span aria-hidden="true">→</span></span>
+        </a>
+    </div>
+</section>
+
+<!-- ========================================================== routes -->
+<section class="sec" style="padding-top:0">
+    <div class="sec-head">
+        <h2>လမ်းကြောင်းများ</h2>
+        <p>ကားတိုင်းကို နံပါတ်နဲ့ အရောင်နဲ့ မှတ်မိပါလိမ့်မယ်</p>
+    </div>
+
+    <div class="grid-3">
+        <a class="card route-card" href="index.html">
+            <div class="row" style="margin-bottom:14px">
+                <span class="plate lg" data-route="36">36</span>
+                <div>
+                    <div style="font-weight:700;font-size:16px">အင်းစိန်ဈေး → ဆူးလေ</div>
+                    <span class="en">Insein Market → Sule Pagoda</span>
+                </div>
+            </div>
+            <div class="leg-line" style="padding-top:0">
+                <span class="where">မှတ်တိုင် ၁၂ ခု<span class="en">12 stops</span></span>
+                <span class="when">58 min</span>
+            </div>
+        </a>
+
+        <a class="card route-card" href="index.html">
+            <div class="row" style="margin-bottom:14px">
+                <span class="plate lg" data-route="43">43</span>
+                <div>
+                    <div style="font-weight:700;font-size:16px">လှည်းတန်း → ဗိုလ်တထောင်</div>
+                    <span class="en">Hledan → Botataung Pagoda</span>
+                </div>
+            </div>
+            <div class="leg-line" style="padding-top:0">
+                <span class="where">မှတ်တိုင် ၁၁ ခု<span class="en">11 stops</span></span>
+                <span class="when">46 min</span>
+            </div>
+        </a>
+
+        <a class="card route-card" href="index.html">
+            <div class="row" style="margin-bottom:14px">
+                <span class="plate lg" data-route="61">61</span>
+                <div>
+                    <div style="font-weight:700;font-size:16px">မြောက်ဒဂုံ → ကျောက်တံတား</div>
+                    <span class="en">North Dagon → Kyauktada</span>
+                </div>
+            </div>
+            <div class="leg-line" style="padding-top:0">
+                <span class="where">မှတ်တိုင် ၁၂ ခု<span class="en">12 stops</span></span>
+                <span class="when">61 min</span>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- ============================================================ footer -->
+<footer class="foot-site">
+    <div class="foot-in">
+        <div>
+            <div class="row" style="gap:12px;margin-bottom:12px">
+                <span class="plate sm" data-route="43">43</span>
+                <span style="font-family:var(--f-display);font-size:20px">YBS</span>
+            </div>
+            <p style="font-size:14px;color:#93A5C2;margin:0;max-width:34ch">
+                ရန်ကုန် ဘတ်စ်ကား ခရီးစဉ် စီစဉ်ရေး — တက္ကသိုလ် AI သင်တန်း စီမံကိန်း နမူနာ။
+            </p>
+        </div>
+
+        <div>
+            <h4>ခရီးသည်</h4>
+            <a href="index.html">ခရီးရှာမည်</a>
+            <a href="passenger.html">ပင်မ စာမျက်နှာ</a>
+            <a href="passenger.html">ခရီးမှတ်တမ်း</a>
+            <a href="register.html">အကောင့်ဖွင့်မည်</a>
+        </div>
+
+        <div>
+            <h4>ဝန်ထမ်း</h4>
+            <a href="driver.html">ယာဉ်မောင်း စာမျက်နှာ</a>
+            <a href="admin.html">စီမံခန့်ခွဲမှု</a>
+            <a href="ops.html">Ops dashboard</a>
+            <a href="login.html">ဝင်မည်</a>
+        </div>
+
+        <div>
+            <h4>စီမံကိန်း</h4>
+            <a href="components.html">ဒီဇိုင်း စနစ်</a>
+            <a href="index.html">A* search trace</a>
+            <a href="api/prolog/query?goal=fare(m1,'43',F)">Prolog console</a>
+            <a href="api/health">Health check</a>
+        </div>
+    </div>
+
+    <div class="foot-bar">
+        <div class="foot-bar-in">
+            ဤစာမျက်နှာများသည် ဒီဇိုင်း နမူနာဖြစ်ပါသည် — အကောင့် စစ်ဆေးမှု အမှန်တကယ် မရှိပါ။
+            <span class="en" style="margin-top:4px">Design mockup. No authentication is performed.</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
