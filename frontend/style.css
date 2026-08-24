@@ -30,6 +30,11 @@
     --r36: #E11D48;
     --r43: #059669;
     --r61: #4338CA;
+    --r57: #EA580C;
+    --r56: #7E22CE;
+    --r58: #0F766E;
+    --rAPS-Pyay: #C026D3;
+    --rAPS-Kabaraye: #9F1239;
 
     --font-my: "Padauk", "Noto Sans Myanmar", "Myanmar Text", system-ui, sans-serif;
     --font-en: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -226,6 +231,11 @@ body {
 .route-badge[data-route="36"] { background: var(--r36); }
 .route-badge[data-route="43"] { background: var(--r43); }
 .route-badge[data-route="61"] { background: var(--r61); }
+.route-badge[data-route="57"] { background: var(--r57); }
+.route-badge[data-route="56"] { background: var(--r56); }
+.route-badge[data-route="58"] { background: var(--r58); }
+.route-badge[data-route="APS-Pyay"] { background: var(--rAPS-Pyay); }
+.route-badge[data-route="APS-Kabaraye"] { background: var(--rAPS-Kabaraye); }
 .route-sep { color: var(--ink-2); }
 .walk-badge { background: #E2E8F0; color: var(--ink); }
 
