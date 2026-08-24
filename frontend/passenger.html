@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ခရီးသည် — YBS</title>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<div class="shell" data-seg-group>
+
+    <!-- =================================================== rail / tab bar -->
+    <aside class="rail">
+        <div class="mark">
+            <span class="plate sm" data-route="43">43</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Passenger</span>
+            </div>
+        </div>
+        <nav aria-label="အဓိက လမ်းညွှန်">
+            <a href="home.html"><span class="ic" aria-hidden="true">🏠</span>ပင်မစာမျက်နှာ</a>
+            <a href="#" data-nav="home" aria-current="page"><span class="ic" aria-hidden="true">📋</span>ယနေ့ ခရီးစဉ်</a>
+            <a href="index.html"><span class="ic" aria-hidden="true">🔍</span>ခရီးရှာမည်</a>
+            <a href="#" data-nav="history"><span class="ic" aria-hidden="true">🧾</span>ခရီးမှတ်တမ်း</a>
+            <a href="#" data-nav="profile"><span class="ic" aria-hidden="true">👤</span>ကိုယ်ရေးအချက်</a>
+        </nav>
+        <div class="foot">
+            <button class="btn btn-ghost-navy btn-block" data-logout>
+                <span aria-hidden="true">⏻</span> ထွက်မည် <span class="en">Sign out</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <h1 id="page-title">မင်္ဂလာပါ ဦးကျော်မင်း</h1>
+            <div class="spacer"></div>
+            <span class="badge info"><span aria-hidden="true">🎓</span>ကျောင်းသား — ခ တစ်ဝက်</span>
+            <div class="who">
+                <div class="avatar" aria-hidden="true">KM</div>
+                <div>
+                    <div class="nm">ဦးကျော်မင်း</div>
+                    <div class="rl">Passenger · 09-771 204 118</div>
+                </div>
+            </div>
+            <button class="btn btn-quiet" data-logout>
+                <span aria-hidden="true">⏻</span><span class="sr">ထွက်မည်</span>
+            </button>
+        </header>
+
+        <!-- ============================================ HOME ============ -->
+        <div class="content" data-panel-id="home">
+
+            <div class="page-intro">
+                <h2>ယနေ့ ခရီးစဉ်</h2>
+                <p>လှည်းတန်း → ဗိုလ်တထောင်ဘုရား · ခရီးစဉ် စတင်ပြီးပါပြီ</p>
+            </div>
+
+            <!-- The one card that matters while a trip is running. Everything
+                 else on this page is reference; this is live. -->
+            <div class="card" style="border-color:#B9D3FF;background:linear-gradient(180deg,#F7FAFF,#fff)">
+                <div class="card-head">
+                    <span class="ic" aria-hidden="true">🚌</span>
+                    <h2>လက်ရှိ ခရီးစဉ် <span class="en">Trip in progress</span></h2>
+                    <span class="spacer"></span>
+                    <span class="badge ok"><span aria-hidden="true">●</span>တိုက်ရိုက်</span>
+                </div>
+
+                <div class="row" style="align-items:flex-start;gap:24px">
+                    <span class="plate lg" data-route="43">43</span>
+                    <div style="flex:1;min-width:220px">
+                        <div class="leg-line" style="padding-top:0">
+                            <span class="ic" aria-hidden="true">🟢</span>
+                            <span class="where">လှည်းတန်း</span>
+                            <span class="when">စီးပြီး · 14:06</span>
+                        </div>
+                        <div class="leg-line">
+                            <span class="ic" aria-hidden="true">🔴</span>
+                            <span class="where">ဗိုလ်တထောင်ဘုရား</span>
+                            <span class="when">မှတ်တိုင် ၄ ခု ကျန်</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="k en" style="font-size:11px">Arriving in</div>
+                        <div class="fare" style="color:var(--accent-ink)">9<small> မိနစ်</small></div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="row">
+                    <button class="btn btn-outline" id="demo-alert">
+                        <span aria-hidden="true">🔔</span> အသိပေးချက် စမ်းကြည့်ရန်
+                        <span class="en">Preview alert</span>
+                    </button>
+                    <button class="btn btn-quiet"
+                            data-mock-submit="ခရီးစဉ် ရပ်လိုက်ပါပြီ|Trip ended">
+                        <span aria-hidden="true">■</span> ခရီးစဉ် ရပ်မည်
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:16px">
+                <div class="stat accent">
+                    <div class="k">ဤလ ခရီးစဉ်<span class="en">Trips this month</span></div>
+                    <div class="v">24</div>
+                </div>
+                <div class="stat">
+                    <div class="k">သုံးစွဲမှု<span class="en">Spent this month</span></div>
+                    <div class="v">4,800<small> ကျပ်</small></div>
+                </div>
+                <div class="stat">
+                    <div class="k">သက်သာခဲ့သည်<span class="en">Saved by concession</span></div>
+                    <div class="v" style="color:var(--ok)">4,800<small> ကျပ်</small></div>
+                </div>
+            </div>
+
+            <!-- Saved trips: named by where the rider is going, not by route. -->
+            <div class="card" style="margin-top:16px">
+                <div class="card-head">
+                    <span class="ic" aria-hidden="true">⭐</span>
+                    <h2>သိမ်းထားသော ခရီးစဉ် <span class="en">Saved trips</span></h2>
+                    <span class="spacer"></span>
+                    <button class="btn btn-quiet" data-mock-submit="အသစ် ထည့်ရန် ခရီးတစ်ခု ရှာပါ|Plan a trip, then save it">
+                        <span aria-hidden="true">＋</span> ထည့်မည်
+                    </button>
+                </div>
+
+                <div class="grid-2">
+                    <div class="stat" style="display:flex;gap:14px;align-items:center">
+                        <span class="plate" data-route="36">36</span>
+                        <div style="flex:1">
+                            <div style="font-weight:700">အိမ် → ကျောင်း</div>
+                            <span class="en">Insein Market → Hledan · 42 min · 200 Ks</span>
+                        </div>
+                        <button class="btn btn-quiet" data-mock-submit="ခရီးစဉ် စတင်ပါပြီ|Trip started">စီးမည်</button>
+                    </div>
+                    <div class="stat" style="display:flex;gap:14px;align-items:center">
+                        <span class="plate" data-route="61">61</span>
+                        <div style="flex:1">
+                            <div style="font-weight:700">ကျောင်း → အလုပ်</div>
+                            <span class="en">Hledan → Sule Pagoda · 28 min · 200 Ks</span>
+                        </div>
+                        <button class="btn btn-quiet" data-mock-submit="ခရီးစဉ် စတင်ပါပြီ|Trip started">စီးမည်</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice warn" style="margin-top:16px">
+                <span class="ic" aria-hidden="true">🌊</span>
+                <div>
+                    <div class="t">တာမွေ လမ်းပိုင်း ရေကြီးနေသည်</div>
+                    <div>အဲဒီလမ်းကြောင်း ဖြတ်တဲ့ ခရီးစဉ်တွေကို ယာယီ ဖယ်ထားပါတယ်။ အခြားလမ်းကြောင်း အကြံပြုပါမယ်။</div>
+                    <span class="en">Tamwe segment flooded — affected options are held back
+                        until it clears. Alternatives are shown instead.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= TRIP HISTORY ======== -->
+        <div class="content hidden" data-panel-id="history">
+            <div class="page-intro">
+                <h2>ခရီးမှတ်တမ်း</h2>
+                <p>နောက်ဆုံး ခရီးစဉ်များနှင့် ပေးဆောင်ခဲ့သော ခ</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Date</th><th>Route</th><th>From → To</th>
+                            <th>Duration</th><th>Fare</th><th>Concession</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="num">24 Aug</td>
+                            <td><span class="plate sm" data-route="43">43</span></td>
+                            <td>လှည်းတန်း → ဗိုလ်တထောင်ဘုရား</td>
+                            <td class="num">31 min</td>
+                            <td class="num" style="font-weight:700">200 Ks</td>
+                            <td><span class="badge info">ကျောင်းသား ½</span></td>
+                        </tr>
+                        <tr>
+                            <td class="num">23 Aug</td>
+                            <td><span class="plate sm" data-route="36">36</span>
+                                <span class="plate sm" data-route="61">61</span></td>
+                            <td>အင်းစိန်ဈေး → ဆူးလေဘုရား</td>
+                            <td class="num">64 min</td>
+                            <td class="num" style="font-weight:700">400 Ks</td>
+                            <td><span class="badge info">ကျောင်းသား ½</span></td>
+                        </tr>
+                        <tr>
+                            <td class="num">23 Aug</td>
+                            <td><span class="plate sm" data-route="36">36</span></td>
+                            <td>ကမာရွတ် → လှည်းတန်း</td>
+                            <td class="num">12 min</td>
+                            <td class="num" style="font-weight:700">100 Ks</td>
+                            <td><span class="badge info">ကျောင်းသား ½</span></td>
+                        </tr>
+                        <tr>
+                            <td class="num">22 Aug</td>
+                            <td><span class="plate sm" data-route="61">61</span></td>
+                            <td>ဆူးလေဘုရား → တာမွေ</td>
+                            <td class="num">26 min</td>
+                            <td class="num" style="font-weight:700">200 Ks</td>
+                            <td><span class="badge info">ကျောင်းသား ½</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- =============================================== PROFILE ======= -->
+        <div class="content hidden" data-panel-id="profile">
+            <div class="page-intro">
+                <h2>ကိုယ်ရေးအချက်အလက်</h2>
+                <p>ဒီအချက်တွေက ခရီးစဉ် ရှာတဲ့အခါ ခ ဘယ်လောက်ကျမလဲ တိုက်ရိုက် သက်ရောက်ပါတယ်</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-head">
+                        <span class="ic" aria-hidden="true">👤</span>
+                        <h2>အကောင့် <span class="en">Account</span></h2>
+                    </div>
+
+                    <div class="field">
+                        <label for="pf-name">အမည် <span class="en">Full name</span></label>
+                        <div class="control">
+                            <span class="ic" aria-hidden="true">👤</span>
+                            <input id="pf-name" type="text" value="ဦးကျော်မင်း">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pf-phone">ဖုန်းနံပါတ် <span class="en">Phone number</span></label>
+                        <div class="control">
+                            <span class="ic" aria-hidden="true">📱</span>
+                            <input id="pf-phone" type="tel" value="09-771 204 118">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pf-home">ပုံမှန် ထွက်ခွာမှတ်တိုင် <span class="en">Default origin</span></label>
+                        <div class="control">
+                            <span class="ic" aria-hidden="true">🚏</span>
+                            <select id="pf-home">
+                                <option>အင်းစိန်ဈေး</option>
+                                <option selected>လှည်းတန်း</option>
+                                <option>ဆူးလေဘုရား</option>
+                                <option>ကျောက်တံတား</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block"
+                            data-mock-submit="အချက်အလက် သိမ်းပြီးပါပြီ|Changes saved">
+                        <span aria-hidden="true">✓</span> သိမ်းမည် <span class="en">Save changes</span>
+                    </button>
+                </div>
+
+                <div class="stack">
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="ic" aria-hidden="true">🎫</span>
+                            <h2>သက်သာခွင့် <span class="en">Concessions</span></h2>
+                        </div>
+                        <p class="muted" style="font-size:14px;margin:-6px 0 14px">
+                            ရွေးလိုက်တာနဲ့ ခ ချက်ချင်း ပြန်တွက်ပါတယ်။
+                            <span class="en">These feed the fare rules directly — pick only what applies to you.</span>
+                        </p>
+
+                        <div class="chips">
+                            <button type="button" class="chip" aria-pressed="true">
+                                <span class="ic" aria-hidden="true">🎓</span>ကျောင်းသား<span class="en">Student</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="true">
+                                <span class="ic" aria-hidden="true">💳</span>ကတ်ရှိ<span class="en">Has card</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">🧡</span>သံဃာ<span class="en">Monk</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">🤰</span>ကိုယ်ဝန်ဆောင်<span class="en">Pregnant</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">👵</span>သက်ကြီး<span class="en">Elderly</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">♿</span>သွားလာမှု အခက်အခဲ<span class="en">Wheelchair</span>
+                            </button>
+                        </div>
+
+                        <div class="notice ok" style="margin-top:16px">
+                            <span class="ic" aria-hidden="true">✓</span>
+                            <div>
+                                <div class="t">ကျောင်းသား + ကတ် = ခ တစ်ဝက်</div>
+                                <span class="en">Student with a card halves every fare.
+                                    A monk travels free, and that rule wins over any other.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="ic" aria-hidden="true">🔔</span>
+                            <h2>အသိပေးချက် <span class="en">Alerts</span></h2>
+                        </div>
+                        <div class="leg-line" style="padding-top:0">
+                            <span class="where">ဆင်းရမယ့် မှတ်တိုင် နီးလာရင်<span class="en">Alert before my stop</span></span>
+                            <span class="badge ok">ဖွင့်ထား</span>
+                        </div>
+                        <div class="leg-line">
+                            <span class="where">လမ်းပိတ် / ရေကြီးမှု<span class="en">Disruption on my saved routes</span></span>
+                            <span class="badge ok">ဖွင့်ထား</span>
+                        </div>
+                        <div class="leg-line">
+                            <span class="where">အသံဖြင့် အသိပေးခြင်း<span class="en">Spoken alert</span></span>
+                            <span class="badge">ပိတ်ထား</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== arrival banner -->
+<div id="arrival" class="arrival hidden" role="alert" aria-live="assertive">
+    <div class="arrival-inner">
+        <span class="ic" aria-hidden="true">🔔</span>
+        <div>
+            <div class="t">ဆင်းရန် အဆင်သင့်ဖြစ်ပါ</div>
+            <div class="s">ဗိုလ်တထောင်ဘုရား</div>
+            <span class="en">Get ready to alight — Botataung Pagoda</span>
+        </div>
+        <button class="btn btn-ghost-navy" id="arrival-close"
+                style="border-color:rgba(255,255,255,.55);color:#fff">
+            <span aria-hidden="true">✕</span> ပိတ်မည်
+        </button>
+    </div>
+</div>
+
+<!-- ========================================================== logout -->
+<dialog id="logout-dialog" aria-labelledby="lo-title">
+    <div class="dlg">
+        <h2 id="lo-title">ထွက်မှာ သေချာပါသလား?</h2>
+        <p>လက်ရှိ ခရီးစဉ် ရပ်သွားပြီး ဆင်းရမယ့် မှတ်တိုင် အသိပေးချက် မရတော့ပါ။
+            <span class="en">Your trip in progress ends and the alight alert stops.</span>
+        </p>
+        <div class="dlg-actions">
+            <button class="btn btn-quiet" data-logout-cancel>ဆက်နေမည်</button>
+            <button class="btn btn-danger" data-logout-confirm>
+                <span aria-hidden="true">⏻</span> ထွက်မည်
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<script src="ui.js"></script>
+<script>
+const titles = { home: 'မင်္ဂလာပါ ဦးကျော်မင်း', history: 'ခရီးမှတ်တမ်း', profile: 'ကိုယ်ရေးအချက်အလက်' };
+document.querySelectorAll('[data-nav]').forEach(a => {
+    a.addEventListener('click', ev => {
+        ev.preventDefault();
+        const to = a.dataset.nav;
+        document.querySelectorAll('.rail nav a').forEach(x => x.removeAttribute('aria-current'));
+        a.setAttribute('aria-current', 'page');
+        document.querySelectorAll('[data-panel-id]').forEach(p =>
+            p.classList.toggle('hidden', p.dataset.panelId !== to));
+        document.getElementById('page-title').textContent = titles[to];
+        window.scrollTo(0, 0);
+    });
+});
+
+const banner = document.getElementById('arrival');
+document.getElementById('demo-alert').addEventListener('click', () => banner.classList.remove('hidden'));
+document.getElementById('arrival-close').addEventListener('click', () => banner.classList.add('hidden'));
+</script>
+</body>
+</html>

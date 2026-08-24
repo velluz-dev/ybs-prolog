@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>စီမံခန့်ခွဲမှု — YBS</title>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<div class="shell" data-seg-group>
+
+    <aside class="rail">
+        <div class="mark">
+            <span class="plate sm" data-route="61">61</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Operations</span>
+            </div>
+        </div>
+        <nav aria-label="အဓိက လမ်းညွှန်">
+            <a href="home.html"><span class="ic" aria-hidden="true">🏠</span>ပင်မစာမျက်နှာ</a>
+            <a href="#" data-nav="overview" aria-current="page"><span class="ic" aria-hidden="true">📈</span>ခြုံငုံ</a>
+            <a href="#" data-nav="fleet"><span class="ic" aria-hidden="true">🚌</span>ကားနှင့် ယာဉ်မောင်း</a>
+            <a href="#" data-nav="routes"><span class="ic" aria-hidden="true">🛣️</span>လမ်းကြောင်း</a>
+            <a href="#" data-nav="incidents"><span class="ic" aria-hidden="true">⚠️</span>အဖြစ်အပျက်</a>
+        </nav>
+        <div class="foot">
+            <button class="btn btn-ghost-navy btn-block" data-logout>
+                <span aria-hidden="true">⏻</span> ထွက်မည် <span class="en">Sign out</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <h1 id="page-title">ကွန်ရက် ခြုံငုံသုံးသပ်ချက်</h1>
+            <div class="spacer"></div>
+            <span class="badge ok"><span aria-hidden="true">●</span>ကား ၆ စီး တိုက်ရိုက်</span>
+            <div class="who">
+                <div class="avatar" aria-hidden="true">TT</div>
+                <div>
+                    <div class="nm">ဒေါ်သီတာထွန်း</div>
+                    <div class="rl">Operations · Insein depot</div>
+                </div>
+            </div>
+            <button class="btn btn-quiet" data-logout>
+                <span aria-hidden="true">⏻</span><span class="sr">ထွက်မည်</span>
+            </button>
+        </header>
+
+        <!-- ============================================= OVERVIEW ======== -->
+        <div class="content" data-panel-id="overview">
+
+            <div class="grid-4">
+                <div class="stat accent">
+                    <div class="k">လည်ပတ်နေသော ကား<span class="en">Buses in service</span></div>
+                    <div class="v">6<small> / 6</small></div>
+                </div>
+                <div class="stat">
+                    <div class="k">ယနေ့ ခရီးသည်<span class="en">Passengers today</span></div>
+                    <div class="v">4,182</div>
+                </div>
+                <div class="stat">
+                    <div class="k">ကွန်ရက် အချိန်မှန်မှု<span class="en">Network on-time</span></div>
+                    <div class="v" style="color:var(--ok)">91<small>%</small></div>
+                </div>
+                <div class="stat">
+                    <div class="k">ဖွင့်ထားသော အဖြစ်အပျက်<span class="en">Open incidents</span></div>
+                    <div class="v" style="color:var(--warn)">2</div>
+                </div>
+            </div>
+
+            <!-- Disruption injection is the one admin control that changes what
+                 riders are shown, so it states its effect before it is used. -->
+            <div class="card" style="margin-top:16px">
+                <div class="card-head">
+                    <span class="ic" aria-hidden="true">🌊</span>
+                    <h2>လမ်းပိုင်း ပိတ်ဆို့မှု <span class="en">Segment disruptions</span></h2>
+                </div>
+                <p class="muted" style="font-size:14px;margin:-6px 0 16px">
+                    ဒီနေရာမှာ ပိတ်လိုက်တဲ့ လမ်းပိုင်းကို ဖြတ်တဲ့ ခရီးစဉ်တွေ ခရီးသည်တွေဆီ မပြတော့ပါ။
+                    <span class="en">Closing a segment removes every journey that uses it from
+                        rider results, immediately.</span>
+                </p>
+
+                <div class="grid-2">
+                    <div class="stat is-blocked" style="display:flex;gap:14px;align-items:center">
+                        <span class="ic" style="font-size:22px" aria-hidden="true">🌊</span>
+                        <div style="flex:1">
+                            <div style="font-weight:700">တာမွေ ↔ ဗိုလ်တထောင်ဘုရား</div>
+                            <span class="en">Route 61 · closed 13:40 · flooding</span>
+                        </div>
+                        <button class="btn btn-quiet"
+                                data-mock-submit="လမ်းပိုင်း ပြန်ဖွင့်ပြီးပါပြီ|Segment reopened">ဖွင့်မည်</button>
+                    </div>
+                    <div class="stat" style="display:flex;gap:14px;align-items:center">
+                        <span class="ic" style="font-size:22px" aria-hidden="true">＋</span>
+                        <div style="flex:1">
+                            <div style="font-weight:700">လမ်းပိုင်း ပိတ်မည်</div>
+                            <span class="en">Close a segment</span>
+                        </div>
+                        <button class="btn btn-outline"
+                                data-mock-submit="လမ်းပိုင်း ရွေးချယ်မှု ဖွင့်ပါပြီ|Pick a segment on the map">ရွေးမည်</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px">
+                <div class="card">
+                    <div class="card-head">
+                        <span class="ic" aria-hidden="true">🛣️</span>
+                        <h2>လမ်းကြောင်းအလိုက် အခြေအနေ <span class="en">By route</span></h2>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="plate sm" data-route="36">36</span>
+                        <span class="where">အင်းစိန်ဈေး → ဆူးလေဘုရား<span class="en">2 buses · 12 stops</span></span>
+                        <span class="badge ok">၉၄%</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="plate sm" data-route="43">43</span>
+                        <span class="where">လှည်းတန်း → ဗိုလ်တထောင်ဘုရား<span class="en">2 buses · 11 stops</span></span>
+                        <span class="badge ok">၉၂%</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="plate sm" data-route="61">61</span>
+                        <span class="where">မြောက်ဒဂုံ → ကျောက်တံတား<span class="en">2 buses · 12 stops</span></span>
+                        <span class="badge warn">၈၅% — ရေကြီးမှု</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <span class="ic" aria-hidden="true">🏅</span>
+                        <h2>ဤလ ဘောနပ်စ် <span class="en">Bonus this month</span></h2>
+                    </div>
+                    <div class="row" style="gap:20px;align-items:center;margin-bottom:14px">
+                        <div class="fare" style="color:var(--brass-ink)">2<small> / 6</small></div>
+                        <span class="en" style="flex:1">Drivers meeting all three conditions
+                            for August. The rule set has not changed this month.</span>
+                    </div>
+                    <div class="notice info">
+                        <span class="ic" aria-hidden="true">ⓘ</span>
+                        <div>
+                            <div class="t">စည်းမျဉ်း</div>
+                            <span class="en">On-time ≥ 90%, complaints ≤ 2, incidents = 0.
+                                All three, or no bonus.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================ FLEET ======== -->
+        <div class="content hidden" data-panel-id="fleet">
+            <div class="page-intro">
+                <h2>ကားနှင့် ယာဉ်မောင်း</h2>
+                <p>ဩဂုတ် ၂၀၂၆ အမှတ်များနှင့် ဘောနပ်စ် အခြေအနေ</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>Driver</th><th>Bus</th><th>Route</th>
+                            <th>On time</th><th>Complaints</th><th>Incidents</th><th>Bonus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ဦးမြင့်ဆွေ<span class="en">D-1042</span></td>
+                            <td class="mono">YGN-3417</td>
+                            <td><span class="plate sm" data-route="36">36</span></td>
+                            <td class="num">94%</td><td class="num">1</td><td class="num">0</td>
+                            <td><span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိ</span></td>
+                        </tr>
+                        <tr>
+                            <td>ဦးအောင်မျိုး<span class="en">D-1077</span></td>
+                            <td class="mono">YGN-2288</td>
+                            <td><span class="plate sm" data-route="43">43</span></td>
+                            <td class="num">93%</td><td class="num">0</td><td class="num">0</td>
+                            <td><span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိ</span></td>
+                        </tr>
+                        <tr>
+                            <td>ဦးဇော်လင်း<span class="en">D-1103</span></td>
+                            <td class="mono">YGN-5502</td>
+                            <td><span class="plate sm" data-route="61">61</span></td>
+                            <td class="num">89%</td><td class="num">2</td><td class="num">0</td>
+                            <td><span class="badge bad">အချိန်မှန်မှု ၉၀% အောက်</span></td>
+                        </tr>
+                        <tr>
+                            <td>ဦးသန်းထွေး<span class="en">D-1156</span></td>
+                            <td class="mono">YGN-1930</td>
+                            <td><span class="plate sm" data-route="36">36</span></td>
+                            <td class="num">91%</td><td class="num">4</td><td class="num">0</td>
+                            <td><span class="badge bad">တိုင်ကြားချက် ၂ ခုထက် ပို</span></td>
+                        </tr>
+                        <tr>
+                            <td>ဦးကျော်စွာ<span class="en">D-1188</span></td>
+                            <td class="mono">YGN-4071</td>
+                            <td><span class="plate sm" data-route="43">43</span></td>
+                            <td class="num">96%</td><td class="num">1</td><td class="num">1</td>
+                            <td><span class="badge bad">အဖြစ်အပျက် ရှိ</span></td>
+                        </tr>
+                        <tr>
+                            <td>ဦးမောင်မောင်<span class="en">D-1201</span></td>
+                            <td class="mono">YGN-6644</td>
+                            <td><span class="plate sm" data-route="61">61</span></td>
+                            <td class="num">87%</td><td class="num">3</td><td class="num">1</td>
+                            <td><span class="badge bad">စည်းမျဉ်း ၃ ခုစလုံး မပြည့်မီ</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- =============================================== ROUTES ======== -->
+        <div class="content hidden" data-panel-id="routes">
+            <div class="page-intro">
+                <h2>လမ်းကြောင်း စီမံခန့်ခွဲမှု</h2>
+                <p>မှတ်တိုင် အစီအစဉ်၊ အခြေခံခ နှင့် ခရီးအကြာ</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="row" style="margin-bottom:14px">
+                        <span class="plate lg" data-route="36">36</span>
+                        <div>
+                            <div style="font-weight:700">အင်းစိန်ဈေး → ဆူးလေ</div>
+                            <span class="en">Insein Market → Sule Pagoda</span>
+                        </div>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="where">မှတ်တိုင်<span class="en">Stops</span></span>
+                        <span class="when">12</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အခြေခံခ<span class="en">Base fare</span></span>
+                        <span class="when">400 Ks</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အလှည့်တစ်ခု<span class="en">End to end</span></span>
+                        <span class="when">58 min</span>
+                    </div>
+                    <button class="btn btn-quiet btn-block" style="margin-top:14px"
+                            data-mock-submit="လမ်းကြောင်း တည်းဖြတ်မှု ဖွင့်ပါပြီ|Route editor opened">
+                        <span aria-hidden="true">✎</span> တည်းဖြတ်မည်
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="row" style="margin-bottom:14px">
+                        <span class="plate lg" data-route="43">43</span>
+                        <div>
+                            <div style="font-weight:700">လှည်းတန်း → ဗိုလ်တထောင်</div>
+                            <span class="en">Hledan → Botataung Pagoda</span>
+                        </div>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="where">မှတ်တိုင်<span class="en">Stops</span></span>
+                        <span class="when">11</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အခြေခံခ<span class="en">Base fare</span></span>
+                        <span class="when">400 Ks</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အလှည့်တစ်ခု<span class="en">End to end</span></span>
+                        <span class="when">46 min</span>
+                    </div>
+                    <button class="btn btn-quiet btn-block" style="margin-top:14px"
+                            data-mock-submit="လမ်းကြောင်း တည်းဖြတ်မှု ဖွင့်ပါပြီ|Route editor opened">
+                        <span aria-hidden="true">✎</span> တည်းဖြတ်မည်
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="row" style="margin-bottom:14px">
+                        <span class="plate lg" data-route="61">61</span>
+                        <div>
+                            <div style="font-weight:700">မြောက်ဒဂုံ → ကျောက်တံတား</div>
+                            <span class="en">North Dagon → Kyauktada</span>
+                        </div>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="where">မှတ်တိုင်<span class="en">Stops</span></span>
+                        <span class="when">12</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အခြေခံခ<span class="en">Base fare</span></span>
+                        <span class="when">400 Ks</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">အလှည့်တစ်ခု<span class="en">End to end</span></span>
+                        <span class="when">61 min</span>
+                    </div>
+                    <button class="btn btn-quiet btn-block" style="margin-top:14px"
+                            data-mock-submit="လမ်းကြောင်း တည်းဖြတ်မှု ဖွင့်ပါပြီ|Route editor opened">
+                        <span aria-hidden="true">✎</span> တည်းဖြတ်မည်
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ INCIDENTS ======== -->
+        <div class="content hidden" data-panel-id="incidents">
+            <div class="page-intro">
+                <h2>အဖြစ်အပျက် စာရင်း</h2>
+                <p>ယာဉ်မောင်းများ တင်ပြထားသည်များ — အသစ်ဆုံး အပေါ်ဆုံး</p>
+            </div>
+
+            <div class="stack">
+                <div class="notice warn">
+                    <span class="ic" aria-hidden="true">🌊</span>
+                    <div style="flex:1">
+                        <div class="t">ရေကြီးမှု — တာမွေ ↔ ဗိုလ်တထောင်ဘုရား</div>
+                        <div>ဦးဇော်လင်း (D-1103) တင်ပြသည် · ယနေ့ 13:40 · လမ်းပိုင်း ပိတ်ထားပြီး</div>
+                        <span class="en">Reported by driver D-1103 · segment already closed to riders</span>
+                    </div>
+                    <button class="btn btn-quiet"
+                            data-mock-submit="ဖြေရှင်းပြီးအဖြစ် မှတ်ပါပြီ|Marked resolved">ဖြေရှင်းပြီး</button>
+                </div>
+
+                <div class="notice warn">
+                    <span class="ic" aria-hidden="true">🔧</span>
+                    <div style="flex:1">
+                        <div class="t">ကား ချွတ်ယွင်းမှု — YGN-6644</div>
+                        <div>ဦးမောင်မောင် (D-1201) တင်ပြသည် · ယနေ့ 09:12 · အစားထိုးကား စေလွှတ်ပြီး</div>
+                        <span class="en">Reported by driver D-1201 · replacement bus dispatched</span>
+                    </div>
+                    <button class="btn btn-quiet"
+                            data-mock-submit="ဖြေရှင်းပြီးအဖြစ် မှတ်ပါပြီ|Marked resolved">ဖြေရှင်းပြီး</button>
+                </div>
+
+                <div class="notice">
+                    <span class="ic" aria-hidden="true">✓</span>
+                    <div style="flex:1">
+                        <div class="t">ယာဉ်ကြောပိတ်ဆို့မှု — လှည်းတန်း</div>
+                        <div>ဦးမြင့်ဆွေ (D-1042) တင်ပြသည် · ၂၃ ဩဂုတ် 08:14</div>
+                        <span class="en">Resolved 23 Aug, 09:30</span>
+                    </div>
+                    <span class="badge ok">ဖြေရှင်းပြီး</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="logout-dialog" aria-labelledby="lo-title">
+    <div class="dlg">
+        <h2 id="lo-title">ထွက်မှာ သေချာပါသလား?</h2>
+        <p>ဖွင့်ထားသော အဖြစ်အပျက် ၂ ခု ရှိပါသေးတယ်။
+            <span class="en">Two incidents are still open. They stay open after you sign out.</span>
+        </p>
+        <div class="dlg-actions">
+            <button class="btn btn-quiet" data-logout-cancel>ဆက်နေမည်</button>
+            <button class="btn btn-danger" data-logout-confirm>
+                <span aria-hidden="true">⏻</span> ထွက်မည်
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<script src="ui.js"></script>
+<script>
+const titles = {
+    overview: 'ကွန်ရက် ခြုံငုံသုံးသပ်ချက်',
+    fleet: 'ကားနှင့် ယာဉ်မောင်း',
+    routes: 'လမ်းကြောင်း စီမံခန့်ခွဲမှု',
+    incidents: 'အဖြစ်အပျက် စာရင်း'
+};
+document.querySelectorAll('[data-nav]').forEach(a => {
+    a.addEventListener('click', ev => {
+        ev.preventDefault();
+        const to = a.dataset.nav;
+        document.querySelectorAll('.rail nav a').forEach(x => x.removeAttribute('aria-current'));
+        a.setAttribute('aria-current', 'page');
+        document.querySelectorAll('[data-panel-id]').forEach(p =>
+            p.classList.toggle('hidden', p.dataset.panelId !== to));
+        document.getElementById('page-title').textContent = titles[to];
+        window.scrollTo(0, 0);
+    });
+});
+</script>
+</body>
+</html>

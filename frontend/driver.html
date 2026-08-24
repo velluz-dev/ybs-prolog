@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ယာဉ်မောင်း — YBS</title>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<div class="shell" data-seg-group>
+
+    <aside class="rail">
+        <div class="mark">
+            <span class="plate sm" data-route="36">36</span>
+            <div>
+                <div class="wordmark">YBS</div>
+                <span class="sub">Driver</span>
+            </div>
+        </div>
+        <nav aria-label="အဓိက လမ်းညွှန်">
+            <a href="home.html"><span class="ic" aria-hidden="true">🏠</span>ပင်မစာမျက်နှာ</a>
+            <a href="#" data-nav="shift" aria-current="page"><span class="ic" aria-hidden="true">🚌</span>ယနေ့ အလှည့်</a>
+            <a href="#" data-nav="score"><span class="ic" aria-hidden="true">📊</span>လစဉ် အမှတ်</a>
+            <a href="#" data-nav="report"><span class="ic" aria-hidden="true">⚠️</span>အဖြစ်အပျက် တင်ပြ</a>
+        </nav>
+        <div class="foot">
+            <button class="btn btn-ghost-navy btn-block" data-logout>
+                <span aria-hidden="true">⏻</span> ထွက်မည် <span class="en">Sign out</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <h1 id="page-title">ယနေ့ အလှည့်</h1>
+            <div class="spacer"></div>
+            <span class="seal"><span class="dot" aria-hidden="true"></span>ဘောနပ်စ် အရည်အချင်းပြည့်မီ</span>
+            <div class="who">
+                <div class="avatar" aria-hidden="true">MS</div>
+                <div>
+                    <div class="nm">ဦးမြင့်ဆွေ</div>
+                    <div class="rl">Driver · D-1042 · Bus YGN-3417</div>
+                </div>
+            </div>
+            <button class="btn btn-quiet" data-logout>
+                <span aria-hidden="true">⏻</span><span class="sr">ထွက်မည်</span>
+            </button>
+        </header>
+
+        <!-- ================================================ SHIFT ======== -->
+        <div class="content" data-panel-id="shift">
+
+            <!-- A driver checks one thing at the depot gate: which bus, which
+                 route, what time. The plate answers it from across the yard. -->
+            <div class="card" style="background:var(--navy-800);border-color:var(--navy-line);color:var(--on-navy)">
+                <div class="row" style="gap:26px;align-items:center">
+                    <span class="plate lg" data-route="36">36</span>
+                    <div style="flex:1;min-width:200px">
+                        <div style="font-size:20px;font-weight:700">အင်းစိန်ဈေး → ဆူးလေဘုရား</div>
+                        <span class="en" style="color:#93A5C2">Insein Market → Sule Pagoda · 12 stops · Bus YGN-3417</span>
+                        <div class="row" style="margin-top:12px;gap:8px">
+                            <span class="badge ok"><span aria-hidden="true">●</span>အလှည့် စတင်ပြီး</span>
+                            <span class="badge" style="background:var(--navy-600);color:var(--on-navy)">06:00 – 14:00</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="en" style="color:#93A5C2;font-size:11px">Next stop</div>
+                        <div style="font-family:var(--f-display);font-size:26px;line-height:1.3">ကမာရွတ်</div>
+                        <div class="en" style="color:#93A5C2">in 3 min</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-4" style="margin-top:16px">
+                <div class="stat accent">
+                    <div class="k">ယနေ့ အကြိမ်<span class="en">Runs today</span></div>
+                    <div class="v">4<small> / 6</small></div>
+                </div>
+                <div class="stat">
+                    <div class="k">အချိန်မှန်မှု<span class="en">On time today</span></div>
+                    <div class="v" style="color:var(--ok)">96<small>%</small></div>
+                </div>
+                <div class="stat">
+                    <div class="k">သယ်ဆောင်ခဲ့သူ<span class="en">Passengers</span></div>
+                    <div class="v">312</div>
+                </div>
+                <div class="stat">
+                    <div class="k">လုပ်သက်<span class="en">Hours on shift</span></div>
+                    <div class="v">5.2<small> နာရီ</small></div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px">
+                <div class="card">
+                    <div class="card-head">
+                        <span class="ic" aria-hidden="true">🚏</span>
+                        <h2>ကျန်ရှိသော မှတ်တိုင် <span class="en">Stops remaining</span></h2>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="ic" aria-hidden="true">🔵</span>
+                        <span class="where">ကမာရွတ်<span class="en">Kamayut</span></span>
+                        <span class="when">3 min</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="ic" aria-hidden="true">○</span>
+                        <span class="where">လှည်းတန်း<span class="en">Hledan</span></span>
+                        <span class="when">9 min</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="ic" aria-hidden="true">○</span>
+                        <span class="where">လမ်းမတော်<span class="en">Lanmadaw</span></span>
+                        <span class="when">21 min</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="ic" aria-hidden="true">🏁</span>
+                        <span class="where">ဆူးလေဘုရား<span class="en">Sule Pagoda</span></span>
+                        <span class="when">34 min</span>
+                    </div>
+                </div>
+
+                <div class="stack">
+                    <div class="notice warn">
+                        <span class="ic" aria-hidden="true">🌊</span>
+                        <div>
+                            <div class="t">တာမွေ လမ်းပိုင်း ရေကြီးနေသည်</div>
+                            <div>ကိုယ့်လမ်းကြောင်း မဟုတ်ပါ။ သတိပြုရန်သာ။</div>
+                            <span class="en">Not on route 36 — advisory only.</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="ic" aria-hidden="true">⚡</span>
+                            <h2>အမြန် လုပ်ဆောင်ချက် <span class="en">Quick actions</span></h2>
+                        </div>
+                        <div class="stack" style="gap:10px">
+                            <button class="btn btn-quiet btn-block"
+                                    data-mock-submit="နားချိန် မှတ်သားပြီးပါပြီ|Break logged">
+                                <span aria-hidden="true">☕</span> နားချိန် မှတ်မည်
+                            </button>
+                            <button class="btn btn-quiet btn-block"
+                                    data-mock-submit="ယာဉ်ကြောပိတ်ဆို့မှု တင်ပြပြီးပါပြီ|Traffic delay reported">
+                                <span aria-hidden="true">🚦</span> ယာဉ်ကြောပိတ် တင်ပြမည်
+                            </button>
+                            <button class="btn btn-danger btn-block" data-nav-jump="report">
+                                <span aria-hidden="true">⚠️</span> အရေးပေါ် တင်ပြမည်
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================ SCORE ======== -->
+        <div class="content hidden" data-panel-id="score">
+            <div class="page-intro">
+                <h2>လစဉ် အမှတ် — ဩဂုတ် ၂၀၂၆</h2>
+                <p>ဘောနပ်စ် ရဖို့ စည်းမျဉ်း သုံးခုလုံး ပြည့်ရပါမယ်</p>
+            </div>
+
+            <!-- Brass is used here and only here: this is something earned. -->
+            <div class="card" style="background:var(--brass-soft);border-color:#E4CB94">
+                <div class="row" style="gap:20px;align-items:center">
+                    <span class="seal" style="font-size:15px;padding:9px 20px 9px 14px">
+                        <span class="dot" style="width:20px;height:20px" aria-hidden="true"></span>
+                        ဘောနပ်စ် အရည်အချင်းပြည့်မီပါသည်
+                    </span>
+                    <div style="flex:1;min-width:180px">
+                        <span class="en" style="color:var(--brass-ink)">
+                            All three conditions met for August. Payment follows the depot's
+                            normal cycle.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:16px">
+                <div class="stat">
+                    <div class="k">အချိန်မှန်မှု<span class="en">On-time · needs ≥ 90%</span></div>
+                    <div class="v" style="color:var(--ok)">94<small>%</small></div>
+                    <div style="margin-top:8px"><span class="badge ok"><span aria-hidden="true">✓</span>ပြည့်မီ</span></div>
+                </div>
+                <div class="stat">
+                    <div class="k">တိုင်ကြားချက်<span class="en">Complaints · needs ≤ 2</span></div>
+                    <div class="v">1</div>
+                    <div style="margin-top:8px"><span class="badge ok"><span aria-hidden="true">✓</span>ပြည့်မီ</span></div>
+                </div>
+                <div class="stat">
+                    <div class="k">အဖြစ်အပျက်<span class="en">Incidents · needs 0</span></div>
+                    <div class="v">0</div>
+                    <div style="margin-top:8px"><span class="badge ok"><span aria-hidden="true">✓</span>ပြည့်မီ</span></div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="card-head">
+                    <span class="ic" aria-hidden="true">📅</span>
+                    <h2>ယခင် လများ <span class="en">Previous months</span></h2>
+                </div>
+                <div class="table-wrap">
+                    <table class="grid">
+                        <thead>
+                            <tr><th>Month</th><th>On time</th><th>Complaints</th><th>Incidents</th><th>Bonus</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ဩဂုတ် 2026</td>
+                                <td class="num">94%</td><td class="num">1</td><td class="num">0</td>
+                                <td><span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိ</span></td>
+                            </tr>
+                            <tr>
+                                <td>ဇူလိုင် 2026</td>
+                                <td class="num">91%</td><td class="num">2</td><td class="num">0</td>
+                                <td><span class="seal"><span class="dot" aria-hidden="true"></span>ရရှိ</span></td>
+                            </tr>
+                            <tr>
+                                <td>ဇွန် 2026</td>
+                                <td class="num">88%</td><td class="num">3</td><td class="num">1</td>
+                                <td><span class="badge bad">မရရှိ — အချိန်မှန်မှု ၉၀% အောက်</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================================== REPORT ======== -->
+        <div class="content hidden" data-panel-id="report">
+            <div class="page-intro">
+                <h2>အဖြစ်အပျက် တင်ပြခြင်း</h2>
+                <p>တင်ပြပြီးတာနဲ့ စီမံခန့်ခွဲရေးဌာနကို ချက်ချင်း ရောက်ပါတယ်</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="field">
+                        <label id="kind-lbl">အမျိုးအစား <span class="en">What happened</span></label>
+                        <div class="chips" role="group" aria-labelledby="kind-lbl">
+                            <button type="button" class="chip" aria-pressed="true">
+                                <span class="ic" aria-hidden="true">🚦</span>ယာဉ်ကြောပိတ်<span class="en">Traffic</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">🔧</span>ကား ချွတ်ယွင်း<span class="en">Breakdown</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">💥</span>ထိခိုက်မှု<span class="en">Collision</span>
+                            </button>
+                            <button type="button" class="chip" aria-pressed="false">
+                                <span class="ic" aria-hidden="true">🌊</span>ရေကြီး<span class="en">Flooding</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="rp-stop">နေရာ <span class="en">Nearest stop</span></label>
+                        <div class="control">
+                            <span class="ic" aria-hidden="true">🚏</span>
+                            <select id="rp-stop">
+                                <option>ကမာရွတ်</option>
+                                <option selected>လှည်းတန်း</option>
+                                <option>လမ်းမတော်</option>
+                                <option>ဆူးလေဘုရား</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="rp-note">အသေးစိတ် <span class="en">Details</span></label>
+                        <div class="control" style="align-items:flex-start;min-height:120px;padding:12px 14px">
+                            <span class="ic" aria-hidden="true">✎</span>
+                            <textarea id="rp-note" rows="4"
+                                style="flex:1;border:0;background:transparent;outline:none;resize:vertical;
+                                       font-family:var(--f-my);font-size:16px;line-height:1.8;color:var(--ink)"
+                                placeholder="ဘာဖြစ်ခဲ့လဲ တိုတိုရေးပါ"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg btn-block"
+                            data-mock-submit="တင်ပြချက် ပို့ပြီးပါပြီ|Report sent to operations">
+                        <span aria-hidden="true">↑</span> တင်ပြမည် <span class="en">Send report</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <span class="ic" aria-hidden="true">🧾</span>
+                        <h2>ကိုယ့် တင်ပြချက်များ <span class="en">Your reports</span></h2>
+                    </div>
+                    <div class="leg-line" style="padding-top:0">
+                        <span class="where">ယာဉ်ကြောပိတ် — လှည်းတန်း
+                            <span class="en">23 Aug, 08:14 · resolved</span></span>
+                        <span class="badge ok">ဖြေရှင်းပြီး</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">ရေကြီး — တာမွေ
+                            <span class="en">18 Aug, 17:02 · resolved</span></span>
+                        <span class="badge ok">ဖြေရှင်းပြီး</span>
+                    </div>
+                    <div class="leg-line">
+                        <span class="where">ကား ချွတ်ယွင်း — ကမာရွတ်
+                            <span class="en">02 Aug, 11:40 · resolved</span></span>
+                        <span class="badge ok">ဖြေရှင်းပြီး</span>
+                    </div>
+
+                    <div class="notice info" style="margin-top:16px">
+                        <span class="ic" aria-hidden="true">ⓘ</span>
+                        <div>
+                            <div class="t">တင်ပြခြင်းက အမှတ်ကို မလျှော့ပါ</div>
+                            <span class="en">Reporting a problem never counts against your
+                                monthly score. Not reporting one can.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="logout-dialog" aria-labelledby="lo-title">
+    <div class="dlg">
+        <h2 id="lo-title">ထွက်မှာ သေချာပါသလား?</h2>
+        <p>အလှည့် မပြီးသေးပါ။ ထွက်လိုက်ရင် ဒီကားရဲ့ တည်နေရာ ပို့လွှတ်မှု ရပ်သွားပါမယ်။
+            <span class="en">Your shift is still open — signing out stops this bus
+                reporting its position.</span>
+        </p>
+        <div class="dlg-actions">
+            <button class="btn btn-quiet" data-logout-cancel>ဆက်နေမည်</button>
+            <button class="btn btn-danger" data-logout-confirm>
+                <span aria-hidden="true">⏻</span> ထွက်မည်
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<script src="ui.js"></script>
+<script>
+const titles = { shift: 'ယနေ့ အလှည့်', score: 'လစဉ် အမှတ်', report: 'အဖြစ်အပျက် တင်ပြခြင်း' };
+function go(to) {
+    document.querySelectorAll('.rail nav a').forEach(x => {
+        x.removeAttribute('aria-current');
+        if (x.dataset.nav === to) x.setAttribute('aria-current', 'page');
+    });
+    document.querySelectorAll('[data-panel-id]').forEach(p =>
+        p.classList.toggle('hidden', p.dataset.panelId !== to));
+    document.getElementById('page-title').textContent = titles[to];
+    window.scrollTo(0, 0);
+}
+document.querySelectorAll('[data-nav]').forEach(a =>
+    a.addEventListener('click', ev => { ev.preventDefault(); go(a.dataset.nav); }));
+document.querySelectorAll('[data-nav-jump]').forEach(b =>
+    b.addEventListener('click', () => go(b.dataset.navJump)));
+</script>
+</body>
+</html>

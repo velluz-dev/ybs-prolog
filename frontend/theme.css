@@ -1,0 +1,685 @@
+/* ============================================================================
+   YBS — design system v2
+   ----------------------------------------------------------------------------
+   Built on the existing style.css tokens. Three rules carried forward from the
+   original brief, unchanged:
+     1. Fare is the largest element on screen — it is what riders decide on.
+     2. Burmese is primary, English is the secondary line, never a replacement.
+     3. Every control pairs an icon with words. Icons never stand alone.
+
+   Three rules added here:
+     4. The route plate is the identity. A Yangon rider reads a bus by its
+        number and colour from across the street; the interface does the same.
+     5. Chrome is navy, content is paper. The plates only sing against dark.
+     6. Nothing dims to say "unavailable" — opacity kills contrast. State is
+        said in words and structure instead.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- typefaces */
+/* Padauk is not bundled — it cannot be fetched offline. Drop the two files
+   into /fonts/ and these rules pick them up automatically. Until then the
+   stack falls back to Myanmar Text (Windows) or Noto Sans Myanmar (Linux),
+   which is why every Burmese size below is set with fallback metrics in mind. */
+@font-face {
+    font-family: "Padauk";
+    src: local("Padauk"), url("fonts/Padauk-Regular.woff2") format("woff2");
+    font-weight: 400; font-display: swap;
+}
+@font-face {
+    font-family: "Padauk";
+    src: local("Padauk Bold"), url("fonts/Padauk-Bold.woff2") format("woff2");
+    font-weight: 700; font-display: swap;
+}
+
+:root {
+    /* ---- navy chrome ---------------------------------------------------- */
+    --navy-900: #060A14;
+    --navy-800: #0B1220;   /* inherited --panel-dark */
+    --navy-700: #141E33;
+    --navy-600: #1F2C47;
+    --navy-line:#2A3A5C;
+    --on-navy:  #E8EEF9;
+    --on-navy-2:#94A3B8;
+
+    /* ---- paper content -------------------------------------------------- */
+    --paper:      #EEF1F5;
+    --surface:    #FFFFFF;
+    --surface-2:  #F5F7FA;
+    --ink:        #0B1220;
+    --ink-2:      #475569;
+    --ink-3:      #78879C;
+    --line:       #D8DEE7;
+    --line-soft:  #E7ECF2;
+
+    /* ---- brand ---------------------------------------------------------- */
+    --accent:      #1D4ED8;
+    --accent-600:  #1741B8;
+    --accent-soft: #DBEAFE;
+    --accent-ink:  #1E3A8A;
+
+    /* Brass is the only warm note in the system and it has exactly one job:
+       marking something a person earned. Never decorative. */
+    --brass:      #B8863B;
+    --brass-soft: #FBF3E2;
+    --brass-ink:  #6B4A15;
+
+    /* ---- semantic ------------------------------------------------------- */
+    --ok: #15803D;  --ok-soft: #DCFCE7;  --ok-ink: #14532D;
+    --warn: #B45309; --warn-soft: #FFF7ED; --warn-ink: #7C2D12;
+    --danger: #B91C1C; --danger-soft: #FEE2E2; --danger-ink: #7F1D1D;
+
+    /* ---- routes (inherited, now load-bearing) --------------------------- */
+    --r36: #E11D48;
+    --r43: #059669;
+    --r61: #4338CA;
+
+    /* ---- type ----------------------------------------------------------- */
+    /* Display is used for route numerals and headline figures only. Signage
+       is not refined — a bus plate is meant to be legible, not elegant. */
+    --f-display: "Arial Black", "Segoe UI Black", Impact, system-ui, sans-serif;
+    --f-my: "Padauk", "Noto Sans Myanmar", "Myanmar Text", system-ui, sans-serif;
+    --f-en: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --f-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    /* ---- shape ---------------------------------------------------------- */
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-pill: 999px;
+
+    --sh-1: 0 1px 2px rgba(11,18,32,.06);
+    --sh-2: 0 4px 16px rgba(11,18,32,.08);
+    --sh-3: 0 18px 48px rgba(6,10,20,.28);
+
+    --rail-w: 248px;
+    --tap: 44px;              /* WCAG 2.5.5 minimum target */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-my);
+    font-size: 16px;
+    /* Burmese stacks diacritics above and below the baseline. 1.55 collides;
+       1.85 is the floor at which ကျွန်ုပ် and မြို့ stay clear. */
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 700; line-height: 1.4; }
+
+a { color: var(--accent); text-underline-offset: 3px; }
+
+/* English is the second line, never smaller than 12px — for a reader who has
+   no Burmese it is the only line. */
+.en {
+    display: block;
+    font-family: var(--f-en);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink-2);
+}
+.en-i { display: inline; font-family: var(--f-en); }
+.muted { color: var(--ink-2); }
+.hidden { display: none !important; }
+.num { font-family: var(--f-en); font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--f-mono); font-size: 13px; }
+
+/* Keyboard focus is visible everywhere, on both surfaces. */
+:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+.on-navy :focus-visible, .rail :focus-visible, .authside :focus-visible {
+    outline-color: #7FA8FF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+    }
+}
+
+/* ============================================================== THE PLATE ==
+   The signature. An enamel route plate: heavy numeral, colour block, a notch
+   at the top where it hangs, a hairline highlight so it reads as metal rather
+   than as a coloured rectangle. Every size is the same object. */
+.plate {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 8px 14px 9px;
+    border-radius: 8px;
+    background: #64748B;
+    color: #fff;
+    font-family: var(--f-display);
+    font-size: 22px;
+    letter-spacing: -.02em;
+    line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.32),
+                inset 0 -2px 0 rgba(0,0,0,.22),
+                0 1px 3px rgba(6,10,20,.3);
+}
+.plate::after {                      /* the hanging notch */
+    content: "";
+    position: absolute;
+    top: 4px; left: 50%;
+    width: 16px; height: 3px;
+    margin-left: -8px;
+    border-radius: 2px;
+    background: rgba(255,255,255,.35);
+}
+.plate[data-route="36"] { background: var(--r36); }
+.plate[data-route="43"] { background: var(--r43); }
+.plate[data-route="61"] { background: var(--r61); }
+
+.plate.sm { min-width: 44px; padding: 5px 10px 6px; font-size: 15px; border-radius: 6px; }
+.plate.sm::after { width: 11px; margin-left: -5.5px; top: 3px; }
+.plate.lg { min-width: 96px; padding: 16px 22px 18px; font-size: 44px; border-radius: 12px; }
+.plate.lg::after { width: 28px; margin-left: -14px; top: 7px; height: 4px; }
+
+/* A stack of plates on a rail — a bus stop board. Used as the auth hero. */
+.board { position: relative; padding-top: 22px; }
+.board .rail-bar {
+    position: absolute; top: 12px; left: 0; right: 0; height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--navy-line) 12%, var(--navy-line) 88%, transparent);
+}
+.board .hangers { display: flex; gap: 14px; flex-wrap: wrap; }
+.board .plate { animation: hang .5s cubic-bezier(.22,1.2,.36,1) backwards; transform-origin: top center; }
+.board .plate:nth-child(2) { animation-delay: .07s; }
+.board .plate:nth-child(3) { animation-delay: .14s; }
+@keyframes hang {
+    from { transform: translateY(-10px) rotate(-4deg); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+}
+
+/* ================================================================ BUTTONS == */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    min-height: var(--tap);
+    padding: 11px 20px;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--f-my);
+    font-size: 15px; font-weight: 700; line-height: 1.3;
+    cursor: pointer;
+    transition: background .14s ease, border-color .14s ease, transform .06s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn .en { color: inherit; opacity: .72; font-weight: 400; }
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-600); }
+
+.btn-quiet { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn-quiet:hover { background: var(--surface-2); }
+
+.btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+.btn-outline:hover { background: var(--accent-soft); }
+
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #9F1717; }
+
+.btn-ghost-navy { background: transparent; border-color: var(--navy-line); color: var(--on-navy); }
+.btn-ghost-navy:hover { background: var(--navy-700); }
+
+.btn-block { width: 100%; }
+.btn-lg { min-height: 54px; font-size: 17px; padding: 14px 24px; }
+.btn[disabled] { cursor: not-allowed; background: var(--surface-2); color: var(--ink-3); border-color: var(--line); }
+
+/* ================================================================= FIELDS == */
+.field { margin-bottom: 16px; }
+.field > label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.field > label .en { font-weight: 400; margin-top: 0; }
+
+.control {
+    display: flex; align-items: center; gap: 10px;
+    min-height: 52px;
+    padding: 6px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    transition: border-color .14s ease, box-shadow .14s ease;
+}
+.control:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.control .ic { font-size: 18px; line-height: 1; }
+.control input, .control select {
+    flex: 1; min-width: 0;
+    border: 0; background: transparent; outline: none;
+    font-family: var(--f-my); font-size: 16px; font-weight: 600; color: var(--ink);
+}
+.control input::placeholder { color: var(--ink-3); font-weight: 400; }
+.control select { cursor: pointer; }
+.control.err { border-color: var(--danger); }
+.control.err:focus-within { box-shadow: 0 0 0 4px var(--danger-soft); }
+
+.field-msg { display: flex; align-items: flex-start; gap: 7px; margin-top: 7px; font-size: 13px; }
+.field-msg.err { color: var(--danger-ink); }
+.field-msg.hint { color: var(--ink-2); }
+
+.reveal {
+    border: 0; background: transparent; cursor: pointer;
+    min-width: var(--tap); min-height: var(--tap);
+    font-size: 17px; color: var(--ink-2); border-radius: 8px;
+}
+.reveal:hover { background: var(--surface-2); }
+
+/* Segmented control — used for role selection and any 2–3 way switch. */
+.seg {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+}
+.seg button {
+    min-height: var(--tap);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1px; padding: 7px 6px;
+    border: 0; border-radius: var(--r-sm);
+    background: transparent; cursor: pointer;
+    font-family: var(--f-my); font-size: 14px; font-weight: 700; color: var(--ink-2);
+    transition: background .14s ease, color .14s ease;
+}
+.seg button .en { font-size: 11px; color: inherit; opacity: .7; }
+.seg button:hover { background: rgba(29,78,216,.07); }
+.seg button[aria-selected="true"] {
+    background: var(--surface); color: var(--accent-ink);
+    box-shadow: var(--sh-1);
+}
+
+/* Choice chips — rider profile flags. Icon + word, never icon alone. */
+.chips { display: flex; flex-wrap: wrap; gap: 9px; }
+.chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    min-height: var(--tap);
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    cursor: pointer;
+    font-family: var(--f-my); font-size: 14px; font-weight: 600; color: var(--ink);
+    transition: border-color .14s ease, background .14s ease;
+}
+.chip .ic { font-size: 17px; }
+.chip .en { display: inline; font-size: 12px; color: var(--ink-3); }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+    color: var(--accent-ink);
+}
+.chip[aria-pressed="true"] .en { color: var(--accent-ink); }
+
+/* =================================================================== CARD == */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 22px;
+    box-shadow: var(--sh-1);
+}
+.card + .card { margin-top: 16px; }
+.card-head {
+    display: flex; align-items: center; gap: 11px;
+    margin: -2px 0 16px;
+}
+.card-head .ic { font-size: 20px; line-height: 1; }
+.card-head h2 { font-size: 17px; }
+.card-head .spacer { margin-left: auto; }
+
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+@media (max-width: 900px) {
+    .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 560px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: minmax(0,1fr); }
+}
+
+/* ================================================================== STATS == */
+.stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+}
+.stat .k { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.stat .k .en { font-size: 11px; }
+.stat .v {
+    font-family: var(--f-display);
+    font-size: 34px; line-height: 1.1; letter-spacing: -.02em;
+    margin-top: 6px;
+}
+.stat .v small { font-family: var(--f-en); font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: 0; }
+.stat.accent { background: var(--accent-soft); border-color: #B9D3FF; }
+.stat.accent .v, .stat.accent .k { color: var(--accent-ink); }
+
+/* Fare is the largest thing on any screen it appears on. Rule 1. */
+.fare {
+    font-family: var(--f-display);
+    font-size: 48px; line-height: 1; letter-spacing: -.03em;
+}
+.fare small { font-family: var(--f-en); font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: 0; }
+
+/* ================================================================ BADGES ==  */
+.badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--r-pill);
+    font-family: var(--f-my); font-size: 13px; font-weight: 700;
+    background: var(--surface-2); color: var(--ink-2);
+}
+.badge.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.badge.warn { background: var(--warn-soft); color: var(--warn-ink); }
+.badge.bad { background: var(--danger-soft); color: var(--danger-ink); }
+.badge.info { background: var(--accent-soft); color: var(--accent-ink); }
+
+/* The brass seal. Earned status only — bonus eligibility, verified driver. */
+.seal {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 14px 5px 10px;
+    border-radius: var(--r-pill);
+    background: var(--brass-soft);
+    border: 1px solid #E4CB94;
+    color: var(--brass-ink);
+    font-size: 13px; font-weight: 700;
+}
+.seal .dot {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #E7C87E, var(--brass) 62%, #8A6524);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.14);
+}
+
+/* ================================================================ NOTICES == */
+.notice {
+    display: flex; gap: 13px; align-items: flex-start;
+    padding: 15px 17px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: 14px;
+}
+.notice .ic { font-size: 19px; line-height: 1.3; }
+.notice .t { font-weight: 700; }
+.notice.ok { background: var(--ok-soft); border-color: #A7E8BE; color: var(--ok-ink); }
+.notice.warn { background: var(--warn-soft); border-color: #FBCFA0; color: var(--warn-ink); }
+.notice.bad { background: var(--danger-soft); border-color: #F4B4B4; color: var(--danger-ink); }
+.notice.info { background: var(--accent-soft); border-color: #B9D3FF; color: var(--accent-ink); }
+.notice .en { color: inherit; opacity: .82; }
+
+/* ================================================================== TABLE == */
+.table-wrap { overflow-x: auto; border-radius: var(--r-md); border: 1px solid var(--line); }
+table.grid { border-collapse: collapse; width: 100%; min-width: 620px; background: var(--surface); }
+table.grid th, table.grid td { padding: 13px 16px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+table.grid th {
+    background: var(--surface-2);
+    font-family: var(--f-en); font-size: 11px; font-weight: 700;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2);
+    white-space: nowrap;
+}
+table.grid tbody tr:last-child td { border-bottom: 0; }
+table.grid tbody tr:hover { background: #FAFCFF; }
+table.grid td { font-size: 15px; }
+
+/* ================================================================== STATE == */
+/* Rule 6: unavailable is said, not dimmed. A left bar and a plain surface,
+   with the reason at full contrast. */
+.is-blocked {
+    background: var(--surface-2);
+    border-left: 5px solid var(--danger);
+}
+.empty {
+    text-align: center;
+    padding: 46px 24px;
+    border: 1px dashed var(--line);
+    border-radius: var(--r-md);
+    background: var(--surface-2);
+}
+.empty .ic { font-size: 34px; }
+.empty h3 { font-size: 16px; margin: 10px 0 4px; }
+.empty p { margin: 0 0 16px; font-size: 14px; color: var(--ink-2); }
+
+.skel {
+    background: linear-gradient(90deg, #E9EDF3 25%, #F3F6FA 50%, #E9EDF3 75%);
+    background-size: 300% 100%;
+    animation: shimmer 1.3s linear infinite;
+    border-radius: 7px;
+}
+@keyframes shimmer { from { background-position: 150% 0; } to { background-position: -150% 0; } }
+
+/* ============================================================ APP SHELL ==  */
+.shell { display: flex; min-height: 100vh; }
+
+.rail {
+    width: var(--rail-w);
+    flex: 0 0 var(--rail-w);
+    background: var(--navy-800);
+    color: var(--on-navy);
+    display: flex; flex-direction: column;
+    padding: 20px 14px;
+    gap: 10px;
+    position: sticky; top: 0; height: 100vh;
+}
+.rail .mark { display: flex; align-items: center; gap: 12px; padding: 4px 8px 16px; }
+.rail .mark .wordmark { font-family: var(--f-display); font-size: 21px; letter-spacing: -.02em; }
+.rail .mark .sub { font-family: var(--f-en); font-size: 11px; color: var(--on-navy-2); line-height: 1.3; }
+
+.rail nav { display: flex; flex-direction: column; gap: 3px; }
+.rail nav a {
+    display: flex; align-items: center; gap: 12px;
+    min-height: var(--tap);
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    color: var(--on-navy-2);
+    text-decoration: none;
+    font-size: 15px; font-weight: 600;
+    transition: background .14s ease, color .14s ease;
+}
+.rail nav a .ic { font-size: 18px; width: 22px; text-align: center; }
+.rail nav a:hover { background: var(--navy-700); color: var(--on-navy); }
+.rail nav a[aria-current="page"] {
+    background: var(--navy-600); color: #fff;
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+.rail .foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--navy-line); }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 26px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 40;
+    flex-wrap: wrap;
+}
+.topbar h1 { font-size: 19px; }
+.topbar .spacer { margin-left: auto; }
+
+.who { display: flex; align-items: center; gap: 11px; }
+.avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent-ink);
+    font-family: var(--f-display); font-size: 15px;
+}
+.who .nm { font-size: 14px; font-weight: 700; line-height: 1.35; }
+.who .rl { font-family: var(--f-en); font-size: 11px; color: var(--ink-2); }
+
+.content { padding: 24px 26px 64px; max-width: 1400px; width: 100%; }
+.page-intro { margin-bottom: 20px; }
+.page-intro h2 { font-size: 22px; }
+.page-intro p { margin: 2px 0 0; font-size: 14px; color: var(--ink-2); }
+
+/* Mobile: the rail becomes a bottom tab bar. A rider holds a phone one-handed
+   on a moving bus — navigation belongs under the thumb, not off-screen. */
+@media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .rail {
+        position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+        width: auto; flex: none; height: auto;
+        flex-direction: row; align-items: center;
+        padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--navy-line);
+        z-index: 60;
+    }
+    .rail .mark, .rail .foot { display: none; }
+    .rail nav { flex-direction: row; flex: 1; gap: 2px; }
+    .rail nav a {
+        flex: 1; flex-direction: column; gap: 2px;
+        padding: 6px 2px; font-size: 11px; text-align: center;
+        min-height: 52px; justify-content: center;
+    }
+    .rail nav a .ic { width: auto; font-size: 20px; }
+    .rail nav a[aria-current="page"] { box-shadow: inset 0 3px 0 var(--accent); }
+    .content { padding: 18px 16px 96px; }
+    .topbar { padding: 12px 16px; }
+}
+
+/* ================================================================== AUTH == */
+.auth {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+}
+.authside {
+    background: var(--navy-900);
+    background-image:
+        radial-gradient(900px 420px at 12% 8%, rgba(29,78,216,.30), transparent 62%),
+        radial-gradient(680px 400px at 92% 96%, rgba(67,56,202,.26), transparent 60%);
+    color: var(--on-navy);
+    padding: 44px 52px;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+}
+/* Faint route geometry behind the board — the network, not decoration. */
+.authside::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(circle at 50% 40%, #000, transparent 78%);
+    pointer-events: none;
+}
+.authside > * { position: relative; }
+.authside .mark { display: flex; align-items: center; gap: 13px; }
+.authside .wordmark { font-family: var(--f-display); font-size: 24px; letter-spacing: -.02em; }
+.authside .mark .sub { font-family: var(--f-en); font-size: 11px; color: var(--on-navy-2); }
+
+.authside .pitch { margin: auto 0; padding: 26px 0; max-width: 520px; }
+.authside .pitch h2 { font-size: 34px; line-height: 1.5; }
+.authside .pitch p { font-size: 15px; color: #B7C4DA; margin: 12px 0 0; }
+.authside .pitch .en { color: #8FA1BE; font-size: 13px; margin-top: 8px; }
+
+.netline { display: flex; gap: 26px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--navy-line); }
+.netline .n { font-family: var(--f-display); font-size: 24px; line-height: 1.2; }
+.netline .l { font-family: var(--f-en); font-size: 11px; color: var(--on-navy-2); letter-spacing: .05em; text-transform: uppercase; }
+
+.authmain {
+    background: var(--surface);
+    padding: 44px 52px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow-y: auto;
+}
+.authbox { width: 100%; max-width: 430px; margin: 0 auto; }
+.authbox > h1 { font-size: 26px; margin-bottom: 4px; }
+.authbox > .lede { font-size: 14px; color: var(--ink-2); margin: 0 0 22px; }
+
+.authfoot { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-soft); font-size: 14px; }
+
+@media (max-width: 940px) {
+    .auth { grid-template-columns: minmax(0,1fr); }
+    .authside { padding: 26px 22px 30px; }
+    .authside .pitch { margin: 22px 0; }
+    .authside .pitch h2 { font-size: 25px; }
+    .authmain { padding: 30px 22px 52px; }
+}
+
+/* ================================================================ DIALOG == */
+dialog {
+    border: 0; padding: 0;
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-3);
+    max-width: 430px; width: calc(100% - 32px);
+    color: var(--ink);
+    background: var(--surface);
+}
+dialog::backdrop { background: rgba(6,10,20,.6); backdrop-filter: blur(2px); }
+.dlg { padding: 26px; }
+.dlg h2 { font-size: 19px; margin-bottom: 6px; }
+.dlg p { margin: 0 0 20px; font-size: 14px; color: var(--ink-2); }
+.dlg-actions { display: flex; gap: 10px; }
+.dlg-actions .btn { flex: 1; }
+
+/* ================================================================= TOAST == */
+.toasts {
+    position: fixed; right: 18px; bottom: 18px; z-index: 200;
+    display: flex; flex-direction: column; gap: 10px;
+    max-width: min(370px, calc(100vw - 36px));
+}
+@media (max-width: 860px) { .toasts { bottom: 76px; left: 16px; right: 16px; max-width: none; } }
+.toast {
+    display: flex; gap: 11px; align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: var(--r-md);
+    background: var(--navy-800); color: var(--on-navy);
+    box-shadow: var(--sh-3);
+    font-size: 14px;
+    animation: rise .26s cubic-bezier(.22,1,.36,1);
+}
+.toast .en { color: #97A8C2; }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ======================================================= ARRIVAL BANNER ==  */
+/* A rider glances at this once, in a crowded moving bus. Nothing competes. */
+.arrival {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 150;
+    background: var(--danger); color: #fff;
+    box-shadow: 0 -6px 30px rgba(6,10,20,.4);
+}
+@media (max-width: 860px) { .arrival { bottom: 64px; } }
+.arrival-inner {
+    max-width: 1400px; margin: 0 auto;
+    padding: 18px 26px;
+    display: flex; align-items: center; gap: 20px;
+}
+.arrival .ic { font-size: 42px; line-height: 1; }
+.arrival .t { font-size: 27px; font-weight: 800; line-height: 1.35; }
+.arrival .s { font-size: 20px; font-weight: 700; }
+.arrival .en { color: rgba(255,255,255,.88); }
+.arrival .btn { margin-left: auto; }
+
+/* ============================================================== UTILITIES == */
+.divider { height: 1px; background: var(--line-soft); margin: 20px 0; border: 0; }
+.sr {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+}
+.leg-line { display: flex; align-items: center; gap: 11px; padding: 11px 0; }
+.leg-line + .leg-line { border-top: 1px dashed var(--line); }
+.leg-line .where { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; }
+.leg-line .when { font-family: var(--f-en); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
