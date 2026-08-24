@@ -40,7 +40,7 @@ public class OpsService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> drivers() {
-        prolog.resetToBaseTheory();
+        facts.resetWorld();
         facts.assertDriverScores();
 
         List<Map<String, Object>> rows = new ArrayList<>();

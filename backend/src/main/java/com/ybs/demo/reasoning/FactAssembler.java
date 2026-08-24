@@ -66,6 +66,17 @@ public class FactAssembler {
         assertWorldFacts();
     }
 
+    /**
+     * The baseline every feature resets to: rules plus the standing world facts. The
+     * engine is shared across features, so anything that wipes it must restore these -
+     * otherwise {@code /api/prolog/query} goals like {@code fare(...)} start failing
+     * depending on which page was visited last.
+     */
+    public void resetWorld() {
+        prolog.resetToBaseTheory();
+        assertWorldFacts();
+    }
+
     /** Fares, plus any flood currently in force. */
     public void assertWorldFacts() {
         for (Route r : network.allRoutes()) {

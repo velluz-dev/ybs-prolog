@@ -64,6 +64,9 @@ public class EntityExtractor {
                 destId = stop.getId();
                 destName = name;
             }
+            if (originId != null && destId != null) {
+                break;   // both slots filled; the rest of the scan cannot improve the parse
+            }
         }
 
         log.info("Parsed entities from \"{}\" -> origin={} ({}), destination={} ({})",

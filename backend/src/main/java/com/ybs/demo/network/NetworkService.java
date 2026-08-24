@@ -31,6 +31,8 @@ public class NetworkService {
 
     private final Map<Long, Stop> stopsById = new LinkedHashMap<>();
     private final Map<Long, Route> routesById = new LinkedHashMap<>();
+    /** Route code -> route, so hot paths never scan allRoutes() to find one route. */
+    private final Map<String, Route> routesByCode = new HashMap<>();
     /** Route id -> its stops in running order. */
     private final Map<Long, List<RouteStop>> itineraries = new HashMap<>();
 
@@ -55,6 +57,7 @@ public class NetworkService {
         }
         for (Route r : routeRepository.findAll()) {
             routesById.put(r.getId(), r);
+            routesByCode.put(r.getCode(), r);
             itineraries.put(r.getId(), new ArrayList<>(routeStopRepository.findByRouteIdOrderBySequence(r.getId())));
         }
         log.info("Network cached: {} routes, {} stops", routesById.size(), stopsById.size());
@@ -62,6 +65,9 @@ public class NetworkService {
 
     public Stop stop(Long id) { return stopsById.get(id); }
     public Route route(Long id) { return routesById.get(id); }
+
+    /** Route by its display code (e.g. {@code "43"}), or null if no route has it. */
+    public Route routeByCode(String code) { return routesByCode.get(code); }
     public List<Stop> allStops() { return new ArrayList<>(stopsById.values()); }
     public List<Route> allRoutes() { return new ArrayList<>(routesById.values()); }
 
