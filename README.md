@@ -103,12 +103,22 @@ Two consequences worth stating in a viva:
 
 ## Running it
 
+> **New to the project?** [`docs/SETUP.md`](docs/SETUP.md) is the full install guide —
+> prerequisites, first run, IDE setup and troubleshooting.
+
+**Prerequisites: a JDK 17 or newer, and Git. That is all.** No Maven (the wrapper handles
+it), no Node or npm (the frontend has no build step), no database (H2 runs in memory).
+
 ```bash
-cd backend
-./mvnw spring-boot:run
+git clone https://github.com/velluzHTA-dev/ybs-prolog.git
+cd ybs-prolog/backend
+./mvnw spring-boot:run          # Windows: .\mvnw.cmd spring-boot:run
 ```
 
 Then open <http://localhost:8081>.
+
+The project compiles to Java 17 bytecode on purpose, so any JDK from 17 onward can build it —
+teammates use whatever they already have. It runs happily on 25.
 
 - **Port 8081, not 8080.** Port 8080 is occupied on this machine by an unrelated
   `AgentService` process. Change `server.port` in `application.properties` if you prefer.

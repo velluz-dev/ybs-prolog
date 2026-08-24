@@ -1,0 +1,90 @@
+# =============================================================================
+#  YBS AI transit demo — requirements
+# =============================================================================
+#  NOTE: this file is DOCUMENTATION. No tool reads it.
+#
+#  This is a Java/Maven project, not a Python one. The build resolves its
+#  dependencies from backend/pom.xml, and `./mvnw` downloads them automatically
+#  on first build. You never install anything from this list by hand.
+#
+#  It is here so the required environment and libraries can be read at a glance
+#  without opening pom.xml.
+#
+#  Install guide:  docs/SETUP.md
+#  Dependency source of truth:  backend/pom.xml
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# 1. SYSTEM REQUIREMENTS  (install these yourself)
+# -----------------------------------------------------------------------------
+jdk                     >= 17          # any JDK 17, 21 or 25 — https://adoptium.net
+git                     >= 2.30        # to clone the repository
+web-browser             any modern     # Chrome, Edge or Firefox
+disk-space              ~500 MB        # ~400 MB of that is the ~/.m2 dependency cache
+internet                first build only
+
+# NOT required — deliberately:
+#   maven      — the Maven Wrapper (backend/mvnw) provisions Maven 3.9.9 itself
+#   node/npm   — the frontend is plain HTML/CSS/JS with no build step
+#   database   — H2 runs in memory and reseeds from data.sql on every startup
+#   docker     — single process, runs directly on the JVM
+#   python     — none of the runtime uses Python
+
+
+# -----------------------------------------------------------------------------
+# 2. BUILD TOOLING  (provisioned automatically)
+# -----------------------------------------------------------------------------
+apache-maven            == 3.9.9       # via backend/.mvn/wrapper/maven-wrapper.properties
+maven-wrapper           == 3.3.2
+
+
+# -----------------------------------------------------------------------------
+# 3. DIRECT DEPENDENCIES  (declared in backend/pom.xml)
+# -----------------------------------------------------------------------------
+org.springframework.boot:spring-boot-starter-parent        == 3.5.6
+org.springframework.boot:spring-boot-starter-web           == 3.5.6   # REST + embedded Tomcat
+org.springframework.boot:spring-boot-starter-data-jpa      == 3.5.6   # persistence
+com.h2database:h2                                          == 2.3.232 # in-memory database (runtime)
+it.unibo.alice.tuprolog:tuprolog                           == 3.3.0   # in-JVM Prolog engine
+org.springframework.boot:spring-boot-starter-test          == 3.5.6   # JUnit 5 + assertions (test)
+
+# Spring Boot's parent POM manages every version above except tuProlog, which is
+# why only that one carries an explicit <version> in pom.xml.
+
+
+# -----------------------------------------------------------------------------
+# 4. KEY TRANSITIVE DEPENDENCIES  (pulled in automatically — 67 artifacts total)
+# -----------------------------------------------------------------------------
+org.springframework:spring-core                            == 6.2.11
+org.apache.tomcat.embed:tomcat-embed-core                  == 10.1.46
+org.hibernate.orm:hibernate-core                           == 6.6.29.Final
+com.fasterxml.jackson.core:jackson-databind                == 2.19.2
+
+
+# -----------------------------------------------------------------------------
+# 5. VENDORED FRONTEND ASSETS  (committed, no install step)
+# -----------------------------------------------------------------------------
+leaflet                 == 1.9.4       # frontend/vendor/ — map rendering
+#
+# Leaflet is committed rather than fetched from a CDN so the page works with the
+# network cable unplugged. Map TILES still come from OpenStreetMap and need the
+# internet; if they fail, routes, stops and buses stay visible on a plain
+# background and the page says so.
+
+
+# -----------------------------------------------------------------------------
+# 6. WHY THESE, AND NOT SOMETHING ELSE
+# -----------------------------------------------------------------------------
+# tuProlog 3.3.0 (classic) rather than 2p-kt:
+#     pure Java, runs in-JVM, so there is no native SWI-Prolog install and
+#     nothing to configure at demo time. Its API (new Prolog(); setTheory();
+#     solve()) keeps the Java-to-Prolog bridge short enough to read aloud.
+#
+# Spring Boot 3.5.6 rather than 3.2.x:
+#     3.2 predates Java 25 and its bundled ASM rejects class-file version 69.
+#     3.5.x is Java 25 ready while still targeting Java 17 bytecode.
+#
+# H2 in memory rather than a real database:
+#     the demo must reset clean on every start, and must not depend on a service
+#     being up during the presentation.

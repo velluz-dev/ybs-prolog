@@ -23,8 +23,14 @@
     <description>YBS AI transit demo</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-        <java.version>25</java.version>
+        <!--
+          Java 17 bytecode, deliberately. Nothing in this project uses an API newer than 17,
+          so targeting 17 lets every teammate build with whatever JDK they already have
+          (17, 21 or 25) instead of everyone having to install one specific version.
+          It still RUNS fine on JDK 25 - a 17 target is forward compatible.
+        -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
