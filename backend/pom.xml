@@ -63,6 +63,26 @@
     </dependencies>
 
     <build>
+        <!--
+          The browser assets live in ../frontend so the frontend teammates own a folder of
+          their own rather than reaching into src/main/resources. Declaring the resources
+          block explicitly means the default src/main/resources must be re-declared too,
+          or Maven would stop copying application.properties, data.sql and ybs.pl.
+
+          This is still ONE Spring Boot process. The split is about who owns which files,
+          not about running two servers - the brief requires a single command and no
+          network dependency at demo time.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/../frontend</directory>
+                <targetPath>static</targetPath>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

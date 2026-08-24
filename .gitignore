@@ -1,14 +1,15 @@
 # Build output
 target/
+backend/target/
 
 # Local-only workaround for this machine's Avast HTTPS interception.
 # Avast MITMs TLS, so the JDK cannot verify Maven Central. These three files are a
 # machine-specific fix: a copy of the JDK truststore with Avast's root imported, the
-# exported cert, and a jvm.config that hardcodes an absolute D:/YBS path. Committing
-# them would break the build for anyone else. See README for how to recreate.
-.mvn/cacerts
-.mvn/avast-root.pem
-.mvn/jvm.config
+# exported cert, and a jvm.config that hardcodes an absolute path. Committing them
+# would break the build for everyone else. See backend/README.md to recreate.
+**/.mvn/cacerts
+**/.mvn/avast-root.pem
+**/.mvn/jvm.config
 
 # Editor and tool local settings
 .vscode/

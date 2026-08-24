@@ -221,7 +221,7 @@ as "not eligible" — a visible failure rather than stale data quietly passing a
 
 ---
 
-## Frontend loops (`static/app.js`)
+## Frontend loops (`frontend/app.js`)
 
 | Loop | Interval | Purpose |
 |---|---|---|

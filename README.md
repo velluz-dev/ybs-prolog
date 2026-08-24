@@ -8,7 +8,7 @@ Each component maps to a recognisable AI topic:
 
 | AI topic | Feature package | Start reading at |
 |---|---|---|
-| Knowledge representation & reasoning | `reasoning/` | `src/main/resources/rules/ybs.pl` |
+| Knowledge representation & reasoning | `reasoning/` | `backend/src/main/resources/rules/ybs.pl` |
 | Heuristic search | `planning/` | `planning/AStarPlanner.java` |
 | Constraint satisfaction | `reasoning/` | `violates/2` in `ybs.pl` |
 | Reasoning under uncertainty | `eta/` | `eta/EtaService.java` |
@@ -19,6 +19,55 @@ Each component maps to a recognisable AI topic:
 > **How it all fits together:** [`docs/WORKFLOW.md`](docs/WORKFLOW.md) traces one request end
 > to end — Burmese audio → entity extraction → A\* → Pareto → Prolog → trip → 400 m alert —
 > naming the class and endpoint at every hop, with diagrams.
+
+## Repository layout — who owns what
+
+```
+YBS/
+├── frontend/          ← the browser. HTML, CSS, JS, Leaflet, audio clips.
+│   ├── index.html         journey planner
+│   ├── ops.html           ops dashboard
+│   ├── app.js             all behaviour: map, polling, search, alerts
+│   ├── style.css          design tokens + components
+│   ├── vendor/            Leaflet, vendored for offline use
+│   ├── audio/             arrival clips (placeholders)
+│   └── voice/             sample Burmese queries
+│
+├── backend/           ← the JVM. Spring Boot, Prolog, A*, simulation.
+│   ├── pom.xml
+│   ├── mvnw, mvnw.cmd     run everything from in here
+│   └── src/
+│       ├── main/java/com/ybs/demo/    feature packages (see below)
+│       ├── main/resources/            application.properties, data.sql, rules/ybs.pl
+│       └── test/java/                 21 tests
+│
+├── docs/WORKFLOW.md   ← how a request flows through the whole system
+└── README.md
+```
+
+**This is still one process.** The split is about ownership, not architecture — the brief
+requires a single command and no network dependency at demo time, so there is no separate
+frontend server, no build step, and no npm. `backend/pom.xml` declares `../frontend` as a
+resource directory, so it is packaged into the jar at build time.
+
+### Working in parallel
+
+| You are working on | You edit | To see your change |
+|---|---|---|
+| UI, layout, Burmese copy, map | `frontend/` | **just refresh the browser** — no rebuild, no restart |
+| Search, Prolog, simulation, APIs | `backend/src/main/java/` | restart `./mvnw spring-boot:run` |
+| Stops, routes, fares, traffic prior | `backend/src/main/resources/data.sql` | restart (H2 reseeds on boot) |
+| Reasoning rules | `backend/src/main/resources/rules/ybs.pl` | restart |
+
+Frontend edits are live because `application.properties` serves `file:../frontend/` ahead of
+the packaged copy. That is the one thing that makes parallel work comfortable: the frontend
+teammate never waits on a Maven build.
+
+**The contract between the two halves is the REST API** — see
+[`frontend/README.md`](frontend/README.md) for every endpoint the UI consumes, with example
+responses. As long as those shapes hold, both halves can change independently.
+
+---
 
 ## Project structure
 
@@ -55,6 +104,7 @@ Two consequences worth stating in a viva:
 ## Running it
 
 ```bash
+cd backend
 ./mvnw spring-boot:run
 ```
 
@@ -64,7 +114,7 @@ Then open <http://localhost:8081>.
   `AgentService` process. Change `server.port` in `application.properties` if you prefer.
 - **First build needs the internet** to download Maven and the dependencies. After that
   `~/.m2` is warm and everything runs offline.
-- Run the tests with `./mvnw test`.
+- Run the tests with `cd backend && ./mvnw test`.
 
 ### The Avast TLS workaround (already applied)
 
@@ -72,13 +122,29 @@ Avast Web/Mail Shield intercepts HTTPS on this machine and re-signs certificates
 own root CA. That root is trusted by Windows (so browsers and `curl` work) but not by the
 JDK, so Maven could not reach Maven Central — it failed with `PKIX path building failed`.
 
-The fix is committed and needs no action from you:
+**These files are deliberately NOT committed** — they are machine-specific and would break
+the build for anyone whose machine does not run Avast:
 
-- `.mvn/cacerts` — a copy of the JDK truststore with the Avast root added
-- `.mvn/jvm.config` — points Maven at it
+- `backend/.mvn/cacerts` — a copy of the JDK truststore with the Avast root added
+- `backend/.mvn/jvm.config` — points Maven at it, using an absolute path
 
-Nothing outside the project was modified. If you ever disable Avast's HTTPS scanning, you
-can delete both files.
+**Teammates: you almost certainly do not need this.** If `./mvnw` works, ignore this
+section. Only if you hit `PKIX path building failed`, recreate the two files for your own
+machine (adjust the JDK path and your interceptor's name):
+
+```bash
+# 1. export the intercepting root CA from the Windows trust store
+powershell -Command "Get-ChildItem Cert:\LocalMachine\Root | Where-Object { \$_.Subject -like '*Avast*' } | Select-Object -First 1 | ForEach-Object { [Convert]::ToBase64String(\$_.RawData,'InsertLineBreaks') }" > root.b64
+
+# 2. copy the JDK truststore and import the cert into the copy
+cp "$JAVA_HOME/lib/security/cacerts" backend/.mvn/cacerts
+keytool -importcert -noprompt -trustcacerts -alias mitm-root         -file backend/.mvn/avast-root.pem         -keystore backend/.mvn/cacerts -storepass changeit
+
+# 3. point Maven at it
+echo "-Djavax.net.ssl.trustStore=$(pwd)/backend/.mvn/cacerts -Djavax.net.ssl.trustStorePassword=changeit"      > backend/.mvn/jvm.config
+```
+
+Nothing outside the project is modified. The system JDK truststore is left untouched.
 
 ---
 
@@ -86,7 +152,7 @@ can delete both files.
 
 - **Data & map** — 28 stops with coordinates looked up from OpenStreetMap (each row in
   `data.sql` cites its source), 3 routes, Leaflet rendering. Leaflet is vendored in
-  `static/vendor/` so the page works with no network; only the map *tiles* need the
+  `frontend/vendor/` so the page works with no network; only the map *tiles* need the
   internet, and the routes stay visible without them.
 - **Bus simulation** — 1 Hz tick, 6 buses, 1× / 10× / 60× speed control. Buses alternate
   between **driving** a segment and **waiting** at the stop they reach, and predict their
@@ -141,12 +207,14 @@ Insein → Botataung trip. Both A\* tests stayed green, and the reason is worth 
 only ever *increases* edge costs, and a heuristic that was a lower bound on the smaller cost
 is still a lower bound on the larger one. Admissibility survives cost increases; it is cost
 *decreases* that break it — which is exactly what the night-time traffic factor did.
-- **Tests** — 11 passing, including heuristic admissibility across every reachable stop pair.
+- **Tests** — 21 passing: heuristic admissibility across every reachable stop pair *and*
+  every traffic bucket, the Prolog bridge, and the simulation's driving/waiting/arrival
+  behaviour.
 
 ### Replacing the placeholder audio
 
 The repo ships **silent/tone WAV placeholders** so the playback path runs end to end.
-Record real Burmese clips and drop them into `src/main/resources/static/audio/` — the
+Record real Burmese clips and drop them into `frontend/audio/` — the
 player tries `.mp3` first and falls back to `.wav`, so **no code change is needed**.
 
 | File | What to say |
@@ -155,7 +223,7 @@ player tries `.mp3` first and falls back to `.wav`, so **no code change is neede
 | `stop_1.mp3` … `stop_28.mp3` | the stop's Burmese name — ids are in `data.sql` |
 | `suffix.mp3` | "ဆင်းရန် အဆင်သင့်ဖြစ်ပါ" *(get ready to alight)* |
 
-The three voice-query samples in `static/voice/` are silent placeholders too. Their
+The three voice-query samples in `frontend/voice/` are silent placeholders too. Their
 transcripts come from a lookup map in `RecordedTranscriber`, so re-recording them is
 optional — it only matters if you want the audio to match what the screen says.
 
