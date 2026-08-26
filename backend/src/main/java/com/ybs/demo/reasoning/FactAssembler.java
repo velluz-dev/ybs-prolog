@@ -76,6 +76,12 @@ public class FactAssembler {
         for (Long stopId : disruptions.floodedStops()) {
             prolog.assertFact("flooded(s" + stopId + ")");
         }
+
+        // Driver scores belong here too. They describe the world, not one request, and
+        // every reset wipes them - so if only the ops page asserted them, a hand-typed
+        // bonus_eligible/2 goal in the live console would answer "false" the moment
+        // anything else had reset the theory. That looks exactly like a broken rule.
+        assertDriverScores();
     }
 
     /** The rider's profile, as chosen by the toggles in the UI. */

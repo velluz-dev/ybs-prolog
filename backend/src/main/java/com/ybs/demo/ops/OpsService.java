@@ -41,7 +41,7 @@ public class OpsService {
     @Transactional(readOnly = true)
     public List<Map<String, Object>> drivers() {
         prolog.resetToBaseTheory();
-        facts.assertDriverScores();
+        facts.assertWorldFacts();   // includes the driver scores
 
         List<Map<String, Object>> rows = new ArrayList<>();
         for (DriverMonthlyScore s : scoreRepository.findAll()) {

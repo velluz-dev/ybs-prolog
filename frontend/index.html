@@ -12,116 +12,209 @@
 </head>
 <body>
 
-<header class="app-header">
+<div class="shell">
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────────
+     One feature per view. The previous build stacked everything on a single
+     page, so you scrolled past four things to reach the one you wanted. -->
+<aside class="sidebar">
     <div class="brand">
-        <h1>YBS ခရီးစဉ်ရှာဖွေမှု</h1>
-        <p class="sub">Yangon Bus Service — journey planner</p>
+        <div class="brand-mark">YBS</div>
+        <div>
+            <div class="brand-my">ခရီးစဉ်ရှာဖွေမှု</div>
+            <div class="brand-en">AI journey planner</div>
+        </div>
     </div>
-    <div class="header-actions">
+
+    <nav id="nav">
+        <div class="nav-group">ခရီးသည် <span class="en">Rider</span></div>
+        <a class="nav-item" href="#plan" data-view="plan"><span class="ic">🚏</span><span>ခရီးစဉ်ရှာရန်<em>Plan a trip</em></span></a>
+        <a class="nav-item" href="#map" data-view="map"><span class="ic">🗺️</span><span>မြေပုံ<em>Live map</em></span></a>
+        <a class="nav-item" href="#arrivals" data-view="arrivals"><span class="ic">⏱️</span><span>ကားချိန်ဇယား<em>Arrivals board</em></span></a>
+
+        <div class="nav-group">AI သက်သေ <span class="en">Evidence</span></div>
+        <a class="nav-item" href="#trace" data-view="trace"><span class="ic">🔍</span><span>A* ရှာဖွေမှု<em>Search trace</em></span></a>
+        <a class="nav-item" href="#prolog" data-view="prolog"><span class="ic">🧠</span><span>Prolog<em>Live rule console</em></span></a>
+
+        <div class="nav-group">လုပ်ငန်း <span class="en">Operations</span></div>
+        <a class="nav-item" href="#fleet" data-view="fleet"><span class="ic">🚌</span><span>ကားစုစည်းမှု<em>Fleet</em></span></a>
+        <a class="nav-item" href="/ops.html"><span class="ic">📊</span><span>Ops dashboard<em>Driver bonuses</em></span></a>
+        <a class="nav-item" href="#about" data-view="about"><span class="ic">ℹ️</span><span>AI အကြောင်း<em>How it works</em></span></a>
+    </nav>
+
+    <div class="sidebar-foot">
+        <div class="foot-label">အရှိန် <span class="en">Simulation speed</span></div>
         <div id="sim-controls"></div>
-        <a class="ops-link" href="/ops.html">📊 Ops dashboard</a>
     </div>
-</header>
+</aside>
 
-<main class="layout">
+<!-- ── Views ──────────────────────────────────────────────────────────────── -->
+<main class="content">
 
-    <!-- LEFT: the decision surface — ask, constrain, choose ------------------->
-    <div class="col">
+<!-- PLAN ------------------------------------------------------------------->
+<section class="view" data-view="plan">
+    <header class="view-head">
+        <h1>🚏 ခရီးစဉ် ရှာရန်</h1>
+        <p class="en">Ask by voice or pick two stops. A* proposes; the Prolog rule base decides what suits you.</p>
+    </header>
 
-        <section class="card">
-            <div class="card-head">
-                <span class="ic">🚏</span>
-                <h2>ခရီးစဉ် ရွေးပါ <span class="en">Choose your trip</span></h2>
-            </div>
-
-            <div class="voice-row">
-                <button type="button" id="voice-btn" class="mic-btn">🎤 ပြောပါ</button>
-                <select id="voice-sample" title="Sample Burmese query" aria-label="Sample Burmese query"></select>
-            </div>
-            <div id="voice-status" class="muted">ဥပမာ ရွေးပြီး ခလုတ်ကို နှိပ်ပါ။ <span class="en">Pick a sample and press speak.</span></div>
-            <div id="voice-entities"></div>
-
-            <div class="trip-field first">
-                <span class="ic">🔵</span>
-                <div class="grow">
-                    <label class="en" for="from-stop">မှ · from</label>
-                    <select id="from-stop"></select>
+    <div class="two-col">
+        <div class="col">
+            <section class="card">
+                <div class="card-head"><span class="ic">🎤</span><h2>အသံဖြင့် <span class="en">By voice</span></h2></div>
+                <div class="voice-row">
+                    <button type="button" id="voice-btn" class="mic-btn">🎤 ပြောပါ</button>
+                    <select id="voice-sample" title="Sample Burmese query" aria-label="Sample Burmese query"></select>
                 </div>
-            </div>
-            <div class="trip-field">
-                <span class="ic">📍</span>
-                <div class="grow">
-                    <label class="en" for="to-stop">ကို · to</label>
-                    <select id="to-stop"></select>
+                <div id="voice-status" class="muted">ဥပမာ ရွေးပြီး ခလုတ်ကို နှိပ်ပါ။ <span class="en">Pick a sample and press speak.</span></div>
+                <div id="voice-entities"></div>
+            </section>
+
+            <section class="card">
+                <div class="card-head"><span class="ic">📍</span><h2>မှတ်တိုင် ရွေးရန် <span class="en">Choose stops</span></h2></div>
+                <div class="trip-field">
+                    <span class="ic">🔵</span>
+                    <div class="grow"><label class="en" for="from-stop">မှ · from</label><select id="from-stop"></select></div>
                 </div>
-            </div>
-
-            <button type="button" id="search-btn" class="btn-primary">
-                🔍 ရှာမည် <span class="en">Search</span>
-            </button>
-        </section>
-
-        <section class="card">
-            <div class="card-head">
-                <span class="ic">👤</span>
-                <h2>ခရီးသည် အချက်အလက်
-                    <span class="en">Rider profile — results are re-filtered live by the Prolog rule base</span>
-                </h2>
-            </div>
-            <div id="profile" class="chips"></div>
-            <div class="disruption-row">
-                <span class="ic">🌊</span>
-                <div class="grow">
-                    <div class="my">တာမွေ ရေကြီးမှု ထည့်သွင်းရန်</div>
-                    <div class="en">Inject a flood at Tamwe — asserts flooded(s15) into the rule base</div>
+                <div class="trip-field">
+                    <span class="ic">📍</span>
+                    <div class="grow"><label class="en" for="to-stop">ကို · to</label><select id="to-stop"></select></div>
                 </div>
-                <button type="button" id="flood-btn" class="alt-btn">ရေကြီး</button>
-                <button type="button" id="clear-btn" class="alt-btn">✖ ရှင်း</button>
-            </div>
-        </section>
+                <button type="button" id="search-btn" class="btn-primary">🔍 ရှာမည် <span class="en">Search</span></button>
+            </section>
 
-        <section>
+            <section class="card">
+                <div class="card-head"><span class="ic">👤</span><h2>ခရီးသည်အချက်အလက် <span class="en">Rider profile</span></h2></div>
+                <p class="hint">တစ်ခုခု ရွေးလိုက်တာနဲ့ ရလဒ်တွေကို Prolog က ပြန်စစ်ပေးပါတယ်။
+                   <span class="en">Toggling any of these re-filters the results through the rule base.</span></p>
+                <div id="profile" class="chips"></div>
+                <div class="disruption-row">
+                    <span class="ic">🌊</span>
+                    <div class="grow">
+                        <div class="my">တာမွေ ရေကြီးမှု</div>
+                        <div class="en">Assert flooded(s15) into the rule base</div>
+                    </div>
+                    <button type="button" id="flood-btn" class="alt-btn">ရေကြီး</button>
+                    <button type="button" id="clear-btn" class="alt-btn">✖</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="col">
             <div class="results-head">
                 <h2>ခရီးစဉ် ရွေးချယ်မှု <span class="en">Journey options</span></h2>
                 <span class="pareto-badge" id="pareto-badge"></span>
             </div>
-            <div id="results" class="muted">ခရီးစဉ် ရွေးပြီး “ရှာမည်” ကို နှိပ်ပါ။</div>
-        </section>
-
+            <div id="results" class="muted empty-state">
+                ခရီးစဉ် ရွေးပြီး ရှာမည် ကို နှိပ်ပါ။<br>
+                <span class="en">Choose two stops and press Search.</span>
+            </div>
+        </div>
     </div>
+</section>
 
-    <!-- RIGHT: the evidence — what the AI did -------------------------------->
-    <div class="col">
+<!-- MAP -------------------------------------------------------------------->
+<section class="view" data-view="map">
+    <header class="view-head">
+        <h1>🗺️ လမ်းကြောင်းမြေပုံ</h1>
+        <p class="en">Three routes, 28 stops, six buses updating every second. Click a stop for its arrivals.</p>
+    </header>
+    <section class="card">
+        <div id="map"></div>
+        <div id="map-note" class="muted hidden">
+            ⚠️ မြေပုံအကြောင်းအရာ မရနိုင်ပါ (offline) — လမ်းကြောင်းများသာ ပြသည်။
+            <span class="en">Map tiles unavailable — routes, stops and buses still shown.</span>
+        </div>
+        <div id="trip-countdown" class="countdown muted">
+            ခရီးစဉ်တစ်ခု ရွေးပါ။ <span class="en">Start a trip from Plan a trip to watch the countdown here.</span>
+        </div>
+        <div id="legend" class="legend"></div>
+    </section>
+</section>
 
-        <section class="card">
-            <div class="card-head">
-                <span class="ic">🗺️</span>
-                <h2>လမ်းကြောင်းမြေပုံ <span class="en">Network map — buses update every second</span></h2>
-            </div>
-            <div id="map"></div>
-            <div id="map-note" class="muted hidden">
-                ⚠️ မြေပုံအကြောင်းအရာ မရနိုင်ပါ (offline) — လမ်းကြောင်းများသာ ပြသည်။
-                <span class="en">Map tiles unavailable (offline) — routes, stops and buses still shown.</span>
-            </div>
-            <div id="trip-countdown" class="countdown muted">
-                ခရီးစဉ်တစ်ခု ရွေးပါ။ <span class="en">Pick a journey to start a trip — then click any stop for its arrivals board.</span>
-            </div>
-            <div id="legend" class="legend"></div>
-        </section>
+<!-- ARRIVALS --------------------------------------------------------------->
+<section class="view" data-view="arrivals">
+    <header class="view-head">
+        <h1>⏱️ ကား ဘယ်အချိန် ရောက်မလဲ</h1>
+        <p class="en">Predicted from the same model that moves the buses, so the board and the map
+           can never disagree.</p>
+    </header>
+    <section class="card">
+        <div class="trip-field">
+            <span class="ic">🚏</span>
+            <div class="grow"><label class="en" for="arrivals-stop">မှတ်တိုင် · stop</label><select id="arrivals-stop"></select></div>
+        </div>
+        <div id="arrivals-board" class="empty-state muted">မှတ်တိုင် ရွေးပါ။ <span class="en">Pick a stop.</span></div>
+        <p class="hint">အချိန်တိုင်းကို အပိုင်းအခြားနဲ့ ပြပါတယ်။
+           <span class="en">Every figure is a range, never a single number — the model does not know better than ±25%,
+           and a point estimate would claim confidence it has not earned.</span></p>
+    </section>
+</section>
 
-        <section class="card">
-            <div class="card-head">
-                <span class="ic">🔍</span>
-                <h2>A* ရှာဖွေမှု အခြေအနေ
-                    <span class="en">A* search trace — every expanded node with its g, h and f</span>
-                </h2>
-            </div>
-            <div id="search-stats" class="stats"></div>
-            <div id="trace-panel" class="trace muted">Run a search to watch the frontier expand.</div>
-        </section>
+<!-- TRACE ------------------------------------------------------------------>
+<section class="view" data-view="trace">
+    <header class="view-head">
+        <h1>🔍 A* ရှာဖွေမှု အခြေအနေ</h1>
+        <p class="en">Every node the search expanded with its g, h and f — and what the heuristic bought.</p>
+    </header>
+    <section class="card">
+        <div id="search-stats" class="stats"></div>
+        <div id="trace-panel" class="trace muted">ရှာဖွေမှုတစ်ခု လုပ်ပါ။ Run a search to watch the frontier expand.</div>
+        <p class="hint">Dijkstra ဆိုတာ h = 0 ထားတဲ့ A* ပါပဲ။
+           <span class="en">Dijkstra is literally this same search with h = 0 — which is what makes the comparison fair
+           rather than a comparison of two different implementations.</span></p>
+    </section>
+</section>
 
-    </div>
+<!-- PROLOG ----------------------------------------------------------------->
+<section class="view" data-view="prolog">
+    <header class="view-head">
+        <h1>🧠 Prolog rule console</h1>
+        <p class="en">Type a goal; the engine solves it live. This is the proof the answers are derived, not looked up.</p>
+    </header>
+    <section class="card">
+        <div class="console-row">
+            <span class="prompt">?-</span>
+            <input type="text" id="goal-input" spellcheck="false" aria-label="Prolog goal">
+            <button type="button" id="goal-run" class="btn-run">Solve</button>
+        </div>
+        <div class="preset-row" id="goal-presets"></div>
+        <div id="goal-output" class="console-out muted">Solve a goal to see its bindings.</div>
+        <p class="hint">
+            <b>The moment to land in a viva.</b> Run the first preset: one solution, <code>F = 400</code>,
+            because nothing is known about <code>m1</code> so it falls through to the general clause.
+            Now run the second: <b>two</b> solutions, <code>0</code> then <code>400</code>. The monk clause
+            matches first because it is written first, then Prolog backtracks and finds the general clause
+            still applies. Clause ordering and backtracking, on a fact invented one second earlier.
+        </p>
+    </section>
+</section>
+
+<!-- FLEET ------------------------------------------------------------------>
+<section class="view" data-view="fleet">
+    <header class="view-head">
+        <h1>🚌 ကား စုစည်းမှု</h1>
+        <p class="en">Every simulated bus: what it is doing right now, and where it goes next.</p>
+    </header>
+    <section class="card">
+        <div id="fleet-table"></div>
+        <p class="hint">တစ်စက္ကန့်တိုင်း update လုပ်ပါတယ်။
+           <span class="en">Updates once a second. Buses alternate between DRIVING a segment and DWELLING at the
+           stop they reach — the waiting is real, not a fudge factor folded into driving time.</span></p>
+    </section>
+</section>
+
+<!-- ABOUT ------------------------------------------------------------------>
+<section class="view" data-view="about">
+    <header class="view-head">
+        <h1>ℹ️ How this demo works</h1>
+        <p class="en">Each feature maps to one AI topic. This page is the map between them.</p>
+    </header>
+    <div id="about-grid" class="about-grid"></div>
+</section>
+
 </main>
+</div>
 
 <!-- Arrival banner: hidden until the 400 m geofence fires -->
 <div id="arrival-banner" class="arrival hidden">

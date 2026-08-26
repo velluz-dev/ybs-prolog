@@ -1,3 +1,182 @@
+
+
+/* ------------------------------------------------------------------- card */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+}
+.card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.card-head .ic { font-size: 20px; line-height: 1; }
+.card-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.card-head .en { display: block; margin-top: 1px; }
+
+/* ------------------------------------------- ops.html (its own top header) */
+/* ops.html is a separate page with no sidebar, so it keeps a horizontal header. */
+.app-header {
+    background: var(--panel-dark); color: #fff;
+    padding: 16px 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
+.ops-brand h1 { margin: 0; font-size: 23px; font-weight: 700; line-height: 1.2; }
+.ops-brand .sub { margin: 2px 0 0; font-family: var(--font-en); font-size: 13px; color: #94A3B8; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.ops-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 10px; border: 1px solid #334155; color: #E2E8F0;
+    text-decoration: none; font-family: var(--font-en); font-size: 14px; font-weight: 600;
+}
+.ops-link:hover { background: #1E293B; }
+.layout {
+    display: grid; gap: 20px; padding: 20px;
+    align-items: start; max-width: 1600px; margin: 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* ============================ APP SHELL ==================================== */
+/* Sidebar + one view at a time. The previous build stacked every feature on a
+   single scrolling page, so reaching the one under discussion meant scrolling
+   past four others. */
+
+.shell { display: flex; min-height: 100vh; }
+
+.sidebar {
+    width: 268px; flex: 0 0 268px;
+    background: var(--panel-dark); color: #E2E8F0;
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+}
+.brand { display: flex; align-items: center; gap: 12px; padding: 20px 18px 18px; }
+.brand-mark {
+    width: 42px; height: 42px; border-radius: 11px; background: var(--accent);
+    color: #fff; font-family: var(--font-en); font-weight: 800; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; letter-spacing: .04em;
+}
+.brand-my { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.25; }
+.brand-en { font-family: var(--font-en); font-size: 11px; color: #94A3B8; }
+
+#nav { flex: 1; overflow-y: auto; padding: 4px 10px 10px; }
+.nav-group {
+    font-family: var(--font-en); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .09em; color: #64748B;
+    padding: 16px 10px 6px;
+}
+.nav-group .en { color: #475569; font-size: 10px; }
+.nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 11px; border-radius: 10px; margin-bottom: 2px;
+    color: #CBD5E1; text-decoration: none; font-size: 14px; line-height: 1.3;
+}
+.nav-item .ic { font-size: 18px; width: 22px; text-align: center; }
+.nav-item em { display: block; font-family: var(--font-en); font-style: normal; font-size: 11px; color: #64748B; }
+.nav-item:hover { background: #1E293B; color: #fff; }
+.nav-item.on { background: var(--accent); color: #fff; }
+.nav-item.on em { color: #BFDBFE; }
+
+.sidebar-foot { padding: 14px 16px 18px; border-top: 1px solid #1E293B; }
+.foot-label { font-size: 12px; color: #94A3B8; margin-bottom: 8px; }
+.foot-label .en { color: #64748B; font-size: 10px; }
+
+.content { flex: 1; min-width: 0; padding: 26px 30px 60px; max-width: 1500px; }
+.view { display: none; }
+.view.active { display: block; animation: fade .18s ease-out; }
+@keyframes fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.view-head { margin-bottom: 20px; }
+.view-head h1 { margin: 0; font-size: 26px; font-weight: 700; }
+.view-head p { margin: 5px 0 0; max-width: 76ch; font-size: 13px; }
+
+.two-col { display: grid; grid-template-columns: 460px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 1180px) {
+    .two-col { grid-template-columns: minmax(0, 1fr); }
+    .shell { flex-direction: column; }
+    .sidebar { width: auto; flex: none; height: auto; position: static; }
+    #nav { display: flex; flex-wrap: wrap; }
+    .nav-group { width: 100%; }
+}
+
+.hint { font-size: 12px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.6; }
+.hint code {
+    font-family: var(--font-en); background: #F1F5F9;
+    padding: 1px 5px; border-radius: 4px; font-size: 11px;
+}
+.empty-state {
+    border: 1px dashed var(--line); border-radius: var(--radius);
+    padding: 30px 20px; text-align: center; background: #FBFCFD;
+}
+
+/* ---------------------------- Prolog console ------------------------------ */
+.console-row { display: flex; align-items: center; gap: 10px; }
+.prompt { font-family: var(--font-en); font-weight: 700; color: var(--accent); font-size: 17px; }
+#goal-input {
+    flex: 1; min-width: 0;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 14px;
+    padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px;
+}
+#goal-input:focus { outline: none; border-color: var(--accent); }
+.btn-run {
+    font-family: var(--font-en); font-size: 14px; font-weight: 700;
+    padding: 12px 20px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #fff; cursor: pointer;
+}
+.preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.preset {
+    text-align: left; cursor: pointer; font: inherit;
+    border: 1px solid var(--line); background: #fff;
+    border-radius: 9px; padding: 8px 11px;
+}
+.preset:hover { border-color: var(--accent); background: var(--accent-soft); }
+.preset code { display: block; font-size: 12px; color: var(--ink); }
+.preset em { font-family: var(--font-en); font-style: normal; font-size: 10px; color: var(--ink-2); }
+
+.console-out {
+    background: var(--panel-dark); color: #D1E0FF; border-radius: 10px;
+    padding: 14px; min-height: 120px;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px;
+}
+.console-out .echo { color: #7DD3FC; margin-bottom: 8px; }
+.console-out .sol { padding: 3px 0; }
+.console-out .sol .n { color: #64748B; margin-right: 6px; }
+.console-out .sol code { color: #FDE68A; }
+.console-out .yes { color: #86EFAC; }
+.console-out .no { color: #FCA5A5; }
+.console-out .err { color: #FCA5A5; }
+.console-out .sol-count { color: #64748B; margin-top: 8px; font-size: 11px; }
+
+/* ---------------------------- fleet + boards ------------------------------ */
+.state-pill {
+    display: inline-block; padding: 4px 10px; border-radius: 20px;
+    font-family: var(--font-en); font-size: 12px; font-weight: 600;
+}
+.state-pill.driving { background: var(--ok-soft); color: var(--ok-ink); }
+.state-pill.waiting { background: #FFF7ED; color: #7C2D12; }
+
+.board-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.board.big .board-row {
+    padding: 12px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px;
+}
+.board.big .board-eta { font-size: 20px; }
+.board-bus { margin-left: auto; }
+
+/* ---------------------------------- about --------------------------------- */
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.topic {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+}
+.topic:hover { border-color: var(--accent); }
+.topic.flat:hover { border-color: var(--line); }
+.topic-ic { font-size: 26px; }
+.topic-title { font-size: 17px; font-weight: 700; margin: 8px 0 4px; }
+.topic-pkg {
+    font-family: var(--font-en); font-size: 11px; background: #F1F5F9;
+    padding: 2px 7px; border-radius: 5px; color: var(--ink-2);
+}
+.topic p { font-size: 13px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.6; }
+
 /* ============================================================================
    YBS demo — design system
    ----------------------------------------------------------------------------
@@ -52,58 +231,6 @@ body {
 .en { font-family: var(--font-en); color: var(--ink-2); font-size: 12px; font-weight: 400; }
 .muted { color: var(--ink-2); }
 .hidden { display: none !important; }
-
-/* ------------------------------------------------------------------ header */
-.app-header {
-    background: var(--panel-dark);
-    color: #fff;
-    padding: 16px 28px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-.brand h1 { margin: 0; font-size: 23px; font-weight: 700; line-height: 1.2; }
-.brand .sub { margin: 2px 0 0; font-family: var(--font-en); font-size: 13px; color: #94A3B8; }
-.header-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-
-.ops-link {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 16px; border-radius: 10px;
-    border: 1px solid #334155; color: #E2E8F0;
-    text-decoration: none; font-family: var(--font-en); font-size: 14px; font-weight: 600;
-}
-.ops-link:hover { background: #1E293B; }
-
-/* -------------------------------------------------------------- structure */
-/* Two zones: the decision surface on the left, the evidence on the right.
-   The examiner needs the results and the A* trace visible at the same time. */
-.layout {
-    display: grid;
-    grid-template-columns: 560px minmax(0, 1fr);
-    gap: 20px;
-    padding: 20px;
-    align-items: start;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-
-@media (max-width: 1100px) {
-    .layout { grid-template-columns: minmax(0, 1fr); }
-}
-
-.card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
-}
-.card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.card-head .ic { font-size: 20px; line-height: 1; }
-.card-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
-.card-head .en { display: block; margin-top: 1px; }
 
 /* ------------------------------------------------------------------ voice */
 .voice-row {
