@@ -512,3 +512,9 @@ body {
     font-size: 10px; color: var(--ink-2);
 }
 #map { height: 560px; }
+
+.inline-check {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+.inline-check input { cursor: pointer; }

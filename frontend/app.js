@@ -11,6 +11,7 @@ let networkStops = [];
 let selectedJourney = null;
 let watchedBusId = null;
 let lastSearch = null;
+let busesOnlySelected = false;
 
 /* ------------------------------------------------------------------- router */
 
@@ -265,7 +266,11 @@ async function pollBuses() {
     try {
         const all = await (await fetch('/api/buses/live')).json();
         latestBuses = all;
-        const buses = all.filter(b => selected.has(b.routeCode));
+        // Every bus on the network is shown by default, each in its own route's colour -
+        // that colouring is what makes 236 markers readable rather than a swarm of
+        // identical pills. Restricting them to the drawn routes is opt-in, because
+        // hiding buses whose line happens not to be drawn surprises people.
+        const buses = busesOnlySelected ? all.filter(b => selected.has(b.routeCode)) : all;
         for (const [id, m] of busMarkers) {
             if (!buses.some(b => b.id === id)) { map.removeLayer(m); busMarkers.delete(id); }
         }
@@ -310,9 +315,9 @@ const CROWD = { 0: ['🟢', 'ထိုင်ခုံရ', 'seats free'], 1: ['�
 
 function renderFleet() {
     const el = document.getElementById('fleet-table');
-    const shown = latestBuses.filter(b => selected.has(b.routeCode));
+    const shown = busesOnlySelected ? latestBuses.filter(b => selected.has(b.routeCode)) : latestBuses;
     if (!shown.length) {
-        el.innerHTML = '<div class="muted">No buses on the selected routes — turn some on in Live map.</div>';
+        el.innerHTML = '<div class="muted">No buses to show.</div>';
         return;
     }
     el.innerHTML = `
@@ -710,6 +715,12 @@ loadNetwork()
         initProlog();
         initAbout();
         document.getElementById('route-search').addEventListener('input', renderRouteFilter);
+        document.getElementById('buses-selected-only').addEventListener('change', e => {
+            busesOnlySelected = e.target.checked;
+            for (const [id, m] of busMarkers) { map.removeLayer(m); }
+            busMarkers.clear();
+            pollBuses();
+        });
         document.getElementById('route-clear').addEventListener('click', () => {
             [...selected].forEach(hideRoute);
             selected.clear();
