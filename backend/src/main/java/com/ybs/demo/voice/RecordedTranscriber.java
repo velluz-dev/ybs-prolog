@@ -22,10 +22,17 @@ public class RecordedTranscriber implements VoiceTranscriber {
     private static final long FAKE_LATENCY_MS = 800;
 
     /** Sample key -> the transcript of the matching file in static/voice/. */
+    /**
+     * Each sample must name stops that actually exist, because EntityExtractor matches
+     * against the seeded stop names. Two of these silently stopped resolving when the demo
+     * moved to the real YBS export - "ကျောက်တံတား" and "ဆူးလေဘုရား" are not stop names in
+     * that dataset (Sule is "ဆူးလေမြို့တော်ခန်းမ") - and the voice demo returned
+     * understood=false. If you reseed the database, re-check these.
+     */
     private static final Map<String, String> TRANSCRIPTS = new LinkedHashMap<>(Map.of(
-            "sample1", "ကျောက်တံတားမှ လှည်းတန်းကို သွားချင်တယ်",
+            "sample1", "လှည်းတန်းမှ ဆူးလေမြို့တော်ခန်းမကို သွားချင်တယ်",
             "sample2", "အင်းစိန်ဈေးမှ ဗိုလ်တထောင်ဘုရားကို သွားချင်တယ်",
-            "sample3", "လှည်းတန်းမှ ဆူးလေဘုရားကို သွားချင်တယ်"));
+            "sample3", "မြေနီကုန်းမှ ရွှေဂုံတိုင်ကို သွားချင်တယ်"));
 
     public static Map<String, String> transcripts() {
         return TRANSCRIPTS;

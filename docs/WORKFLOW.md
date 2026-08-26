@@ -233,7 +233,7 @@ badge as "not eligible" — a visible failure rather than stale data quietly pas
 | `runSearch` | on demand | fires on Search, on any profile toggle, and after a voice query |
 
 Polling rather than WebSocket/STOMP: no client library, no handshake to fail on stage, and at
-six buses on localhost the cost difference is not measurable.
+a few hundred buses on localhost the cost difference is not measurable.
 
 ---
 

@@ -1,8 +1,9 @@
 
 # YBS AI transit demo
 
-A university AI-course demo: an AI-assisted journey planner over three Yangon Bus Service
-routes. One Spring Boot process, H2 in memory, reseeded on every startup.
+A university AI-course demo: an AI-assisted journey planner over the **real Yangon Bus
+Service network** - 118 routes, 2,080 stops, 236 simulated buses. One Spring Boot process,
+H2 in memory, reseeded from `data.sql` on every startup.
 
 Each component maps to a recognisable AI topic:
 
@@ -16,6 +17,9 @@ Each component maps to a recognisable AI topic:
 
 ---
 
+> **Database:** [`docs/ER.md`](docs/ER.md) is the ER diagram — eight tables, the composite
+> keys and why they are shaped that way, plus two constraint gaps worth knowing about.
+>
 > **How it all fits together:** [`docs/WORKFLOW.md`](docs/WORKFLOW.md) traces one request end
 > to end — Burmese audio → entity extraction → A\* → Pareto → Prolog → trip → 400 m alert —
 > naming the class and endpoint at every hop, with diagrams.
@@ -25,9 +29,11 @@ Each component maps to a recognisable AI topic:
 ```
 YBS/
 ├── frontend/          ← the browser. HTML, CSS, JS, Leaflet, audio clips.
-│   ├── index.html         journey planner
+│   ├── index.html         journey planner (sidebar, one view per feature)
 │   ├── ops.html           ops dashboard
+│   ├── admin.html         add / edit data, export data.sql
 │   ├── app.js             all behaviour: map, polling, search, alerts
+│   ├── admin.js           admin screens
 │   ├── style.css          design tokens + components
 │   ├── vendor/            Leaflet, vendored for offline use
 │   ├── audio/             arrival clips (placeholders)
@@ -39,9 +45,12 @@ YBS/
 │   └── src/
 │       ├── main/java/com/ybs/demo/    feature packages (see below)
 │       ├── main/resources/            application.properties, data.sql, rules/ybs.pl
-│       └── test/java/                 21 tests
+│       └── test/java/                 23 tests
 │
-├── docs/WORKFLOW.md   ← how a request flows through the whole system
+├── docs/
+│   ├── SETUP.md       ← install guide and troubleshooting
+│   ├── WORKFLOW.md    ← how a request flows through the whole system
+│   └── ER.md          ← database ER diagram
 └── README.md
 ```
 
@@ -56,7 +65,7 @@ resource directory, so it is packaged into the jar at build time.
 |---|---|---|
 | UI, layout, Burmese copy, map | `frontend/` | **just refresh the browser** — no rebuild, no restart |
 | Search, Prolog, simulation, APIs | `backend/src/main/java/` | restart `./mvnw spring-boot:run` |
-| Stops, routes, fares, traffic prior | `backend/src/main/resources/data.sql` | restart (H2 reseeds on boot) |
+| Stops, routes, fares, traffic prior | `data.sql`, **or** `/admin.html` | admin edits are live at once; export to keep them |
 | Reasoning rules | `backend/src/main/resources/rules/ybs.pl` | restart |
 
 Frontend edits are live because `application.properties` serves `file:../frontend/` ahead of
@@ -160,8 +169,8 @@ Nothing outside the project is modified. The system JDK truststore is left untou
 
 ## Status — all seven components built and verified
 
-- **Data & map** — 28 stops with coordinates looked up from OpenStreetMap (each row in
-  `data.sql` cites its source), 3 routes, Leaflet rendering. Leaflet is vendored in
+- **Data & map** — the real network: 2,080 stops and 118 routes imported from the YBS
+  dataset, with road-following route geometry precomputed from OSRM. Leaflet rendering. Leaflet is vendored in
   `frontend/vendor/` so the page works with no network; only the map *tiles* need the
   internet, and the routes stay visible without them.
 - **Bus simulation** — 1 Hz tick, 6 buses, 1× / 10× / 60× speed control. Buses alternate
@@ -264,17 +273,18 @@ as such in the code. There is no learned model here and the demo does not claim 
 
 ## The 7-minute demo script
 
-**0:00 — Set the scene.** Open <http://localhost:8081>. Three routes on a Yangon map,
-buses already moving. Point out the console: it is about to fill with Prolog goals.
+**0:00 — Set the scene.** Open <http://localhost:8081>. 236 buses moving across the real
+Yangon network, each coloured by its route. Point out the console: it is about to fill with
+Prolog goals.
 
 **0:30 — Ask by voice.** Pick the second sample
 (`အင်းစိန်ဈေးမှ ဗိုလ်တထောင်ဘုရားကို သွားချင်တယ်`) and press Speak. After a beat the
-transcript appears, then two green chips: **မှ Insein Market** and **ကို Botataung**.
+transcript appears, then two green chips: **မှ အင်းစိန်ဈေး** and **ကို ဗိုလ်တထောင်ဘုရား**.
 Say plainly: *this is string matching on the two postpositions* `မှ` *(from) and* `ကို`
 *(to) — not a language model. The chips exist so you can see the parse, not just trust it.*
 The search then runs itself.
 
-**0:45 — The journey options.** Insein Market → Botataung Pagoda.
+**0:45 — The journey options.** အင်းစိန်ဈေး → ဗိုလ်တထောင်ဘုရား.
 Three options come back, fare shown first and largest:
 
 | | time | fare | transfers |
@@ -286,14 +296,16 @@ Three options come back, fare shown first and largest:
 Say: *this is a Pareto set — none of these beats the others on all three at once, so the
 planner refuses to pretend there is a single best answer.*
 
-**2:00 — The A\* trace.** Scroll the trace panel. Every expanded node with its g, h and f.
-Point at the stats line: A* expanded **54** nodes, Dijkstra **56**.
+**2:00 — The A\* trace.** Open the *Search trace* view. Every expanded node with its g, h
+and f. Point at the stats line: on a cross-city plan A\* expands around **1,300** nodes where
+Dijkstra needs **2,400** — the heuristic saves roughly 1,000, and on the longest journeys
+over 3,000.
 
-> Be honest about this number. The saving is small because the network is 28 stops and the
-> heuristic is weak — the fastest segment in the data runs at 42.8 km/h, so `distance ÷
-> 42.8` is a loose lower bound. The heuristic is provably admissible (`AStarHeuristicTest`
-> checks it on every stop pair), which is the examinable claim; dramatic pruning at this
-> scale is not.
+> Dijkstra here is literally the same search with `h = 0`, which is what makes the comparison
+> fair rather than a comparison of two different implementations. The heuristic is provably
+> admissible — `AStarHeuristicTest` checks it on sampled stop pairs *and* exhaustively on
+> every segment in every traffic bucket — and that admissibility is the examinable claim.
+> The pruning is the visible payoff.
 
 **3:00 — Constraint satisfaction, the money shot.** Tap **ကိုယ်ဝန်ဆောင် / pregnant**.
 The two multi-transfer options grey out with *"too many transfers"*. The one-transfer

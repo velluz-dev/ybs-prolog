@@ -56,15 +56,16 @@ This matters for demo day: build once beforehand, and the venue's wifi becomes i
 curl http://localhost:8081/api/health          # {"status":"ok"}
 ```
 
-In the browser you should see three coloured routes across Yangon, 28 stop circles, and six
-numbered bus markers that move once a second. Press **60×** in the header and they visibly
+In the browser you should see 236 numbered bus markers moving once a second across Yangon,
+each coloured by its route. The map starts with no route lines drawn - switch any of the 118
+routes on from the filter to draw its road-following line and its stops. Press **60×** in the header and they visibly
 speed up; some will stop at stops and turn amber while passengers board.
 
 ### Run the tests
 
 ```bash
 cd backend
-./mvnw test        # 21 tests
+./mvnw test        # 23 tests
 ```
 
 ---
