@@ -42,8 +42,7 @@ public class JourneyPlanningService {
 
         // One clean world per request. Without this, facts from the previous query would
         // still be in the engine and the next answer would look uncannily well-informed.
-        prolog.resetToBaseTheory();
-        facts.assertWorldFacts();
+        facts.resetWorld();
         facts.assertRider(RIDER, riderFlags);
         for (Journey j : result.journeys()) {
             facts.assertJourney(j);

@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Travel-time estimation under uncertainty.
@@ -36,8 +36,12 @@ public class EtaService {
 
     private final TrafficFactorRepository trafficFactorRepository;
 
-    /** Priors change only when data.sql is reseeded, so a simple cache is safe. */
-    private final Map<String, Double> cache = new HashMap<>();
+    /**
+     * Priors change only when data.sql is reseeded, so a simple cache is safe.
+     * ConcurrentHashMap, not HashMap: the 1 Hz simulation tick fills this from the
+     * scheduler thread while HTTP request threads read and fill it concurrently.
+     */
+    private final Map<String, Double> cache = new ConcurrentHashMap<>();
 
     public EtaService(TrafficFactorRepository trafficFactorRepository) {
         this.trafficFactorRepository = trafficFactorRepository;

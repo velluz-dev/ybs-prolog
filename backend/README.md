@@ -1,6 +1,6 @@
 # Backend
 
-Spring Boot 3.5 on Java 17 source level, H2 in memory, tuProlog in-JVM. One process; it also
+Spring Boot 3.5 on Java 25 source level, H2 in memory, tuProlog in-JVM. One process; it also
 serves `../frontend`.
 
 ```bash
@@ -55,9 +55,10 @@ constructed, so a `@PostConstruct` loader sees an empty database. `NetworkServic
 `BusSimulator`, `StopGraph` and `FactAssembler` all load on `ApplicationReadyEvent` with an
 explicit `@Order` instead. Follow that pattern for anything new that reads seed data.
 
-**Reset the Prolog theory before each query.** `JourneyPlanningService` and `OpsService` both
-call `resetToBaseTheory()` before asserting. Skip it and facts from the previous request
-linger — which looks exactly like a hardcoded answer.
+**Reset the world before each query.** `JourneyPlanningService` and `OpsService` both call
+`facts.resetWorld()` — reset *plus* re-assert of the standing facts in one step. Skip it and
+facts from the previous request linger — which looks exactly like a hardcoded answer. Resetting
+without re-asserting is just as wrong: `base_fare/2` would vanish and console goals fail.
 
 **Never reintroduce a dwell multiplier on driving time.** Dwell is modelled explicitly now.
 Multiplying driving time by crowding *as well* charges it twice.

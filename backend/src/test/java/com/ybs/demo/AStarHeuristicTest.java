@@ -1,6 +1,8 @@
 package com.ybs.demo;
 
 import com.ybs.demo.network.NetworkService;
+import com.ybs.demo.network.Route;
+import com.ybs.demo.network.RouteStop;
 import com.ybs.demo.network.Stop;
 import com.ybs.demo.planning.AStarPlanner;
 import com.ybs.demo.planning.StopGraph;
@@ -13,6 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * The heuristic must never overestimate, or A* stops being optimal. This checks that
@@ -100,5 +103,28 @@ class AStarHeuristicTest {
                         "segment faster than the claimed maximum on route " + route.getCode());
             }
         }
+    }
+
+    /**
+     * Regression for the ridden-flag fix: boarding a bus must count as a transfer only
+     * when another bus was already boarded. One bus the whole way is zero transfers -
+     * including when the rider walked to a nearby stop first, which no direct-board
+     * alternative can dominate away.
+     */
+    @Test
+    void singleRouteJourneyHasZeroTransfers() {
+        // Route 36 runs Insein Market (1) -> Sule (12); one bus, end to end.
+        Long origin = 1L, dest = 12L;
+        AStarPlanner.Result result = planner.plan(origin, dest);
+        assertFalse(result.journeys().isEmpty(), "route 36 endpoints must be reachable");
+
+        boolean zeroTransferSingleRoute = result.journeys().stream().anyMatch(j ->
+                j.transferCount() == 0 && j.routeCodes().size() == 1);
+        assertTrue(zeroTransferSingleRoute,
+                "a one-bus journey must appear with 0 transfers on the Pareto front");
+
+        // And nothing on the front may claim negative or nonsense transfer counts.
+        result.journeys().forEach(j ->
+                assertTrue(j.transferCount() >= 0, "transfer count must never be negative"));
     }
 }

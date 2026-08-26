@@ -1,5 +1,6 @@
 package com.ybs.demo;
 
+import com.ybs.demo.ops.OpsService;
 import com.ybs.demo.reasoning.PrologService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PrologBridgeTest {
 
     @Autowired PrologService prolog;
+    @Autowired OpsService ops;
 
     @BeforeEach
     void freshWorld() {
@@ -107,5 +109,16 @@ class PrologBridgeTest {
         // The live demo types goals by hand into a URL; a missing dot must not 500.
         prolog.assertFact("monk(r9)");
         assertTrue(prolog.prove("fare(r9, '43', F)"));
+    }
+
+    @Test
+    void opsDashboardDoesNotWipeWorldFacts() {
+        // Regression for the bug where loading the ops dashboard reset the shared engine
+        // and asserted only driver scores, wiping base_fare/2 - so a hand-typed console
+        // goal like fare(...) silently failed afterwards. resetWorld() must restore it.
+        ops.drivers();
+        List<Map<String, String>> solutions = prolog.solveAll("fare(m1, '43', F)", 5);
+        assertFalse(solutions.isEmpty(), "base_fare must survive an ops dashboard load");
+        assertEquals("400", solutions.get(0).get("F"));
     }
 }

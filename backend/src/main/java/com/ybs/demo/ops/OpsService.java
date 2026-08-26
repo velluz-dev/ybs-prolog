@@ -40,8 +40,10 @@ public class OpsService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> drivers() {
-        prolog.resetToBaseTheory();
-        facts.assertWorldFacts();   // includes the driver scores
+        // resetWorld() reloads the rules and re-asserts every standing fact, and
+        // assertWorldFacts now includes the driver scores - so asserting them again
+        // here would put a duplicate copy of each headway_score/3 in the engine.
+        facts.resetWorld();
 
         List<Map<String, Object>> rows = new ArrayList<>();
         for (DriverMonthlyScore s : scoreRepository.findAll()) {

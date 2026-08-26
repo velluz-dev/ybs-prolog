@@ -17,11 +17,18 @@ import java.util.Map;
 @RequestMapping("/api")
 public class NetworkController {
 
-    /** Fixed per-route colours so the map legend matches across reloads. */
+    /** Fixed per-route colours so the map legend matches across reloads.
+     *  The first three are the hand-built demo corridors; the rest are the
+     *  imported real YBS routes (see data.sql extension section). */
     private static final Map<String, String> ROUTE_COLOURS = Map.of(
             "36", "#e6194b",
             "43", "#3cb44b",
-            "61", "#4363d8");
+            "61", "#4363d8",
+            "57", "#f58231",
+            "56", "#911eb4",
+            "58", "#008080",
+            "APS-Pyay", "#f032e6",
+            "APS-Kabaraye", "#800000");
 
     private final RouteRepository routeRepository;
     private final StopRepository stopRepository;

@@ -117,14 +117,16 @@ expansion counts side by side. That's what turns "we used a heuristic" into a nu
 `JourneyPlanningService.plan()` runs a strict order, and the first step is not optional:
 
 ```java
-prolog.resetToBaseTheory();   // drop every asserted fact, reload only the rules
-facts.assertWorldFacts();     // base_fare/2, any active flooded/1
+facts.resetWorld();           // drop every asserted fact, reload rules + standing world facts
 facts.assertRider(RIDER, riderFlags);
 for (Journey j : result.journeys()) facts.assertJourney(j);
 ```
 
 Without the reset, facts from the previous query would linger and the next answer would look
-uncannily well-informed — which is exactly what "it's hardcoded" looks like.
+uncannily well-informed — which is exactly what "it's hardcoded" looks like. `resetWorld()`
+is one step on purpose: the engine is shared across features, so anything that wipes it must
+also restore `base_fare/2` and any active flood, or hand-typed console goals start failing
+depending on which page was visited last.
 
 Then, per journey, two goals:
 
@@ -214,10 +216,10 @@ This is deliberately separate from the seeded `incident` table, which is a histo
 the dashboard. Treating every past flood as still active would rule out every journey at
 startup.
 
-**Ops dashboard** — `GET /api/ops/dashboard` resets the theory, asserts driver scores, then
-proves `bonus_eligible(dN, '2026-08')` **per driver at request time**. The seeded
-`bonus_eligible` column is `false` for everyone, so a dead rule engine would show every badge
-as "not eligible" — a visible failure rather than stale data quietly passing as correct.
+**Ops dashboard** — `GET /api/ops/dashboard` resets the world (`facts.resetWorld()`), asserts
+driver scores, then proves `bonus_eligible(dN, '2026-08')` **per driver at request time**. The
+seeded `bonus_eligible` column is `false` for everyone, so a dead rule engine would show every
+badge as "not eligible" — a visible failure rather than stale data quietly passing as correct.
 
 ---
 

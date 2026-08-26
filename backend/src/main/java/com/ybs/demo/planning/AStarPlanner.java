@@ -69,11 +69,23 @@ public class AStarPlanner {
         this.eta = eta;
     }
 
-    /** A node in the search: standing at a stop, either on a route or on foot. */
+    /**
+     * A node in the search: standing at a stop, either on a route or on foot.
+     */
     private record Node(Long stopId, String routeCode) {}
 
-    /** Everything known about the best path found so far to a node. */
-    private record Label(Node node, double minutes, int fare, int transfers, Label parent, String how) {}
+    /**
+     * Everything known about the best path found so far to a node.
+     *
+     * @param ridden whether a bus has been boarded anywhere on the path so far - what
+     *               distinguishes the journey's first boarding (free of penalty) from a
+     *               genuine transfer, including when the rider walks to a nearby stop first
+     * @param hv     the heuristic at this node, computed once at creation. The open-set
+     *               comparator runs on every poll and every insertion; recomputing a
+     *               haversine per comparison is wasted work for an identical answer.
+     */
+    private record Label(Node node, double minutes, int fare, int transfers, boolean ridden,
+                         Label parent, String how, double hv) {}
 
     /** One line of the visible search trace. */
     public record TraceEntry(int order, Long stopId, String stopName, String routeCode,
@@ -137,14 +149,15 @@ public class AStarPlanner {
             return out;
         }
 
-        Map<Node, Double> best = new HashMap<>();
+        Map<Node, Label> best = new HashMap<>();
         Set<Node> closed = new HashSet<>();
         PriorityQueue<Label> open = new PriorityQueue<>(
-                Comparator.comparingDouble(l -> l.minutes() + h(l.node().stopId(), destination, uninformed)));
+                Comparator.comparingDouble(l -> l.minutes() + l.hv()));
 
-        Label start = new Label(new Node(originStopId, null), 0, 0, 0, null, "start");
+        Label start = new Label(new Node(originStopId, null), 0, 0, 0, false, null, "start",
+                h(originStopId, destination, uninformed));
         open.add(start);
-        best.put(start.node(), 0.0);
+        best.put(start.node(), start);
 
         while (!open.isEmpty() && out.expansions < MAX_EXPANSIONS) {
             Label current = open.poll();
@@ -167,10 +180,18 @@ public class AStarPlanner {
                 return out;
             }
 
-            for (Label next : successors(current, bucket, transferPenalty)) {
-                Double prior = best.get(next.node());
-                if (prior == null || next.minutes() < prior - 1e-9) {
-                    best.put(next.node(), next.minutes());
+            for (Label next : successors(current, bucket, transferPenalty, destination, uninformed)) {
+                Label prior = best.get(next.node());
+                boolean better = prior == null
+                        || next.minutes() < prior.minutes() - 1e-9
+                        || (Math.abs(next.minutes() - prior.minutes()) <= 1e-9
+                            && (next.fare() < prior.fare()
+                                || (next.fare() == prior.fare()
+                                    && next.transfers() < prior.transfers())));
+                if (better) {
+                    // On an exact tie in minutes the cheaper, less transfer-heavy path wins,
+                    // so the Pareto filter sees the best candidate of each shape.
+                    best.put(next.node(), next);
                     open.add(next);
                 }
             }
@@ -178,30 +199,33 @@ public class AStarPlanner {
         return out;
     }
 
-    private List<Label> successors(Label current, String bucket, double transferPenalty) {
+    private List<Label> successors(Label current, String bucket, double transferPenalty,
+                                   Stop destination, boolean uninformed) {
         List<Label> out = new ArrayList<>();
         Long stopId = current.node().stopId();
         String routeCode = current.node().routeCode();
 
         if (routeCode == null) {
-            // Board any route calling here. The first boarding is not a transfer.
+            // Board any route calling here. The journey's first boarding is not a transfer -
+            // and neither is boarding after walking to a nearby stop, since no bus has been
+            // boarded yet; that is what the ridden flag tracks.
             for (String rc : graph.routesAt(stopId)) {
-                Route route = network.allRoutes().stream()
-                        .filter(r -> r.getCode().equals(rc)).findFirst().orElse(null);
+                Route route = network.routeByCode(rc);
                 if (route == null) continue;
-                boolean isTransfer = current.transfers() > 0 || current.parent() != null;
+                boolean isTransfer = current.ridden();
                 double penalty = isTransfer ? transferPenalty : 0.0;
                 out.add(new Label(new Node(stopId, rc),
                         current.minutes() + penalty,
                         current.fare() + route.getBaseFareKyats(),
                         current.transfers() + (isTransfer ? 1 : 0),
-                        current, "board " + rc));
+                        true, current, "board " + rc, current.hv()));
             }
             // Walk to a nearby stop.
             for (StopGraph.WalkLink w : graph.walksFrom(stopId)) {
                 out.add(new Label(new Node(w.toStopId(), null),
                         current.minutes() + w.minutes(),
-                        current.fare(), current.transfers(), current, "walk"));
+                        current.fare(), current.transfers(), current.ridden(), current, "walk",
+                        h(w.toStopId(), destination, uninformed)));
             }
         } else {
             // Ride one segment onward.
@@ -211,11 +235,13 @@ public class AStarPlanner {
                 double minutes = graph.rideMinutes(routeCode, index, bucket);
                 out.add(new Label(new Node(ids.get(index + 1), routeCode),
                         current.minutes() + minutes,
-                        current.fare(), current.transfers(), current, "ride " + routeCode));
+                        current.fare(), current.transfers(), true, current, "ride " + routeCode,
+                        h(ids.get(index + 1), destination, uninformed)));
             }
             // Get off here.
             out.add(new Label(new Node(stopId, null),
-                    current.minutes(), current.fare(), current.transfers(), current, "alight"));
+                    current.minutes(), current.fare(), current.transfers(), current.ridden(),
+                    current, "alight", current.hv()));
         }
         return out;
     }
@@ -262,8 +288,7 @@ public class AStarPlanner {
                 Long to = via.get(via.size() - 1);
                 int fare = 0;
                 if (kind.equals("ride")) {
-                    Route r = network.allRoutes().stream()
-                            .filter(x -> x.getCode().equals(rc)).findFirst().orElse(null);
+                    Route r = network.routeByCode(rc);
                     fare = r == null ? 0 : r.getBaseFareKyats();
                     routeCodes.add(rc);
                 }
