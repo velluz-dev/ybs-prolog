@@ -102,37 +102,14 @@ async function loadNetwork() {
     networkStops = net.stops;
     allRoutes = net.routes;
 
-    // 118 routes drawn at once is an unreadable hairball across 44 townships, so the
-    // map starts with the longest cross-town services and everything else is a click
-    // away in the filter. The SEARCH always runs over the whole network regardless.
-    //
-    // Colours are assigned server-side by route index, so simply taking the five
-    // longest routes can land two blues and two purples together - technically
-    // distinct, visually the same line. Skipping colours already taken costs nothing
-    // and guarantees the default map is readable.
-    // Skipping only exact colour repeats is not enough - blue and navy are different
-    // strings but the same line to the eye. Requiring a real colour distance is what
-    // makes the default map readable.
-    const byLength = [...allRoutes].sort((a, b) => b.stopCount - a.stopCount);
-    const picked = [];
-    for (const r of byLength) {
-        if (picked.length >= 5) break;
-        // 140 is as strict as the 12-colour palette allows while still filling five
-        // slots; above it only three routes qualify.
-        if (picked.some(c => colourDistance(c, r.colour) < 140)) continue;
-        picked.push(r.colour);
-        selected.add(r.code);
-    }
-    // If the palette could not supply five well-separated colours, fill the rest by
-    // length anyway - an under-filled map is worse than two similar lines.
-    for (const r of byLength) {
-        if (selected.size >= 5) break;
-        selected.add(r.code);
-    }
+    // The map opens with NO route lines drawn. Each drawn route brings its polyline
+    // and all of its stop circles with it, and on the real network that buried the
+    // buses under clutter. Routes are switched on from the filter when wanted; the
+    // 236 coloured buses are always visible, and search always runs over all 118
+    // routes regardless of what is drawn.
 
     renderRouteFilter();
-    await Promise.all([...selected].map(showRoute));
-    fitToSelection();
+    fitToCity(net.stops);
     return net;
 }
 
@@ -188,6 +165,7 @@ async function showRoute(code) {
 
     routeLayers.set(code, { line, stops: markers });
     updateLegend();
+    fitToSelection();
 }
 
 function hideRoute(code) {
@@ -206,6 +184,13 @@ function updateLegend() {
         return r ? `<div class="item"><span class="swatch" style="background:${r.colour}"></span>
                     <span><b>${r.code}</b></span></div>` : '';
     }).join('');
+}
+
+/** Frames the whole network, used when no individual route is drawn. */
+function fitToCity(stops) {
+    if (!stops.length) return;
+    const bounds = L.latLngBounds(stops.map(s => [s.lat, s.lon]));
+    setTimeout(() => { map.invalidateSize(); map.fitBounds(bounds.pad(0.02)); }, 60);
 }
 
 function fitToSelection() {
