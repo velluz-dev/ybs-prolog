@@ -58,7 +58,7 @@ public class NetworkService {
         for (Route r : routeRepository.findAll()) {
             routesById.put(r.getId(), r);
             routesByCode.put(r.getCode(), r);
-            itineraries.put(r.getId(), new ArrayList<>(routeStopRepository.findByRouteIdOrderBySequence(r.getId())));
+            itineraries.put(r.getId(), new ArrayList<>(routeStopRepository.findByIdRouteIdOrderByIdSequenceNoAsc(r.getId())));
         }
         log.info("Network cached: {} routes, {} stops", routesById.size(), stopsById.size());
     }

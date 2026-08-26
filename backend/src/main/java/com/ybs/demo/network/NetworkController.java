@@ -1,6 +1,8 @@
 package com.ybs.demo.network;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,38 +12,50 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The whole network in one call: every stop, and every route as an ordered stop list.
- * The frontend draws polylines straight from this, so the map needs exactly one request.
+ * The network, split into two calls on purpose.
+ *
+ * <p>{@code /api/network} is the index: every stop, plus route <i>metadata</i> only. On the
+ * real 118-route network, inlining each route's stop list and road geometry would make that
+ * one response several megabytes, which is a slow first paint for data the user has not
+ * asked to see. {@code /api/routes/{code}} then returns one route's stops and road shape,
+ * fetched only when that route is switched on.
  */
 @RestController
 @RequestMapping("/api")
 public class NetworkController {
 
-    /** Fixed per-route colours so the map legend matches across reloads.
-     *  The first three are the hand-built demo corridors; the rest are the
-     *  imported real YBS routes (see data.sql extension section). */
-    private static final Map<String, String> ROUTE_COLOURS = Map.of(
-            "36", "#e6194b",
-            "43", "#3cb44b",
-            "61", "#4363d8",
-            "57", "#f58231",
-            "56", "#911eb4",
-            "58", "#008080",
-            "APS-Pyay", "#f032e6",
-            "APS-Kabaraye", "#800000");
+    /**
+     * Distinct, high-contrast colours cycled across routes. With 118 routes no palette can
+     * make every pair distinguishable, so the map draws only the selected few at a time.
+     */
+    private static final String[] PALETTE = {
+            "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#008080",
+            "#e6ab02", "#f032e6", "#0082c8", "#d95f02", "#1b9e77", "#7570b3"
+    };
 
     private final RouteRepository routeRepository;
     private final StopRepository stopRepository;
     private final RouteStopRepository routeStopRepository;
+    private final RouteShapeService shapes;
+    private final NetworkService network;
 
     public NetworkController(RouteRepository routeRepository,
                              StopRepository stopRepository,
-                             RouteStopRepository routeStopRepository) {
+                             RouteStopRepository routeStopRepository,
+                             RouteShapeService shapes,
+                             NetworkService network) {
         this.routeRepository = routeRepository;
         this.stopRepository = stopRepository;
         this.routeStopRepository = routeStopRepository;
+        this.shapes = shapes;
+        this.network = network;
     }
 
+    static String colourFor(int index) {
+        return PALETTE[Math.floorMod(index, PALETTE.length)];
+    }
+
+    /** Index: all stops, plus route metadata without stop lists or geometry. */
     @GetMapping("/network")
     public Map<String, Object> network() {
         List<Map<String, Object>> stops = new ArrayList<>();
@@ -56,30 +70,63 @@ public class NetworkController {
             stops.add(m);
         }
 
+        List<Route> all = routeRepository.findAll();
         List<Map<String, Object>> routes = new ArrayList<>();
-        for (Route r : routeRepository.findAll()) {
-            List<Map<String, Object>> ordered = new ArrayList<>();
-            for (RouteStop rs : routeStopRepository.findByRouteIdOrderBySequence(r.getId())) {
-                Map<String, Object> m = new LinkedHashMap<>();
-                m.put("stopId", rs.getStop().getId());
-                m.put("nameMy", rs.getStop().getNameMy());
-                m.put("nameEn", rs.getStop().getNameEn());
-                m.put("lat", rs.getStop().getLat());
-                m.put("lon", rs.getStop().getLon());
-                m.put("sequence", rs.getSequence());
-                m.put("cumulativeMinutes", rs.getCumulativeMinutes());
-                ordered.add(m);
-            }
+        for (int i = 0; i < all.size(); i++) {
+            Route r = all.get(i);
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("id", r.getId());
             m.put("code", r.getCode());
             m.put("nameMy", r.getNameMy());
             m.put("baseFareKyats", r.getBaseFareKyats());
-            m.put("colour", ROUTE_COLOURS.getOrDefault(r.getCode(), "#808080"));
-            m.put("stops", ordered);
+            m.put("colour", colourFor(i));
+            // Lets the map default to the major cross-town routes rather than
+            // whichever six happen to sort first.
+            m.put("stopCount", network.itinerary(r.getId()).size());
             routes.add(m);
         }
 
         return Map.of("routes", routes, "stops", stops);
+    }
+
+    /** One route in full: its stops in running order, and its road-following shape. */
+    @GetMapping("/routes/{code}")
+    public ResponseEntity<Map<String, Object>> route(@PathVariable String code) {
+        List<Route> all = routeRepository.findAll();
+        int index = -1;
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getCode().equals(code)) {
+                index = i;
+                break;
+            }
+        }
+        if (index < 0) {
+            return ResponseEntity.notFound().build();
+        }
+        Route route = all.get(index);
+
+        List<Map<String, Object>> ordered = new ArrayList<>();
+        for (RouteStop rs : routeStopRepository.findByIdRouteIdOrderByIdSequenceNoAsc(route.getId())) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("stopId", rs.getStop().getId());
+            m.put("nameMy", rs.getStop().getNameMy());
+            m.put("nameEn", rs.getStop().getNameEn());
+            m.put("lat", rs.getStop().getLat());
+            m.put("lon", rs.getStop().getLon());
+            m.put("sequence", rs.getSequence());
+            m.put("cumulativeMinutes", rs.getCumulativeMinutes());
+            ordered.add(m);
+        }
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("id", route.getId());
+        out.put("code", route.getCode());
+        out.put("nameMy", route.getNameMy());
+        out.put("baseFareKyats", route.getBaseFareKyats());
+        out.put("colour", colourFor(index));
+        out.put("stops", ordered);
+        // Empty when geometry could not be fetched; the frontend then joins the stops.
+        out.put("shape", shapes.shapeOf(route.getCode()));
+        return ResponseEntity.ok(out);
     }
 }

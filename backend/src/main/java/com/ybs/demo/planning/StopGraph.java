@@ -15,6 +15,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,15 @@ public class StopGraph {
      * produces exactly one real edge here: Sule Pagoda to Kyauktada, 344m apart downtown.
      */
     public static final double WALK_RADIUS_M = 400.0;
+
+    /**
+     * At most this many walking edges leave any one stop.
+     *
+     * <p>Downtown stops can have dozens of neighbours within the radius. Keeping them all
+     * would multiply A*'s branching factor for journeys nobody would walk anyway, so only
+     * the nearest few are kept.
+     */
+    public static final int MAX_WALK_LINKS = 6;
 
     /** Unhurried walking pace, km/h. */
     public static final double WALK_SPEED_KMH = 4.5;
@@ -129,18 +139,7 @@ public class StopGraph {
         }
 
         List<Stop> stops = network.allStops();
-        int walkEdges = 0;
-        for (Stop a : stops) {
-            for (Stop b : stops) {
-                if (a.getId().equals(b.getId())) continue;
-                double metres = GeoUtils.haversineKm(a.getLat(), a.getLon(), b.getLat(), b.getLon()) * 1000.0;
-                if (metres <= WALK_RADIUS_M) {
-                    double minutes = (metres / 1000.0) / WALK_SPEED_KMH * 60.0;
-                    walkLinks.computeIfAbsent(a.getId(), k -> new ArrayList<>()).add(new WalkLink(b.getId(), minutes));
-                    walkEdges++;
-                }
-            }
-        }
+        int walkEdges = buildWalkLinks(stops);
 
         double minFactor = Math.min(1.0, eta.minTrafficFactor());
         heuristicSpeedKmh = maxSegmentSpeedKmh / minFactor;
@@ -205,6 +204,60 @@ public class StopGraph {
     /** Free-flow minutes, ignoring the traffic prior - used by the admissibility test. */
     public double freeFlowRideMinutes(String routeCode, int index) {
         return segmentMinutes.getOrDefault(routeCode + ":" + index, 0.0);
+    }
+
+
+    /**
+     * Joins stops that are close enough to walk between.
+     *
+     * <p>Two things stop this from blowing up on the real network. Comparing all 2,080
+     * stops pairwise is four million haversines, so stops are bucketed into a grid of
+     * roughly {@value #WALK_RADIUS_M}-metre cells and each stop only looks at its own cell
+     * and the eight around it. And in downtown Yangon a single stop can have dozens of
+     * neighbours inside the radius, which would give A* an enormous branching factor for
+     * very little benefit - so only the {@link #MAX_WALK_LINKS} nearest are kept.
+     *
+     * <p>Most of these edges join the outbound and return stops of the same road, which
+     * carry different ids in the source data and sit a few metres apart. That is exactly
+     * the transfer a rider makes when they cross the street to go back the other way.
+     */
+    private int buildWalkLinks(List<Stop> stops) {
+        double cell = WALK_RADIUS_M / 111_000.0;   // degrees; 1 deg latitude ~ 111 km
+        Map<Long, List<Stop>> grid = new HashMap<>();
+        for (Stop s : stops) {
+            grid.computeIfAbsent(cellKey(s.getLat(), s.getLon(), cell), k -> new ArrayList<>()).add(s);
+        }
+
+        int edges = 0;
+        for (Stop a : stops) {
+            List<WalkLink> near = new ArrayList<>();
+            long gx = (long) Math.floor(a.getLon() / cell);
+            long gy = (long) Math.floor(a.getLat() / cell);
+            for (long dx = -1; dx <= 1; dx++) {
+                for (long dy = -1; dy <= 1; dy++) {
+                    for (Stop b : grid.getOrDefault((gx + dx) * 1_000_003L + (gy + dy), List.of())) {
+                        if (a.getId().equals(b.getId())) continue;
+                        double metres = GeoUtils.haversineKm(a.getLat(), a.getLon(), b.getLat(), b.getLon()) * 1000.0;
+                        if (metres <= WALK_RADIUS_M) {
+                            near.add(new WalkLink(b.getId(), metres / 1000.0 / WALK_SPEED_KMH * 60.0));
+                        }
+                    }
+                }
+            }
+            near.sort(Comparator.comparingDouble(WalkLink::minutes));
+            if (near.size() > MAX_WALK_LINKS) {
+                near = new ArrayList<>(near.subList(0, MAX_WALK_LINKS));
+            }
+            if (!near.isEmpty()) {
+                walkLinks.put(a.getId(), near);
+                edges += near.size();
+            }
+        }
+        return edges;
+    }
+
+    private static long cellKey(double lat, double lon, double cell) {
+        return ((long) Math.floor(lon / cell)) * 1_000_003L + ((long) Math.floor(lat / cell));
     }
 
     public record WalkLink(Long toStopId, double minutes) {}

@@ -117,8 +117,20 @@
 <section class="view" data-view="map">
     <header class="view-head">
         <h1>🗺️ လမ်းကြောင်းမြေပုံ</h1>
-        <p class="en">Three routes, 28 stops, six buses updating every second. Click a stop for its arrivals.</p>
+        <p class="en">The real YBS network: 118 routes, 2,080 stops, 236 buses updating every second. Route lines follow the actual roads. Click any stop for its arrivals board.</p>
     </header>
+    <section class="card route-picker">
+        <div class="card-head"><span class="ic">🚌</span><h2>လမ်းကြောင်း ရွေးရန်
+            <span class="en">Which routes to draw — search runs over all 118 regardless</span></h2></div>
+        <div class="picker-top">
+            <input type="text" id="route-search" placeholder="ရှာရန် / search route code or name"
+                   aria-label="Search routes">
+            <span id="route-count" class="en"></span>
+            <button type="button" id="route-clear" class="alt-btn">ရှင်း / clear</button>
+        </div>
+        <div id="route-filter" class="route-filter"></div>
+    </section>
+
     <section class="card">
         <div id="map"></div>
         <div id="map-note" class="muted hidden">

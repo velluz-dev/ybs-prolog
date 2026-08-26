@@ -58,35 +58,104 @@ tiles.on('tileerror', () => {
 });
 tiles.addTo(map);
 
+let allRoutes = [];
+const selected = new Set();
+const routeLayers = new Map();   // code -> { line, stops: [] }
+
 async function loadNetwork() {
     const net = await (await fetch('/api/network')).json();
-    const legend = document.getElementById('legend');
-    const allPoints = [];
+    networkStops = net.stops;
+    allRoutes = net.routes;
 
-    for (const route of net.routes) {
-        const latlngs = route.stops.map(s => [s.lat, s.lon]);
-        allPoints.push(...latlngs);
-        L.polyline(latlngs, { color: route.colour, weight: 5, opacity: 0.85 })
-            .addTo(map)
-            .bindPopup(`<b>${route.code}</b><br>${route.nameMy}<br>${route.baseFareKyats} ကျပ်`);
+    // 118 routes drawn at once is an unreadable hairball across 44 townships, so the
+    // map starts with the longest cross-town services and everything else is a click
+    // away in the filter. The SEARCH always runs over the whole network regardless.
+    const defaults = [...allRoutes].sort((a, b) => b.stopCount - a.stopCount).slice(0, 5);
+    defaults.forEach(r => selected.add(r.code));
 
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.innerHTML = `<span class="swatch" style="background:${route.colour}"></span>` +
-                         `<span><b>${route.code}</b> — ${route.nameMy}</span>`;
-        legend.appendChild(item);
-    }
-
-    for (const stop of net.stops) {
-        const marker = L.circleMarker([stop.lat, stop.lon], {
-            radius: 6, color: '#0B1220', weight: 2, fillColor: '#ffffff', fillOpacity: 1
-        }).addTo(map);
-        marker.bindPopup(`<b>${stop.nameMy}</b><br>${stop.nameEn}`, { minWidth: 240 });
-        marker.on('popupopen', () => loadStopPopup(stop, marker));
-    }
-
-    if (allPoints.length) map.fitBounds(L.latLngBounds(allPoints).pad(0.08));
+    renderRouteFilter();
+    await Promise.all([...selected].map(showRoute));
+    fitToSelection();
     return net;
+}
+
+function renderRouteFilter() {
+    const box = document.getElementById('route-filter');
+    if (!box) return;
+    const term = (document.getElementById('route-search')?.value || '').toLowerCase();
+    const list = allRoutes.filter(r =>
+        !term || r.code.toLowerCase().includes(term) || (r.nameMy || '').includes(term));
+
+    document.getElementById('route-count').textContent =
+        `${selected.size} / ${allRoutes.length} ပြထား`;
+
+    box.innerHTML = list.slice(0, 400).map(r => `
+        <label class="route-toggle ${selected.has(r.code) ? 'on' : ''}">
+            <input type="checkbox" data-code="${r.code}" ${selected.has(r.code) ? 'checked' : ''}>
+            <span class="route-badge" style="background:${r.colour}">${r.code}</span>
+            <span class="route-name">${r.nameMy}<em>${r.stopCount} stops</em></span>
+        </label>`).join('');
+
+    box.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.addEventListener('change', async () => {
+            const code = cb.dataset.code;
+            if (cb.checked) { selected.add(code); await showRoute(code); }
+            else { selected.delete(code); hideRoute(code); }
+            renderRouteFilter();
+        });
+    });
+}
+
+/** Draws one route: its road-following shape, plus its own stop markers. */
+async function showRoute(code) {
+    if (routeLayers.has(code)) return;
+    const r = await (await fetch(`/api/routes/${encodeURIComponent(code)}`)).json();
+
+    // shape follows the road; if geometry was unavailable, join the stops instead
+    const pts = (r.shape && r.shape.length)
+        ? r.shape
+        : r.stops.map(s => [s.lat, s.lon]);
+
+    const line = L.polyline(pts, { color: r.colour, weight: 4, opacity: 0.85 })
+        .addTo(map)
+        .bindPopup(`<b>${r.code}</b><br>${r.nameMy}<br>${r.baseFareKyats} ကျပ် · ${r.stops.length} stops`);
+
+    const markers = r.stops.map(s => {
+        const m = L.circleMarker([s.lat, s.lon], {
+            radius: 4, color: '#0B1220', weight: 1.5, fillColor: '#fff', fillOpacity: 1
+        }).addTo(map);
+        m.bindPopup(`<b>${s.nameMy}</b><br>${s.nameEn}`, { minWidth: 240 });
+        m.on('popupopen', () => loadStopPopup({ id: s.stopId, nameMy: s.nameMy, nameEn: s.nameEn }, m));
+        return m;
+    });
+
+    routeLayers.set(code, { line, stops: markers });
+    updateLegend();
+}
+
+function hideRoute(code) {
+    const layer = routeLayers.get(code);
+    if (!layer) return;
+    map.removeLayer(layer.line);
+    layer.stops.forEach(m => map.removeLayer(m));
+    routeLayers.delete(code);
+    updateLegend();
+}
+
+function updateLegend() {
+    const legend = document.getElementById('legend');
+    legend.innerHTML = [...selected].map(code => {
+        const r = allRoutes.find(x => x.code === code);
+        return r ? `<div class="item"><span class="swatch" style="background:${r.colour}"></span>
+                    <span><b>${r.code}</b></span></div>` : '';
+    }).join('');
+}
+
+function fitToSelection() {
+    const lines = [...routeLayers.values()].map(l => l.line);
+    if (!lines.length) return;
+    const bounds = lines.reduce((b, l) => b ? b.extend(l.getBounds()) : l.getBounds(), null);
+    setTimeout(() => { map.invalidateSize(); map.fitBounds(bounds.pad(0.05)); }, 60);
 }
 
 /* ---------------------------------------------------- arrivals (shared) --- */
@@ -138,8 +207,12 @@ let latestBuses = [];
 
 async function pollBuses() {
     try {
-        const buses = await (await fetch('/api/buses/live')).json();
-        latestBuses = buses;
+        const all = await (await fetch('/api/buses/live')).json();
+        latestBuses = all;
+        const buses = all.filter(b => selected.has(b.routeCode));
+        for (const [id, m] of busMarkers) {
+            if (!buses.some(b => b.id === id)) { map.removeLayer(m); busMarkers.delete(id); }
+        }
         for (const bus of buses) {
             const pos = [bus.lat, bus.lon];
             const dwelling = bus.state === 'DWELLING';
@@ -179,11 +252,15 @@ const CROWD = { 0: ['🟢', 'ထိုင်ခုံရ', 'seats free'], 1: ['�
 
 function renderFleet() {
     const el = document.getElementById('fleet-table');
-    if (!latestBuses.length) { el.innerHTML = '<div class="muted">loading…</div>'; return; }
+    const shown = latestBuses.filter(b => selected.has(b.routeCode));
+    if (!shown.length) {
+        el.innerHTML = '<div class="muted">No buses on the selected routes — turn some on in Live map.</div>';
+        return;
+    }
     el.innerHTML = `
       <table class="grid">
         <tr><th>Bus</th><th>Route</th><th>State</th><th>Next stop</th><th>ETA</th><th>Crowding</th></tr>
-        ${latestBuses.map(b => {
+        ${shown.map(b => {
             const [icon, my, en] = CROWD[b.crowdingLevel] || CROWD[2];
             const dwelling = b.state === 'DWELLING';
             return `<tr>
@@ -574,6 +651,12 @@ loadNetwork()
         initArrival();
         initProlog();
         initAbout();
+        document.getElementById('route-search').addEventListener('input', renderRouteFilter);
+        document.getElementById('route-clear').addEventListener('click', () => {
+            [...selected].forEach(hideRoute);
+            selected.clear();
+            renderRouteFilter();
+        });
         showView(location.hash.slice(1) || 'plan');
         pollBuses();
         setInterval(pollBuses, 1000);

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PrologBridgeTest {
 
     @Autowired PrologService prolog;
+    @Autowired com.ybs.demo.network.NetworkService network;
     @Autowired OpsService ops;
 
     @BeforeEach
@@ -116,9 +117,16 @@ class PrologBridgeTest {
         // Regression for the bug where loading the ops dashboard reset the shared engine
         // and asserted only driver scores, wiping base_fare/2 - so a hand-typed console
         // goal like fare(...) silently failed afterwards. resetWorld() must restore it.
+        // Take the route and its fare from the seeded network rather than hardcoding them:
+        // the demo moved from 3 hand-built routes to the real 118-route export, where the
+        // fare is the real flat 200 Ks, and a pinned 400 made this fail for the wrong reason.
+        var route = network.allRoutes().get(0);
+
         ops.drivers();
-        List<Map<String, String>> solutions = prolog.solveAll("fare(m1, '43', F)", 5);
+        List<Map<String, String>> solutions =
+                prolog.solveAll("fare(m1, '" + route.getCode() + "', F)", 5);
         assertFalse(solutions.isEmpty(), "base_fare must survive an ops dashboard load");
-        assertEquals("400", solutions.get(0).get("F"));
+        assertEquals(String.valueOf(route.getBaseFareKyats()), solutions.get(0).get("F"),
+                "the fare rule should fall through to this route's base fare");
     }
 }

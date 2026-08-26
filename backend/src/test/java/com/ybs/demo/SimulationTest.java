@@ -29,15 +29,31 @@ class SimulationTest {
     @Autowired BusSimulator simulator;
     @Autowired ArrivalPredictor predictor;
 
-    /** Stop 6 is Hledan, served by routes 36 and 43. Stop 3 (Mayangone) is route 36 only. */
-    private static final Long HLEDAN = 6L;
-    private static final Long MAYANGONE = 3L;
+    /**
+     * Found from the data rather than hardcoded. Stop ids came from the real YBS export,
+     * so pinning specific numbers here would break the moment the dataset is refreshed -
+     * and it did, when the demo moved from 3 hand-built routes to the real 118.
+     */
+    private Long interchange;   // served by more than one route
+    private Long singleRoute;   // served by exactly one
+
+    @org.junit.jupiter.api.BeforeEach
+    void findRepresentativeStops() {
+        for (var s : network.allStops()) {
+            int n = network.routeCountAt(s.getId());
+            if (n > 1 && interchange == null) interchange = s.getId();
+            if (n == 1 && singleRoute == null) singleRoute = s.getId();
+            if (interchange != null && singleRoute != null) break;
+        }
+        assertTrue(interchange != null, "network should contain an interchange stop");
+        assertTrue(singleRoute != null, "network should contain a single-route stop");
+    }
 
     @Test
     void fullerBusWaitsLonger() {
-        int free = dwellModel.dwellSeconds(MAYANGONE, 0, false);
-        int standing = dwellModel.dwellSeconds(MAYANGONE, 1, false);
-        int full = dwellModel.dwellSeconds(MAYANGONE, 2, false);
+        int free = dwellModel.dwellSeconds(singleRoute, 0, false);
+        int standing = dwellModel.dwellSeconds(singleRoute, 1, false);
+        int full = dwellModel.dwellSeconds(singleRoute, 2, false);
 
         assertTrue(free < standing, "standing room should dwell longer than seats free");
         assertTrue(standing < full, "a full bus should dwell longest");
@@ -46,17 +62,17 @@ class SimulationTest {
     @Test
     void interchangeStopsWaitLongerThanOrdinaryOnes() {
         // Derived from the data, not hardcoded: Hledan is served by two routes, Mayangone by one.
-        assertTrue(network.routeCountAt(HLEDAN) > 1, "Hledan should be an interchange");
-        assertEquals(1, network.routeCountAt(MAYANGONE), "Mayangone should be single-route");
+        assertTrue(network.routeCountAt(interchange) > 1, "should be an interchange");
+        assertEquals(1, network.routeCountAt(singleRoute), "should be served by one route");
 
-        assertTrue(dwellModel.dwellSeconds(HLEDAN, 1, false) > dwellModel.dwellSeconds(MAYANGONE, 1, false),
+        assertTrue(dwellModel.dwellSeconds(interchange, 1, false) > dwellModel.dwellSeconds(singleRoute, 1, false),
                 "an interchange should dwell longer than an ordinary stop at equal crowding");
     }
 
     @Test
     void terminusTakesALayoverRegardlessOfCrowding() {
-        assertEquals(DwellModel.LAYOVER_SECONDS, dwellModel.dwellSeconds(MAYANGONE, 0, true));
-        assertEquals(DwellModel.LAYOVER_SECONDS, dwellModel.dwellSeconds(HLEDAN, 2, true));
+        assertEquals(DwellModel.LAYOVER_SECONDS, dwellModel.dwellSeconds(singleRoute, 0, true));
+        assertEquals(DwellModel.LAYOVER_SECONDS, dwellModel.dwellSeconds(interchange, 2, true));
     }
 
     /**
@@ -155,7 +171,7 @@ class SimulationTest {
 
     @Test
     void stopBoardIsSortedSoonestFirst() {
-        List<ArrivalPredictor.Arrival> due = predictor.forStop(HLEDAN);
+        List<ArrivalPredictor.Arrival> due = predictor.forStop(interchange);
         for (int i = 1; i < due.size(); i++) {
             assertTrue(due.get(i).etaMinutes() >= due.get(i - 1).etaMinutes(),
                     "the stop board must be sorted soonest first");

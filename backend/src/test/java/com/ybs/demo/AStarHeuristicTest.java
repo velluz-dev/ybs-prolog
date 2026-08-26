@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,33 +30,43 @@ class AStarHeuristicTest {
     @Autowired StopGraph graph;
     @Autowired AStarPlanner planner;
 
+    /**
+     * Checks h never overestimates, on a deterministic random sample of stop pairs.
+     *
+     * <p>It used to check every pair, which was right for a 28-stop network. On the real
+     * 2,080-stop network that is four million searches - so it samples instead. The seed is
+     * fixed, so a failure is reproducible rather than a coin toss that a teammate cannot
+     * repeat. The exhaustive guarantee now comes from
+     * {@link #heuristicSpeedBeatsEverySegmentInEveryTrafficBucket()}, which checks every
+     * segment directly and is what actually pins admissibility down.
+     */
     @Test
     void heuristicNeverOverestimatesTrueCost() {
         List<Stop> stops = network.allStops();
         assertFalse(stops.isEmpty(), "network should be seeded");
 
+        Random random = new Random(20260826L);
         int checked = 0;
-        for (Stop origin : stops) {
-            for (Stop destination : stops) {
-                if (origin.getId().equals(destination.getId())) continue;
+        for (int i = 0; i < 40; i++) {
+            Stop origin = stops.get(random.nextInt(stops.size()));
+            Stop destination = stops.get(random.nextInt(stops.size()));
+            if (origin.getId().equals(destination.getId())) continue;
 
-                AStarPlanner.Result result = planner.plan(origin.getId(), destination.getId());
-                if (result.journeys().isEmpty()) continue;   // unreachable pair, nothing to compare
+            AStarPlanner.Result result = planner.plan(origin.getId(), destination.getId());
+            if (result.journeys().isEmpty()) continue;   // unreachable pair, nothing to compare
 
-                double actual = result.journeys().stream()
-                        .mapToDouble(j -> j.totalMinutes()).min().orElseThrow();
+            double actual = result.journeys().stream()
+                    .mapToDouble(j -> j.totalMinutes()).min().orElseThrow();
+            double km = GeoUtils.haversineKm(origin.getLat(), origin.getLon(),
+                    destination.getLat(), destination.getLon());
+            double h = km / graph.heuristicSpeedKmh() * 60.0;
 
-                double km = GeoUtils.haversineKm(origin.getLat(), origin.getLon(),
-                        destination.getLat(), destination.getLon());
-                double h = km / graph.heuristicSpeedKmh() * 60.0;
-
-                assertTrue(h <= actual + 1e-6,
-                        () -> String.format("h overestimated for %s -> %s: h=%.3f but true cost=%.3f",
-                                origin.getNameEn(), destination.getNameEn(), h, actual));
-                checked++;
-            }
+            assertTrue(h <= actual + 1e-6,
+                    () -> String.format("h overestimated for %s -> %s: h=%.3f but true cost=%.3f",
+                            origin.getNameEn(), destination.getNameEn(), h, actual));
+            checked++;
         }
-        assertTrue(checked > 100, "expected to check many pairs, only checked " + checked);
+        assertTrue(checked > 5, "expected several reachable pairs, only checked " + checked);
     }
 
     /**
