@@ -116,6 +116,14 @@ public class StopGraph {
     @Order(3)  // after NetworkService has cached the itineraries
     @EventListener(ApplicationReadyEvent.class)
     public void build() {
+        // Cleared first so an admin edit can rebuild the graph. Skipping this would
+        // append a second set of walking edges and leave stale segment times behind.
+        routeStopIds.clear();
+        routesAtStop.clear();
+        walkLinks.clear();
+        segmentMinutes.clear();
+        maxSegmentSpeedKmh = 1.0;
+
         for (Route route : network.allRoutes()) {
             List<RouteStop> itinerary = network.itinerary(route.getId());
             List<Long> ids = new ArrayList<>();

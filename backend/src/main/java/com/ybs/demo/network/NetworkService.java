@@ -52,6 +52,14 @@ public class NetworkService {
     @Order(1)  // must populate before BusSimulator starts reading itineraries
     @EventListener(ApplicationReadyEvent.class)
     public void load() {
+        // Cleared first so this can be called again after an admin edit. Without it a
+        // reload would leave the previous generation of routes and stops in place
+        // alongside the new ones.
+        stopsById.clear();
+        routesById.clear();
+        routesByCode.clear();
+        itineraries.clear();
+
         for (Stop s : stopRepository.findAll()) {
             stopsById.put(s.getId(), s);
         }

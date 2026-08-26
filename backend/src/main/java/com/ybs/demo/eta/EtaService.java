@@ -99,6 +99,11 @@ public class EtaService {
                 .orElse(1.0);
     }
 
+    /** Drops the cached priors, so an edited traffic factor takes effect immediately. */
+    public void clearCache() {
+        cache.clear();
+    }
+
     /** Point estimate for one segment, in minutes. */
     public double segmentMinutes(double baseMinutes, String segmentId, String bucket) {
         return baseMinutes * trafficFactor(segmentId, bucket);

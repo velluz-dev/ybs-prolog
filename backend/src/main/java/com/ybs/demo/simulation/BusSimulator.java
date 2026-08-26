@@ -70,7 +70,10 @@ public class BusSimulator {
     @Order(2)
     @EventListener(ApplicationReadyEvent.class)
     public void load() {
-        buses.addAll(busRepository.findAll());
+        synchronized (buses) {
+            buses.clear();                    // so a reload replaces the fleet, not doubles it
+            buses.addAll(busRepository.findAll());
+        }
         log.info("Simulating {} buses", buses.size());
     }
 

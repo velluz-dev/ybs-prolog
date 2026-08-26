@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YBS — Admin</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="ops-brand">
+        <h1>🛠️ YBS Admin</h1>
+        <p class="sub">Add and edit the data every AI feature reasons over</p>
+    </div>
+    <div class="header-actions">
+        <a class="ops-link" href="/">← ခရီးစဉ်ရှာဖွေမှု</a>
+        <a class="ops-link" href="/ops.html">📊 Ops</a>
+    </div>
+</header>
+
+<main class="admin">
+
+    <section class="card warn-card">
+        <div class="card-head"><span class="ic">⚠️</span><h2>Read this before you type anything</h2></div>
+        <p>
+            The database runs <b>in memory</b> and re-runs <code>data.sql</code> on every startup.
+            Anything you add here is live <b>immediately</b> — the map, the planner and the simulation
+            all pick it up — but it is <b>gone when the app restarts</b>.
+        </p>
+        <p>
+            To keep it: press <b>Export data.sql</b>, then replace
+            <code>backend/src/main/resources/data.sql</code> with the download and commit it.
+            That makes your data permanent, version-controlled, and shared with your teammates.
+        </p>
+        <p class="hint">
+            Never edit <code>backend/target/classes/data.sql</code> — that is generated output and is
+            overwritten on the next build.
+        </p>
+        <div class="admin-actions">
+            <a class="btn-primary inline" href="/api/admin/export">⬇ Export data.sql</a>
+            <span id="summary" class="en"></span>
+        </div>
+    </section>
+
+    <div class="tabs" id="tabs">
+        <button type="button" class="tab on" data-tab="stops">🚏 Stops</button>
+        <button type="button" class="tab" data-tab="routes">🛣️ Routes</button>
+        <button type="button" class="tab" data-tab="itinerary">🔢 Route stops</button>
+        <button type="button" class="tab" data-tab="traffic">🚦 Traffic prior</button>
+        <button type="button" class="tab" data-tab="drivers">🧑‍✈️ Drivers</button>
+        <button type="button" class="tab" data-tab="buses">🚌 Buses</button>
+        <button type="button" class="tab" data-tab="incidents">⚠️ Incidents</button>
+    </div>
+
+    <!-- STOPS -->
+    <section class="card tab-panel active" data-tab="stops">
+        <div class="card-head"><span class="ic">🚏</span><h2>Stops</h2></div>
+        <p class="hint">Leave <b>id</b> blank to create; fill it to overwrite an existing stop.
+            Coordinates are decimal degrees — Yangon is around lat 16.8, lon 96.15.</p>
+        <div class="form-grid">
+            <label>id <input id="s-id" type="number" placeholder="(blank = new)"></label>
+            <label>Burmese name <input id="s-my" placeholder="လှည်းတန်း"></label>
+            <label>English name <input id="s-en" placeholder="Hledan Junction"></label>
+            <label>lat <input id="s-lat" type="number" step="0.000001" placeholder="16.8247"></label>
+            <label>lon <input id="s-lon" type="number" step="0.000001" placeholder="96.1248"></label>
+            <label>photo URL <input id="s-photo" placeholder="(optional)"></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="stop">Save stop</button>
+        <div class="admin-list" id="stop-list"></div>
+    </section>
+
+    <!-- ROUTES -->
+    <section class="card tab-panel" data-tab="routes">
+        <div class="card-head"><span class="ic">🛣️</span><h2>Routes</h2></div>
+        <p class="hint">The fare is charged <b>per boarding</b>, so it is also what a transfer costs
+            the rider — which is what makes transfers show up in the Pareto set.</p>
+        <div class="form-grid">
+            <label>id <input id="r-id" type="number" placeholder="(blank = new)"></label>
+            <label>code <input id="r-code" placeholder="43"></label>
+            <label>Burmese name <input id="r-my" placeholder="လှည်းတန်း - ဗိုလ်တထောင်"></label>
+            <label>fare (kyats) <input id="r-fare" type="number" value="200"></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="route">Save route</button>
+        <div class="admin-list" id="route-list"></div>
+    </section>
+
+    <!-- ITINERARY -->
+    <section class="card tab-panel" data-tab="itinerary">
+        <div class="card-head"><span class="ic">🔢</span><h2>Route stops</h2></div>
+        <p class="hint">Builds a route's stop sequence. Saving replaces the whole itinerary, because
+            sequence numbers and running times only make sense as a set.</p>
+        <div class="form-grid">
+            <label>route <select id="i-route"></select></label>
+            <label>add stop <select id="i-stop"></select></label>
+        </div>
+        <div class="admin-actions">
+            <button type="button" class="alt-btn" id="i-add">+ Append stop</button>
+            <button type="button" class="alt-btn" id="i-load">Load current</button>
+            <button type="button" class="btn-primary inline" id="i-save">Save itinerary</button>
+        </div>
+        <div class="admin-list" id="i-list"></div>
+    </section>
+
+    <!-- TRAFFIC -->
+    <section class="card tab-panel" data-tab="traffic">
+        <div class="card-head"><span class="ic">🚦</span><h2>Traffic prior</h2></div>
+        <p class="hint">
+            A factor of 1.0 means free-flow. Above 1.0 is slower, below is faster.
+            <code>DEFAULT</code> applies to any segment without its own row; a specific segment is
+            <code>routeCode:fromStopId-toStopId</code>. This drives <b>both</b> the ETA shown to riders
+            and the speed of the buses on the map — change one and watch both move.
+        </p>
+        <div class="form-grid">
+            <label>segment <input id="t-seg" value="DEFAULT" placeholder="DEFAULT or 43:15-16"></label>
+            <label>bucket
+                <select id="t-bucket">
+                    <option>morning_peak</option><option>midday</option>
+                    <option>evening_peak</option><option>night</option>
+                </select>
+            </label>
+            <label>factor <input id="t-factor" type="number" step="0.05" value="1.30"></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="traffic">Save factor</button>
+        <div class="admin-list" id="traffic-list"></div>
+    </section>
+
+    <!-- DRIVERS -->
+    <section class="card tab-panel" data-tab="drivers">
+        <div class="card-head"><span class="ic">🧑‍✈️</span><h2>Drivers and monthly scores</h2></div>
+        <p class="hint">These numbers are the facts the Prolog rule
+            <code>bonus_eligible/2</code> reasons over: headway ≥ 80, harsh events ≤ 5, and no upheld
+            complaint. Change one and the badge on the ops dashboard flips.</p>
+        <div class="form-grid">
+            <label>id <input id="d-id" type="number" placeholder="(blank = new)"></label>
+            <label>name <input id="d-name" placeholder="ဦးမြင့်ဆွေ"></label>
+            <label>route <select id="d-route"></select></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="driver">Save driver</button>
+
+        <h3 class="sub-head">Monthly score</h3>
+        <div class="form-grid">
+            <label>driver <select id="sc-driver"></select></label>
+            <label>month <input id="sc-month" value="2026-08"></label>
+            <label>headway <input id="sc-headway" type="number" value="90"></label>
+            <label>harsh events <input id="sc-harsh" type="number" value="2"></label>
+            <label>upheld complaints <input id="sc-complaints" type="number" value="0"></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="score">Save score</button>
+        <div class="admin-list" id="driver-list"></div>
+    </section>
+
+    <!-- BUSES -->
+    <section class="card tab-panel" data-tab="buses">
+        <div class="card-head"><span class="ic">🚌</span><h2>Buses</h2></div>
+        <p class="hint">A new bus is placed on its route automatically — a bus dropped off its own
+            line would jump the moment the simulator moved it. Crowding feeds the
+            <code>needs_seat</code> constraint, so setting a bus to <b>full</b> changes what the rule
+            base rules out.</p>
+        <div class="form-grid">
+            <label>id <input id="b-id" type="number" placeholder="(blank = new)"></label>
+            <label>route <select id="b-route"></select></label>
+            <label>start at stop # <input id="b-index" type="number" value="0"></label>
+            <label>crowding
+                <select id="b-crowd">
+                    <option value="0">0 — seats free</option>
+                    <option value="1">1 — standing room</option>
+                    <option value="2">2 — full</option>
+                </select>
+            </label>
+        </div>
+        <button type="button" class="btn-primary" data-save="bus">Save bus</button>
+        <div class="admin-list" id="bus-list"></div>
+    </section>
+
+    <!-- INCIDENTS -->
+    <section class="card tab-panel" data-tab="incidents">
+        <div class="card-head"><span class="ic">⚠️</span><h2>Incidents</h2></div>
+        <p class="hint">Logged for the ops dashboard's counts. To actually withdraw journeys, use the
+            flood button on the planner — that asserts <code>flooded/1</code> into the rule base,
+            which is a live condition rather than a historical record.</p>
+        <div class="form-grid">
+            <label>type
+                <select id="n-type">
+                    <option>BREAKDOWN</option><option>CROWDING</option><option>FLOOD</option>
+                    <option>BUNCHING</option><option>ACCIDENT</option><option>ROADWORK</option>
+                </select>
+            </label>
+            <label>route <select id="n-route"></select></label>
+            <label>stop <select id="n-stop"></select></label>
+        </div>
+        <button type="button" class="btn-primary" data-save="incident">Save incident</button>
+        <div class="admin-list" id="incident-list"></div>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+</main>
+
+<script src="/admin.js"></script>
+</body>
+</html>
