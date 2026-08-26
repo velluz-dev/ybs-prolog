@@ -62,6 +62,40 @@ let allRoutes = [];
 const selected = new Set();
 const routeLayers = new Map();   // code -> { line, stops: [] }
 
+
+/* ------------------------------------------------------- route colouring ---
+   One colour per route, taken from the API, used everywhere that route is named:
+   its line on the map, its bus markers, and every badge. Before this, buses were
+   all the same dark pill, so two buses sitting at the same junction gave no clue
+   which line they belonged to. */
+
+function routeColour(code) {
+    const r = allRoutes.find(x => x.code === code);
+    return r ? r.colour : '#64748B';
+}
+
+/** Straight-line RGB distance. Crude, but enough to tell blue from navy. */
+function colourDistance(a, b) {
+    const rgb = h => [0, 2, 4].map(i => parseInt(h.replace('#', '').slice(i, i + 2), 16));
+    const [x, y] = [rgb(a), rgb(b)];
+    return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]);
+}
+
+/** Black or white label, whichever actually reads on the given background. */
+function inkOn(hex) {
+    const c = hex.replace('#', '');
+    const [r, g, b] = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16) / 255);
+    const lin = v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+    const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    return L > 0.45 ? '#0B1220' : '#FFFFFF';
+}
+
+/** A route badge in the route's own colour. */
+function badge(code) {
+    const bg = routeColour(code);
+    return `<span class="route-badge" style="background:${bg};color:${inkOn(bg)}">${code}</span>`;
+}
+
 async function loadNetwork() {
     const net = await (await fetch('/api/network')).json();
     networkStops = net.stops;
@@ -70,8 +104,30 @@ async function loadNetwork() {
     // 118 routes drawn at once is an unreadable hairball across 44 townships, so the
     // map starts with the longest cross-town services and everything else is a click
     // away in the filter. The SEARCH always runs over the whole network regardless.
-    const defaults = [...allRoutes].sort((a, b) => b.stopCount - a.stopCount).slice(0, 5);
-    defaults.forEach(r => selected.add(r.code));
+    //
+    // Colours are assigned server-side by route index, so simply taking the five
+    // longest routes can land two blues and two purples together - technically
+    // distinct, visually the same line. Skipping colours already taken costs nothing
+    // and guarantees the default map is readable.
+    // Skipping only exact colour repeats is not enough - blue and navy are different
+    // strings but the same line to the eye. Requiring a real colour distance is what
+    // makes the default map readable.
+    const byLength = [...allRoutes].sort((a, b) => b.stopCount - a.stopCount);
+    const picked = [];
+    for (const r of byLength) {
+        if (picked.length >= 5) break;
+        // 140 is as strict as the 12-colour palette allows while still filling five
+        // slots; above it only three routes qualify.
+        if (picked.some(c => colourDistance(c, r.colour) < 140)) continue;
+        picked.push(r.colour);
+        selected.add(r.code);
+    }
+    // If the palette could not supply five well-separated colours, fill the rest by
+    // length anyway - an under-filled map is worse than two similar lines.
+    for (const r of byLength) {
+        if (selected.size >= 5) break;
+        selected.add(r.code);
+    }
 
     renderRouteFilter();
     await Promise.all([...selected].map(showRoute));
@@ -92,7 +148,7 @@ function renderRouteFilter() {
     box.innerHTML = list.slice(0, 400).map(r => `
         <label class="route-toggle ${selected.has(r.code) ? 'on' : ''}">
             <input type="checkbox" data-code="${r.code}" ${selected.has(r.code) ? 'checked' : ''}>
-            <span class="route-badge" style="background:${r.colour}">${r.code}</span>
+            ${badge(r.code)}
             <span class="route-name">${r.nameMy}<em>${r.stopCount} stops</em></span>
         </label>`).join('');
 
@@ -166,7 +222,7 @@ function arrivalRows(arrivals) {
     }
     return arrivals.map(a => `
         <div class="board-row">
-            <span class="route-badge" data-route="${a.routeCode}">${a.routeCode}</span>
+            ${badge(a.routeCode)}
             <span class="board-eta">${a.etaMinutes < 1 ? 'ရောက်နေပြီ' : Math.round(a.etaMinutes) + ' မိနစ်'}</span>
             <span class="en">${a.etaLowerBound.toFixed(0)}–${a.etaUpperBound.toFixed(0)} min</span>
             <span class="board-bus en">bus #${a.busId}</span>
@@ -218,7 +274,9 @@ async function pollBuses() {
             const dwelling = bus.state === 'DWELLING';
             // A waiting bus gets a visibly different marker, so a stationary
             // marker reads as "loading passengers", not "the sim has frozen".
-            const html = `<div class="bus-pill ${dwelling ? 'waiting' : ''}">${bus.routeCode}</div>`;
+            const bg = routeColour(bus.routeCode);
+            const html = `<div class="bus-pill ${dwelling ? 'waiting' : ''}"
+                 style="background:${bg};color:${inkOn(bg)}">${bus.routeCode}</div>`;
 
             let marker = busMarkers.get(bus.id);
             if (!marker) {
@@ -265,7 +323,7 @@ function renderFleet() {
             const dwelling = b.state === 'DWELLING';
             return `<tr>
                 <td><b>#${b.id}</b></td>
-                <td><span class="route-badge" data-route="${b.routeCode}">${b.routeCode}</span></td>
+                <td>${badge(b.routeCode)}</td>
                 <td><span class="state-pill ${dwelling ? 'waiting' : 'driving'}">
                     ${dwelling ? `⏸ waiting ${b.dwellSecondsRemaining}s` : '🚌 driving'}</span></td>
                 <td>${b.nextStopNameMy || '—'}<br><span class="en">${b.nextStopNameEn || ''}</span></td>
@@ -396,7 +454,7 @@ function renderResults(data) {
         const j = o.journey;
         const badges = j.legs.map(l => l.kind === 'walk'
             ? `<span class="route-badge walk-badge">🚶</span>`
-            : `<span class="route-badge" data-route="${l.routeCode}">${l.routeCode}</span>`
+            : badge(l.routeCode)
         ).join('<span class="route-sep">›</span>');
 
         const verdict = o.suitable

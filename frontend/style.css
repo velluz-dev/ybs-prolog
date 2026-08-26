@@ -206,15 +206,6 @@
     --danger-ink:  #7F1D1D;
     --panel-dark:  #0B1220;
 
-    --r36: #E11D48;
-    --r43: #059669;
-    --r61: #4338CA;
-    --r57: #EA580C;
-    --r56: #7E22CE;
-    --r58: #0F766E;
-    --rAPS-Pyay: #C026D3;
-    --rAPS-Kabaraye: #9F1239;
-
     --font-my: "Padauk", "Noto Sans Myanmar", "Myanmar Text", system-ui, sans-serif;
     --font-en: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -351,18 +342,13 @@ body {
 .band { font-family: var(--font-en); font-size: 12px; color: var(--ink-2); }
 
 .route-badges { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+/* Colour is set inline from the route's own colour; this is only the shape.
+   The grey here is the fallback for a route the frontend has not loaded yet. */
 .route-badge {
     background: #64748B; color: #fff; border-radius: 7px; padding: 5px 11px;
     font-family: var(--font-en); font-size: 14px; font-weight: 700;
+    white-space: nowrap;
 }
-.route-badge[data-route="36"] { background: var(--r36); }
-.route-badge[data-route="43"] { background: var(--r43); }
-.route-badge[data-route="61"] { background: var(--r61); }
-.route-badge[data-route="57"] { background: var(--r57); }
-.route-badge[data-route="56"] { background: var(--r56); }
-.route-badge[data-route="58"] { background: var(--r58); }
-.route-badge[data-route="APS-Pyay"] { background: var(--rAPS-Pyay); }
-.route-badge[data-route="APS-Kabaraye"] { background: var(--rAPS-Kabaraye); }
 .route-sep { color: var(--ink-2); }
 .walk-badge { background: #E2E8F0; color: var(--ink); }
 
@@ -405,9 +391,12 @@ body {
 }
 /* A bus standing at a stop. Amber and ringed so a stationary marker reads as
    "loading passengers" rather than "the simulation has frozen". */
+/* A bus that is standing at a stop. It keeps its route colour - that is how you
+   tell which line it belongs to - and signals the state with an amber ring
+   instead, so identity and state are both readable at a glance. */
 .bus-pill.waiting {
-    background: var(--warn); border-color: #FDE68A;
-    box-shadow: 0 0 0 4px rgba(180, 83, 9, .25);
+    border-color: #FDE68A;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, .55), 0 1px 4px rgba(0,0,0,.4);
 }
 
 /* Arrivals board inside a stop popup. */

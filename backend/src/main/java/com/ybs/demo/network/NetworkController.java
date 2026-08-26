@@ -25,12 +25,27 @@ import java.util.Map;
 public class NetworkController {
 
     /**
-     * Distinct, high-contrast colours cycled across routes. With 118 routes no palette can
-     * make every pair distinguishable, so the map draws only the selected few at a time.
+     * Distinct, high-contrast colours cycled across routes.
+     *
+     * <p>Twelve genuinely different hues, all dark enough to read against a pale street
+     * map. An earlier list repeated hues - two blues, two purples, two teals - which meant
+     * two routes drawn side by side could look like the same line. With 118 routes no
+     * palette makes every pair distinguishable, so the map draws only a few at a time and
+     * the default selection skips colours already taken.
      */
     private static final String[] PALETTE = {
-            "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#008080",
-            "#e6ab02", "#f032e6", "#0082c8", "#d95f02", "#1b9e77", "#7570b3"
+            "#e6194b",  // red
+            "#3cb44b",  // green
+            "#4363d8",  // blue
+            "#f58231",  // orange
+            "#911eb4",  // purple
+            "#469990",  // teal
+            "#f032e6",  // magenta
+            "#9a6324",  // brown
+            "#800000",  // maroon
+            "#808000",  // olive
+            "#000075",  // navy
+            "#e6ab02"   // gold
     };
 
     private final RouteRepository routeRepository;
