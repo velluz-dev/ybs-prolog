@@ -1,9 +1,10 @@
 /* Admin screens.
 
-   Every save posts to /api/admin/*, which writes to H2 and then rebuilds the
+   Every save posts to /api/admin/*, which writes to MySQL and then rebuilds the
    in-memory caches - so a stop added here shows up on the map and in the planner
-   immediately, without a restart. It is still lost on restart unless exported,
-   which is what the banner at the top of the page is about. */
+   immediately, without a restart, and persists across restarts. Exporting
+   data.sql (banner at the top of the page) reproduces the current state on
+   another machine. */
 
 let network = { stops: [], routes: [] };
 let itinerary = [];      // the itinerary being edited, before it is saved

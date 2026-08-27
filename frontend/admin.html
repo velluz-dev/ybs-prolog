@@ -24,14 +24,15 @@
     <section class="card warn-card">
         <div class="card-head"><span class="ic">⚠️</span><h2>Read this before you type anything</h2></div>
         <p>
-            The database runs <b>in memory</b> and re-runs <code>data.sql</code> on every startup.
+            The database is MySQL, seeded from <code>data.sql</code> on startup.
             Anything you add here is live <b>immediately</b> — the map, the planner and the simulation
-            all pick it up — but it is <b>gone when the app restarts</b>.
+            all pick it up — and it <b>persists across restarts</b>.
         </p>
         <p>
-            To keep it: press <b>Export data.sql</b>, then replace
+            To share your data with teammates or reproduce it on a clean machine: press
+            <b>Export data.sql</b>, then replace
             <code>backend/src/main/resources/data.sql</code> with the download and commit it.
-            That makes your data permanent, version-controlled, and shared with your teammates.
+            That keeps the current state version-controlled and portable.
         </p>
         <p class="hint">
             Never edit <code>backend/target/classes/data.sql</code> — that is generated output and is

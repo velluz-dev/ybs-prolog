@@ -581,9 +581,9 @@ function initAbout() {
         <div class="topic flat">
             <div class="topic-ic">📐</div>
             <div class="topic-title">One process, on purpose</div>
-            <p>No Docker, no microservices, no build step, no database server. The whole demo is one
-               Spring Boot process with H2 in memory, so it starts with a single command and survives
-               a venue with no wifi. Leaflet is vendored; only map tiles need the internet.</p>
+            <p>No Docker, no microservices, no build step. The whole demo is one Spring Boot
+               process backed by a local MySQL database, so it starts with a single command and
+               needs no separate servers. Leaflet is vendored; only map tiles need the internet.</p>
         </div>`;
 }
 

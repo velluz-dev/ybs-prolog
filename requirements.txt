@@ -20,6 +20,7 @@
 # -----------------------------------------------------------------------------
 jdk                     >= 17          # any JDK 17, 21 or 25 — https://adoptium.net
 git                     >= 2.30        # to clone the repository
+mysql-server            any            # the app connects to MySQL and creates/updates its schema
 web-browser             any modern     # Chrome, Edge or Firefox
 disk-space              ~500 MB        # ~400 MB of that is the ~/.m2 dependency cache
 internet                first build only
@@ -27,7 +28,6 @@ internet                first build only
 # NOT required — deliberately:
 #   maven      — the Maven Wrapper (backend/mvnw) provisions Maven 3.9.9 itself
 #   node/npm   — the frontend is plain HTML/CSS/JS with no build step
-#   database   — H2 runs in memory and reseeds from data.sql on every startup
 #   docker     — single process, runs directly on the JVM
 #   python     — none of the runtime uses Python
 
@@ -45,7 +45,7 @@ maven-wrapper           == 3.3.2
 org.springframework.boot:spring-boot-starter-parent        == 3.5.6
 org.springframework.boot:spring-boot-starter-web           == 3.5.6   # REST + embedded Tomcat
 org.springframework.boot:spring-boot-starter-data-jpa      == 3.5.6   # persistence
-com.h2database:h2                                          == 2.3.232 # in-memory database (runtime)
+com.mysql:mysql-connector-j                                # MySQL JDBC driver (runtime)
 it.unibo.alice.tuprolog:tuprolog                           == 3.3.0   # in-JVM Prolog engine
 org.springframework.boot:spring-boot-starter-test          == 3.5.6   # JUnit 5 + assertions (test)
 
@@ -85,6 +85,7 @@ leaflet                 == 1.9.4       # frontend/vendor/ — map rendering
 #     3.2 predates Java 25 and its bundled ASM rejects class-file version 69.
 #     3.5.x is Java 25 ready while still targeting Java 17 bytecode.
 #
-# H2 in memory rather than a real database:
-#     the demo must reset clean on every start, and must not depend on a service
-#     being up during the presentation.
+# MySQL rather than an embedded in-memory database:
+#     keeps the demo honest with a persistent store — edits survive restarts — and
+#     the schema is created/updated by Hibernate, so only an empty database is
+#     needed, not any manual setup.

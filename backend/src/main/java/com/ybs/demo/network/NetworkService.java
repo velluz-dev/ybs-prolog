@@ -17,9 +17,9 @@ import java.util.Map;
 /**
  * Reads the seeded network once at startup and holds it in memory.
  *
- * <p>The network is small (8 routes, ~120 stops) and never changes while the app
- * runs, so loading it once keeps the 1 Hz simulation tick and the A* search off the
- * database entirely. Both of those run far more often than the data changes.
+ * <p>The network is small (118 routes, ~2,080 stops, ~12k route-stops) and changes only via
+ * the admin screens, so loading it once keeps the 1 Hz simulation tick and the A* search off
+ * the database almost always. Both of those run far more often than the data changes.
  */
 @Service
 public class NetworkService {

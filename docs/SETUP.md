@@ -9,6 +9,7 @@ minutes.
 |---|---|---|
 | **A JDK, 17 or newer** | builds and runs everything | `java -version` |
 | **Git** | to clone | `git --version` |
+| **A running MySQL server** | the app connects to it and creates/updates its schema | `mysql --version` |
 
 That is the whole list.
 
@@ -18,8 +19,17 @@ the right Maven version on first build.
 **You do not need Node, npm or any JS toolchain.** The frontend is plain HTML, CSS and
 vanilla JS with no build step. There is no `package.json` anywhere and that is deliberate.
 
-**You do not need a database.** H2 runs in memory and reseeds from `data.sql` on every
-startup, so the demo always resets clean.
+**You do need a database.** The app runs against MySQL, not an embedded in-memory database.
+Create an empty schema — the app builds the tables itself (`ddl-auto=update`):
+
+```sql
+CREATE DATABASE IF NOT EXISTS ybs_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Connection defaults are `localhost:3306`, user/password `root`/`root`; override with the
+`DB_URL`, `DB_USERNAME` and `DB_PASSWORD` environment variables. On startup the app seeds
+`data.sql` with `INSERT IGNORE`, so the network is loaded on first run and edits made
+through `/admin.html` persist across restarts.
 
 ### If you have no JDK
 
@@ -76,8 +86,7 @@ cd backend
 |---|---|---|
 | UI, layout, Burmese copy, map behaviour | `frontend/` | **just refresh the browser** |
 | Search, Prolog, simulation, APIs | `backend/src/main/java/` | restart `./mvnw spring-boot:run` |
-| Stops, routes, fares, drivers, traffic prior | `backend/src/main/resources/data.sql` | restart |
-| Reasoning rules | `backend/src/main/resources/rules/ybs.pl` | restart |
+| Stops, routes, fares, drivers, traffic prior | `backend/src/main/resources/data.sql` | restart || Reasoning rules | `backend/src/main/resources/rules/ybs.pl` | restart |
 
 Frontend changes are live because the backend serves `../frontend` straight from disk. No
 rebuild, no restart. If a change does not show, hard-refresh with **Ctrl+F5** — that is the
@@ -130,6 +139,21 @@ lsof -ti:8081 | xargs kill -9
 ```
 
 Or change `server.port` in `backend/src/main/resources/application.properties`.
+
+### `Unable to connect to MySQL` / `Communications link failure`
+
+The app needs a running MySQL at the configured `DB_URL` (default
+`jdbc:mysql://localhost:3306/ybs_db`). Ensure the server is up, the `ybs_db` schema exists,
+and the credentials match (defaults `root`/`root`, overridable via `DB_USERNAME` /
+`DB_PASSWORD`). The schema itself is created/updated by Hibernate, so you only need to create
+the empty database:
+
+```sql
+CREATE DATABASE IF NOT EXISTS ybs_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+If you see text like `Access denied for user 'root'@'localhost'`, the password differs from
+the default — set `DB_PASSWORD` instead of editing the committed file.
 
 ### `PKIX path building failed` while downloading dependencies
 

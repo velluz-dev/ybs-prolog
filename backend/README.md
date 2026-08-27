@@ -1,7 +1,7 @@
 # Backend
 
-Spring Boot 3.5 on Java 25 source level, H2 in memory, tuProlog in-JVM. One process; it also
-serves `../frontend`.
+Spring Boot 3.5 on Java 25 source level, MySQL-backed JPA, tuProlog in-JVM. One process; it
+also serves `../frontend`.
 
 ```bash
 cd backend
@@ -44,8 +44,9 @@ lives.** Java only asserts ground facts and asks goals.
 | geofence radius | `alerts/ArrivalAlertService.java` |
 | port, voice mode, static paths | `src/main/resources/application.properties` |
 
-`data.sql` reseeds H2 on **every** startup, so the demo always resets clean and any edit
-just needs a restart.
+`data.sql` is seeded into MySQL on startup with `INSERT IGNORE`, so on a fresh database it
+loads the network once; a change to `data.sql` needs a restart, and edits made via the admin
+screens persist across restarts.
 
 ## Things that will bite you
 
