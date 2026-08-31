@@ -123,4 +123,21 @@ public class NetworkService {
         List<RouteStop> it = itinerary(routeId);
         return !it.isEmpty() && it.get(it.size() - 1).getStop().getId().equals(stopId);
     }
+
+    /**
+     * True when a ride boards at the route's first stop and alights at its last.
+     *
+     * <p>This is what the fare rules mean by an end-to-end ride, and it is derived from the
+     * itinerary rather than hand-listed so it stays correct when {@code data.sql} changes.
+     * A one-stop route cannot be ridden end to end, so an itinerary shorter than two stops
+     * is never a full-route ride however the ids line up.
+     */
+    public boolean spansWholeRoute(Long routeId, Long fromStopId, Long toStopId) {
+        List<RouteStop> it = itinerary(routeId);
+        if (it.size() < 2 || fromStopId == null || toStopId == null) {
+            return false;
+        }
+        return fromStopId.equals(it.get(0).getStop().getId())
+                && toStopId.equals(it.get(it.size() - 1).getStop().getId());
+    }
 }

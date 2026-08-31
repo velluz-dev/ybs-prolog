@@ -62,16 +62,14 @@ public class JourneyPlanningService {
                 }
             }
 
-            // The fare each RIDE leg costs this particular rider, per the fare rules -
-            // a monk's total is 0 however many buses the journey uses.
+            // What the whole journey costs this rider. This used to be a loop here that
+            // asked fare/4 once per leg and added the answers up; journey_fare/3 does the
+            // adding in the rule base now, over the leg/3 facts asserted above. The loop
+            // was the last piece of fare policy living in Java.
             int riderFare = 0;
-            for (Journey.Leg leg : j.legs()) {
-                if ("ride".equals(leg.kind()) && leg.routeCode() != null) {
-                    for (Map<String, String> s :
-                            prolog.solveAll("fare(" + RIDER + ", '" + leg.routeCode() + "', F)", 1)) {
-                        riderFare += parseIntOr(s.get("F"), leg.fareKyats());
-                    }
-                }
+            for (Map<String, String> s :
+                    prolog.solveAll("journey_fare(" + j.id() + ", " + RIDER + ", F)", 1)) {
+                riderFare = parseIntOr(s.get("F"), j.totalFareKyats());
             }
 
             Map<String, Object> m = new LinkedHashMap<>();

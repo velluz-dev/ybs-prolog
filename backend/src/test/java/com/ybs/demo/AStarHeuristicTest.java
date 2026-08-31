@@ -138,4 +138,42 @@ class AStarHeuristicTest {
         result.journeys().forEach(j ->
                 assertTrue(j.transferCount() >= 0, "transfer count must never be negative"));
     }
+
+    /**
+     * The end-to-end fare depends on this being derived, not guessed.
+     *
+     * <p>Checked against every route in the seeded network: only the first-stop-to-last-stop
+     * pair counts as riding the whole route, and shaving either end off it must not.
+     *
+     * <p>Worth knowing while reading this: every YBS route is a loop, so a route's first and
+     * last stop are the same place on the ground. That makes the full-route rate correct but
+     * unreachable through {@code /api/journeys/search} - A* walks the few hundred metres
+     * between the termini instead of riding the whole loop round. See the fare notes in
+     * {@code ybs.pl}.
+     */
+    @Test
+    void onlyTheWholeItineraryCountsAsAFullRouteRide() {
+        for (Route r : network.allRoutes()) {
+            List<RouteStop> it = network.itinerary(r.getId());
+            if (it.size() < 3) continue;
+            Long first = it.get(0).getStop().getId();
+            Long last = it.get(it.size() - 1).getStop().getId();
+            Long second = it.get(1).getStop().getId();
+            Long penultimate = it.get(it.size() - 2).getStop().getId();
+
+            assertTrue(network.spansWholeRoute(r.getId(), first, last),
+                    "route " + r.getCode() + ": first -> last is the whole route");
+            assertFalse(network.spansWholeRoute(r.getId(), second, last),
+                    "route " + r.getCode() + ": boarding one stop late is not the whole route");
+            assertFalse(network.spansWholeRoute(r.getId(), first, penultimate),
+                    "route " + r.getCode() + ": alighting one stop early is not the whole route");
+            // Only meaningful when the loop does not close on the very same stop id: for a
+            // route that literally begins and ends at one stop, first -> last reversed IS
+            // first -> last, and there is no direction left to get wrong.
+            if (!first.equals(last)) {
+                assertFalse(network.spansWholeRoute(r.getId(), last, first),
+                        "route " + r.getCode() + ": the itinerary has a direction");
+            }
+        }
+    }
 }

@@ -33,5 +33,7 @@ public record Journey(
             String toNameEn,
             double minutes,
             int fareKyats,
+            /** True when this ride runs the route end to end - what the fare rules price higher. */
+            boolean fullRoute,
             List<Long> viaStopIds) {}
 }

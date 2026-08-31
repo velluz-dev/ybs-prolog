@@ -3,6 +3,7 @@ package com.ybs.demo.reasoning;
 import com.ybs.demo.disruption.DisruptionService;
 import com.ybs.demo.network.NetworkService;
 import com.ybs.demo.network.Route;
+import com.ybs.demo.network.RouteStop;
 import com.ybs.demo.ops.Driver;
 import com.ybs.demo.ops.DriverMonthlyScore;
 import com.ybs.demo.ops.DriverMonthlyScoreRepository;
@@ -14,6 +15,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +41,13 @@ public class FactAssembler {
     private final DisruptionService disruptions;
     private final DriverMonthlyScoreRepository scoreRepository;
     private final NetworkService network;
+
+    /**
+     * Routes whose itinerary has already been asserted this request. Cleared by
+     * {@link #resetWorld()}, which is what starts a request - a per-call set would only
+     * deduplicate within one journey, and two options sharing a route are the normal case.
+     */
+    private final Set<String> servesAsserted = new HashSet<>();
 
     public FactAssembler(PrologService prolog,
                          BusRepository busRepository,
@@ -74,6 +83,7 @@ public class FactAssembler {
      */
     public void resetWorld() {
         prolog.resetToBaseTheory();
+        servesAsserted.clear();
         assertWorldFacts();
     }
 
@@ -117,10 +127,52 @@ public class FactAssembler {
         prolog.assertFact("transfer_count(" + j + ", " + journey.transferCount() + ")");
         prolog.assertFact("predicted_crowding(" + j + ", " + crowdingOf(journey) + ")");
 
+        // The three objectives A* traded off, so the rule base can state Pareto
+        // dominance itself rather than only being told the answer. Minutes are rounded
+        // to whole numbers: tuProlog compares integers exactly, and two journeys that
+        // differ by a twentieth of a minute are not a real trade-off.
+        prolog.assertFact("journey_stats(" + j + ", " + Math.round(journey.totalMinutes())
+                + ", " + journey.totalFareKyats() + ", " + journey.transferCount() + ")");
+
+        // One fact per RIDE leg, carrying the span the fare rules price on. Walking legs
+        // are deliberately absent - they are free and have no route, and leaving them
+        // out is what lets journey_fare/3 sum an empty list for an all-walking journey
+        // instead of needing a special case.
+        for (Journey.Leg leg : journey.legs()) {
+            if ("ride".equals(leg.kind()) && leg.routeCode() != null) {
+                prolog.assertFact("leg(" + j + ", '" + leg.routeCode() + "', "
+                        + (leg.fullRoute() ? "full" : "part") + ")");
+            }
+        }
+        assertServes(journey.routeCodes());
+
         for (Long stopId : journey.stopIds()) {
             prolog.assertFact("uses_segment(" + j + ", s" + stopId + ")");
             if (OVERBRIDGE_STOPS.contains(stopId) && journey.transferCount() > 0) {
                 prolog.assertFact("uses_overbridge(" + j + ")");
+            }
+        }
+    }
+
+    /**
+     * Which stops the routes in play call at, for the reachability rules.
+     *
+     * <p>Scoped to the routes the search actually proposed rather than all 118. The whole
+     * network is 12,280 route-stop pairs, and asserting that on every request would cost
+     * more than the search it is supporting - so {@code serves/2}, like {@code suitable/2},
+     * answers about the last search. The rule base says so where it uses it.
+     *
+     * <p>Deduplicated across journeys, because two options sharing a route would otherwise
+     * assert its whole itinerary twice and {@code setof/3} would still be right while
+     * {@code count_solutions/2} quietly was not.
+     */
+    private void assertServes(List<String> routeCodes) {
+        for (String code : routeCodes) {
+            if (code == null || !servesAsserted.add(code)) continue;
+            Route route = network.routeByCode(code);
+            if (route == null) continue;
+            for (RouteStop rs : network.itinerary(route.getId())) {
+                prolog.assertFact("serves('" + code + "', s" + rs.getStop().getId() + ")");
             }
         }
     }

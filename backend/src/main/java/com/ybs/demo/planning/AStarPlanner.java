@@ -315,16 +315,21 @@ public class AStarPlanner {
                 }
                 Long to = via.get(via.size() - 1);
                 int fare = 0;
+                boolean fullRoute = false;
                 if (kind.equals("ride")) {
                     Route r = network.routeByCode(rc);
                     fare = r == null ? 0 : r.getBaseFareKyats();
+                    // Riding a route end to end costs more than hopping along it, so the leg
+                    // records which it is. The search itself stays fare-flat and rider-blind;
+                    // it is the rule base that turns this flag into kyats.
+                    fullRoute = r != null && network.spansWholeRoute(r.getId(), from, to);
                     routeCodes.add(rc);
                 }
                 Stop fs = network.stop(from);
                 Stop ts = network.stop(to);
                 legs.add(new Journey.Leg(kind, rc, from, to,
                         fs.getNameMy(), ts.getNameMy(), fs.getNameEn(), ts.getNameEn(),
-                        round(minutes), fare, via));
+                        round(minutes), fare, fullRoute, via));
                 if (stopIds.isEmpty()) stopIds.add(from);
                 stopIds.addAll(via);
                 i = j;
