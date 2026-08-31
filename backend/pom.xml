@@ -55,6 +55,19 @@
           the newer 2p-kt because its Java API (new Prolog(); setTheory(); solve())
           keeps the Java<->Prolog bridge short enough to read aloud in a viva.
         -->
+        <!-- Authentication. Driver and admin screens only: a passenger must never need
+             an account to plan a trip, so the rider half of the API stays open and
+             SecurityConfig says which paths those are, explicitly. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>it.unibo.alice.tuprolog</groupId>
             <artifactId>tuprolog</artifactId>

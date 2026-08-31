@@ -14782,3 +14782,27 @@ INSERT INTO incident (id, type, route_id, stop_id, timestamp) VALUES
   (6, 'CROWDING', 36, 890, '2026-08-26 12:40:00'),
   (7, 'BREAKDOWN', 43, 1438, '2026-08-26 13:45:00'),
   (8, 'CROWDING', 50, 1308, '2026-08-26 14:50:00');
+
+-- ------------------------------------------------------------------ accounts ----
+-- Who can sign in. Riders never appear here: planning a trip is public, and the login
+-- exists only for the two roles that see something not everyone should - a driver's own
+-- month, and the data-entry screens.
+--
+-- Passwords are BCrypt, which is what belongs in a seed file; the plaintext is written
+-- beside each row because these are demo credentials on a throwaway in-memory database
+-- and an examiner has to be able to sign in. THIS FILE IS NOT PUBLISHABLE AS-IS if you
+-- ever put a real password behind one of these hashes.
+--
+--   admin        / admin123     ADMIN
+--   <driver>     / driver123    DRIVER, bound to their own driver row
+--
+-- driver_id is the whole point of the table: it is what makes "my shift" mean one
+-- person's shift. The screen it feeds reads that id from the session, never from the URL.
+INSERT INTO app_user (id, username, password_hash, role, driver_id) VALUES
+  (1, 'admin',        '$2a$10$NMK8J7R3SAqkFCpM.5xPkO4gLl2KgR66BcZ.gTRy79qdtc0sRMoma', 'ADMIN',  null),
+  (2, 'umyintswe',    '$2a$10$kAHf6KhMqGWA7YU2IVk/KOCrlHXCb61agUXWJZYKvCr.z0oncHyeq', 'DRIVER', 1),
+  (3, 'ukyawwin',     '$2a$10$aFh7kUMAmGa4DTEC7MFK/.YW90yxiUctYL3GtxGTlJPb.NkdEPMd2', 'DRIVER', 2),
+  (4, 'dawkhinmalar', '$2a$10$nkpo9HkpIMqc7oaYcEK4EO.FifmzTpGh.KHXiNXYd3NYrPflL.Xk6', 'DRIVER', 3),
+  (5, 'uthanhtun',    '$2a$10$Q6tFsv/CK1hTMSopUsujwuOAPxDkhXcu41AvmuL5OWJQf936MlIBa', 'DRIVER', 4),
+  (6, 'uaungmyo',     '$2a$10$sdVimMjXxnS1.llIynV25eiCxjrTt8bWaR.0cbvFSNs4ZVg/fp0ju', 'DRIVER', 5),
+  (7, 'dawsansanaye', '$2a$10$26flknRmApp0WLFh7Lgfae0mqOM6zEC5qQ.1Mg91lAESusF8a94cm', 'DRIVER', 6);

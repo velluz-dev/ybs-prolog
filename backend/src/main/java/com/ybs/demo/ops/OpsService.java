@@ -25,15 +25,18 @@ public class OpsService {
 
     private final DriverMonthlyScoreRepository scoreRepository;
     private final IncidentRepository incidentRepository;
+    private final DriverRepository driverRepository;
     private final PrologService prolog;
     private final FactAssembler facts;
 
     public OpsService(DriverMonthlyScoreRepository scoreRepository,
                       IncidentRepository incidentRepository,
+                      DriverRepository driverRepository,
                       PrologService prolog,
                       FactAssembler facts) {
         this.scoreRepository = scoreRepository;
         this.incidentRepository = incidentRepository;
+        this.driverRepository = driverRepository;
         this.prolog = prolog;
         this.facts = facts;
     }
@@ -99,5 +102,96 @@ public class OpsService {
             rows.add(row);
         });
         return rows;
+    }
+
+    /** Every driver, for the role switcher's "who am I" picker. */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> driverList() {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Driver d : driverRepository.findAll()) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("driverId", d.getId());
+            row.put("driverName", d.getName());
+            row.put("routeCode", d.getRoute() == null ? null : d.getRoute().getCode());
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    /**
+     * One driver's own shift, for the driver view.
+     *
+     * <p>The supervisor's dashboard answers "which of my drivers earn the bonus". A driver
+     * asking about their own month wants the opposite: not the comparison, but the reason.
+     * So this asks the engine twice - {@code bonus_eligible/2} for the verdict and
+     * {@code bonus_blocker/3} for what withheld it - and a driver who missed out is told
+     * which rule fired rather than being left to infer it from three numbers.
+     *
+     * <p>Live buses are deliberately not included. The page already polls
+     * {@code /api/buses/live} at 1 Hz for the map and filters it by route code, so
+     * duplicating that shaping here would give the screen two clocks to disagree with.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> driverShift(Long driverId) {
+        Driver driver = driverRepository.findById(driverId).orElse(null);
+        if (driver == null) {
+            return Map.of();
+        }
+        facts.resetWorld();
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("driverId", driver.getId());
+        out.put("driverName", driver.getName());
+        Route route = driver.getRoute();
+        out.put("routeId", route == null ? null : route.getId());
+        out.put("routeCode", route == null ? null : route.getCode());
+        out.put("routeNameMy", route == null ? null : route.getNameMy());
+        // Colour is not on the entity - it is assigned per route by /api/network, which the
+        // page has already loaded. Looking it up there keeps one source for it.
+
+        List<Map<String, Object>> months = new ArrayList<>();
+        for (DriverMonthlyScore s : scoreRepository.findAll()) {
+            if (!s.getDriver().getId().equals(driverId)) continue;
+            String month = s.getId().getMonthKey();
+            String d = "d" + driverId;
+            String m = "'" + month + "'";
+
+            List<String> blockers = new ArrayList<>();
+            for (Map<String, String> sol :
+                    prolog.solveAll("bonus_blocker(" + d + ", " + m + ", Why)", 10)) {
+                String why = sol.get("Why");
+                if (why != null && !blockers.contains(why)) {
+                    blockers.add(why);
+                }
+            }
+
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("month", month);
+            row.put("headwayScore", s.getHeadwayScore());
+            row.put("harshEvents", s.getHarshEvents());
+            row.put("upheldComplaints", s.getUpheldComplaints());
+            row.put("bonusEligible", prolog.prove("bonus_eligible(" + d + ", " + m + ")"));
+            row.put("blockers", blockers);
+            months.add(row);
+        }
+        out.put("months", months);
+
+        List<Map<String, Object>> incidents = new ArrayList<>();
+        for (Incident i : incidentRepository.findAll()) {
+            if (route == null || !route.getId().equals(i.getRouteId())) continue;
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("type", i.getType().name());
+            row.put("hour", i.getTimestamp().getHour());
+            row.put("stopNameMy", i.getStop() == null ? null : i.getStop().getNameMy());
+            row.put("stopNameEn", i.getStop() == null ? null : i.getStop().getNameEn());
+            incidents.add(row);
+        }
+        out.put("incidents", incidents);
+
+        // The bunching alert is per route, so a driver only sees it when it is theirs.
+        out.put("bunching", bunchingAlerts().stream()
+                .filter(a -> route != null && route.getCode().equals(a.get("routeCode")))
+                .toList());
+        return out;
     }
 }
