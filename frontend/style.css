@@ -967,7 +967,6 @@ body { background: var(--bg); color: var(--ink); }
 }
 .pill-btn:hover { background: var(--accent-soft); border-color: #C9DBFF; }
 .pill-btn .ic { font-size: 1rem; line-height: 1; }
-.pill-btn.speaking { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* -------------------------------------------------------------- header ---- */
 

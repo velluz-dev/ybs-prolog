@@ -2020,27 +2020,7 @@ function renderPromises() {
         </div>`).join('');
 }
 
-/* ------------------------------------------------------- listen and help --- */
-
-/** Reads the current view aloud. Burmese voices are rare, so a missing one is reported. */
-function initListen() {
-    const btn = document.getElementById('listen-btn');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-        if (!window.speechSynthesis) return;
-        if (speechSynthesis.speaking) { speechSynthesis.cancel(); btn.classList.remove('speaking'); return; }
-
-        const view = document.querySelector('.view.active');
-        const parts = [...view.querySelectorAll('h1, .lede, .card-head h2, .hint, .mic-hint')]
-            .map(e => e.textContent.trim()).filter(Boolean);
-        const say = new SpeechSynthesisUtterance(parts.join('. '));
-        say.lang = lang() === 'en' ? 'en-US' : 'my-MM';
-        say.rate = 0.95;
-        say.onend = () => btn.classList.remove('speaking');
-        btn.classList.add('speaking');
-        speechSynthesis.speak(say);
-    });
-}
+/* ------------------------------------------------------------------ help --- */
 
 function initHelp() {
     const go = () => { location.hash = '#about'; showView('about'); };
@@ -2175,8 +2155,7 @@ loadNetwork()
         });
         initPrefs();
         initSwap();
-        initListen();
-        initHelp();
+            initHelp();
         renderQuickPicks();
         renderPromises();
         paintArt();
