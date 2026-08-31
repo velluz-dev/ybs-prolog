@@ -47,10 +47,15 @@ YBS/
 │       ├── main/resources/            application.properties, data.sql, rules/ybs.pl
 │       └── test/java/                 23 tests
 │
+├── tools/             ← optional, not in the build
+│   └── voice/             the real MMS model: ASR server, TTS sample generation,
+│                          and an accuracy round-trip. The demo runs without it.
+│
 ├── docs/
 │   ├── SETUP.md       ← install guide and troubleshooting
 │   ├── WORKFLOW.md    ← how a request flows through the whole system
-│   └── ER.md          ← database ER diagram
+│   ├── ER.md          ← database ER diagram
+│   └── VOICE.md       ← speech to text in both languages, and how to run MMS
 └── README.md
 ```
 
@@ -180,11 +185,147 @@ Nothing outside the project is modified. The system JDK truststore is left untou
   g/h/f per expanded node, plus an A*-vs-Dijkstra expansion count.
 - **Prolog** — all four rule families, live filtering by rider profile with a named reason
   per rejection, `/api/prolog/query` debug endpoint, flood injection.
+- **Fares** — a four-row tariff in the rule base: 350 with a YBS card, 400 in cash, and 500
+  / 600 for riding a route end to end. Monk and student concessions sit on top of it. See
+  "The fare tariff" below.
 - **ETA** — hand-authored traffic prior with a ±25% confidence band.
-- **Voice** — 3 recorded Burmese queries with entity extraction; a real self-hosted
-  Whisper client that falls back to the recorded path if the endpoint is down.
+- **Voice** — **press to talk**, or pick one of 12 sample queries, in Burmese or English.
+  **Meta MMS** (`facebook/mms-1b-all`) does the recognition, with `mms-tts-mya`/`-eng`
+  generating the sample audio. The recogniser is **constrained to the stop list**: rather
+  than trusting a 30%-wrong transcript, every stop name is scored against the frames that
+  carried the origin and the destination, so the answer is chosen by sound and cannot be a
+  place that does not exist. That took 12 queries from **5 correct to 10**, and confidently
+  wrong answers from 4 to 2. See [`docs/VOICE.md`](docs/VOICE.md). Run it from
+  [`tools/voice/`](tools/voice/); the numbers and the reasoning are in
+  [`docs/VOICE.md`](docs/VOICE.md).
 - **Arrival alert** — 400 m geofence, fires exactly once, large banner plus clip playback.
+- **Three roles with real authentication** — rider, driver and admin. Spring Security with
+  BCrypt and sessions; a driver account is bound to its driver row, so "my shift" means one
+  person's shift. See "Signing in" below.
+- **Two languages** — Burmese or English, one at a time, from `frontend/i18n.js`.
 - **Ops dashboard** — `/ops.html`, bonus badges computed live by Prolog.
+
+---
+
+## What the rule base can be asked
+
+`ybs.pl` is the file to open in a viva, and it is now ten sections rather than four. Beyond
+the fare and constraint families, these are worth typing into the live console:
+
+| Goal | Shows |
+|---|---|
+| `journey_fare(j1, rider1, F)` | **aggregation** — `findall/3` over the legs, summed by a recursive `sum_kyats/2` |
+| `concession(m1, C)` | **explanation** — which fare clause won, the way `violation_reason/3` explains a rejection |
+| `pareto_optimal(J)` / `dominates(A, B)` | **preference as logic** — the planner's Pareto filter, stated in four lines instead of implemented |
+| `meets(R1, R2)` / `reachable('61', To, 2)` | **recursion over a graph**, with a visited list — the reason it terminates on a network where every route is a loop |
+| `transfer_point(S)` | **`setof/3`** — a stop two routes both call at |
+| `top_headway('2026-08', D)` / `near_miss(D, M)` | **aggregation without `sort/2`** — best-of and count-of, written out |
+| `contradictory_bonus(D, M)` | **a KB self-check** — must have *no* solutions |
+
+Three things this is designed to make sayable out loud:
+
+- **tuProlog has no `sort/2`, `between/3`, `sum_list/2` or `aggregate_all/3`.** The aggregates
+  are therefore written out recursively, which is what a KR course is asking to see anyway.
+- **Clause order only means precedence if you take the first solution.** `fare/4` is
+  deliberately non-deterministic — a monk gets `0` and then, on backtracking, the general
+  clause offers `400` as well, which is the whole point of the console preset. That makes
+  `once/1` load-bearing inside `journey_fare/3`: without it a monk's journey would be priced
+  at `0 + 400` per leg. A test pins this.
+- **Section 9 is rules that check the rule base.** `unexplained_rejection/2`,
+  `contradictory_bonus/2` and `missing_tariff/2` should each have no solutions; a solution
+  means two rules written as opposites have drifted apart, which is the failure mode a rule
+  base has and a function does not.
+
+`serves/2`, `leg/3` and `journey_stats/4` are asserted for the journeys the last search
+proposed — so, like `suitable/2`, the reachability and Pareto goals answer about that search
+rather than about all 118 routes. Asserting the whole network would be 12,280 facts per
+request, which would cost more than the search it supports.
+
+---
+
+## The fare tariff
+
+Two things set the price, and both come from the request rather than from the route:
+
+| | ordinary ride | end to end |
+|---|---|---|
+| holds a YBS card | **350** | **500** |
+| paying cash | **400** | **600** |
+
+It lives in `ybs.pl` as `fare_table/3` facts, so changing a fare is a one-line edit rather
+than a hunt through clause bodies. `fare/4` takes the span; `fare/3` is the short form the
+live console types and means an ordinary hop. Clause order still encodes precedence — a monk
+travels free whatever the span, and a student with a card pays half of the card rate for the
+span they actually rode, so an end-to-end student ride is 250 and not 175.
+
+**One thing to know before you go looking for the 500/600 rate in a search result.** Every
+one of the 118 YBS routes is a loop: the furthest any route's first stop sits from its last
+is 1.76 km, and 117 of the 118 are under 1 km. A* therefore always walks between the termini
+rather than riding the whole loop round, so `fullRoute` is never true in a journey the
+planner returns. The rate is correct, tested, and reachable from the rule console — it is
+the *network* that makes it unreachable from a search, not the rules. Pricing long rides
+instead would mean triggering on the share of the route ridden rather than on its endpoints.
+
+---
+
+## Signing in
+
+**A rider is never asked to sign in.** Planning a trip, the live map, the arrivals board, the
+A\* trace and the Prolog console are all public — a passenger needing an account to look up a
+bus would be a worse system. Signing in unlocks two things and only two.
+
+| Role | Gets | Refused |
+|---|---|---|
+| **Rider** (signed out) | plan a trip, live map, arrivals, A\* trace, rule console | anything operational |
+| **Driver** | **their own** shift, their route on the map, arrivals, fleet | every other driver's file, all admin |
+| **Admin** | data entry, ops dashboard, the whole roster, fleet, map, rule console | `/api/ops/me/shift` — an admin has no driver row |
+
+Demo accounts, seeded in `data.sql` as BCrypt hashes:
+
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `admin123` | ADMIN |
+| `umyintswe`, `ukyawwin`, `dawkhinmalar`, `uthanhtun`, `uaungmyo`, `dawsansanaye` | `driver123` | DRIVER, one per driver row |
+
+### What changed, and why it mattered
+
+The role switcher used to be a UI convenience with nothing behind it — this README said so.
+The concrete hole was the driver screen: it was `/api/ops/drivers/{id}` behind a dropdown
+listing all six drivers, so **any visitor could read any driver's headway score, harsh-event
+count and complaints by changing a number in the URL.** The dropdown is gone. The endpoint is
+now `/api/ops/me/shift`, it takes no id, and the driver is read from the session — there is
+deliberately nothing left to change.
+
+### Three decisions worth defending in a viva
+
+- **Sessions, not JWT.** One server, one browser, no third-party client. A token would add
+  signing keys, expiry and revocation in exchange for statelessness this app cannot use.
+- **CSRF stays on for the public writes too.** `/api/sim/speed` is unauthenticated, so strictly
+  a forged request has no privilege to borrow. It keeps the protection anyway: "exempt, and
+  here is the threat-model argument" is a comment that rots, and the cost is one header in the
+  frontend's `post()` helper.
+- **Login answers in JSON, not a 302.** The frontend is a static page driving the API with
+  `fetch`, and a redirect arrives as something it cannot act on. Unauthenticated API calls get
+  401 with a body; the page decides what to show.
+
+`SecurityConfig` lists every public path explicitly rather than relying on a default, so
+adding an endpoint means deciding on purpose whether a passenger may reach it.
+
+The driver's shift screen asks the engine **both** directions: `bonus_eligible/2` for the
+verdict and `bonus_blocker/3` for what withheld it. A driver who missed the bonus is owed the
+rule that decided it, not a bare "not eligible" over three numbers.
+
+## Languages
+
+The sidebar's language switch persists in `localStorage`; the role now comes from the
+server, not from storage — a remembered role is honoured only if the session still allows it.
+
+Language is one string table, `frontend/i18n.js`, with one key and two values per string.
+Markup declares `data-i18n="key"`; anything JavaScript builds calls `t('key')` and is rebuilt
+on the `ybs:lang` event. Stop and route names are not in the table — they arrive from the API
+in both languages, so `stopName()` picks rather than translates. The admin screen
+(`/admin.html`) is deliberately English-only: its copy is about `data.sql`, schema columns and
+export mechanics, which is operator vocabulary rather than rider vocabulary.
 
 ---
 

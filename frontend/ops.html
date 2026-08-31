@@ -4,18 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>YBS — Ops dashboard</title>
+    <link rel="icon" href="/img/logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
 <header class="app-header">
+    <!-- The same mark the app wears, so these read as one product rather than two. -->
+    <div class="brand-mark">
+            <!-- The real logo, with the lettered tile behind it: if the file is
+                 missing the mark is still a mark rather than an empty square. -->
+            <img src="/img/logo.png" alt="YBS"
+                 onload="this.parentElement.classList.add('has-logo')">
+        </div>
     <div class="ops-brand">
-        <h1>YBS Ops Dashboard</h1>
-        <p class="sub">Bonus eligibility is computed live by the Prolog engine — watch the server console</p>
+        <h1 data-i18n="ops.title"></h1>
+        <p class="sub" data-i18n="ops.sub"></p>
     </div>
     <div class="header-actions">
-        <a class="ops-link" href="/">← ခရီးစဉ်ရှာဖွေမှု</a>
-        <a class="ops-link" href="/admin.html">🛠️ Admin</a>
+        <div id="lang-switch"></div>
+        <a class="ops-link" href="/">← <span data-i18n="ops.backToPlanner"></span></a>
+        <a class="ops-link" href="/admin.html">🛠️ <span data-i18n="role.admin"></span></a>
     </div>
 </header>
 
@@ -24,7 +33,7 @@
         <section class="card">
             <div class="card-head">
                 <span class="ic">🚨</span>
-                <h2>Bunching alert <span class="en">Headway has collapsed on one route</span></h2>
+                <h2 data-i18n="ops.bunching"></h2>
             </div>
             <div id="bunching"></div>
         </section>
@@ -32,7 +41,7 @@
         <section class="card">
             <div class="card-head">
                 <span class="ic">📈</span>
-                <h2>Incidents <span class="en">By route and hour</span></h2>
+                <h2 data-i18n="ops.incidents"></h2>
             </div>
             <table id="incidents" class="grid"></table>
         </section>
@@ -42,49 +51,53 @@
         <section class="card">
             <div class="card-head">
                 <span class="ic">🏅</span>
-                <h2>Driver bonus eligibility
-                    <span class="en">Each badge is one bonus_eligible(D, M) goal sent to tuProlog</span>
-                </h2>
+                <h2 data-i18n="ops.bonus"></h2>
             </div>
-            <p class="muted rule-note">
-                The seeded database column is <code>false</code> for every driver, so anything
-                showing “eligible” was derived by the rule base just now — not read from storage.
-            </p>
+            <p class="muted rule-note" data-i18n="ops.bonus.note"></p>
             <table id="drivers" class="grid"></table>
         </section>
     </div>
 </main>
 
+<script src="/i18n.js"></script>
 <script>
 async function load() {
     const d = await (await fetch('/api/ops/dashboard')).json();
 
     document.getElementById('bunching').innerHTML = d.bunchingAlerts.map(a =>
         `<div class="alert-row">
-            <div class="alert-my">${a.messageMy}</div>
-            <div class="en">${a.messageEn}</div>
+            <div class="alert-my">${lang() === 'en' ? a.messageEn : a.messageMy}</div>
             <div class="action">→ ${a.action}</div>
          </div>`).join('');
 
     document.getElementById('drivers').innerHTML =
-        `<tr><th>Driver</th><th>Headway</th><th>Harsh</th><th>Complaints</th><th>Bonus</th></tr>` +
+        `<tr><th>${t('ops.driver')}</th><th>${t('shift.headway')}</th><th>${t('shift.harsh')}</th>
+             <th>${t('shift.complaints')}</th><th>${t('shift.bonus')}</th></tr>` +
         d.drivers.map(r => `<tr>
             <td>${r.driverName}</td>
             <td>${r.headwayScore}</td>
             <td>${r.harshEvents}</td>
             <td>${r.upheldComplaints}</td>
             <td>${r.bonusEligible
-                ? '<span class="badge yes">✔ eligible</span>'
-                : '<span class="badge no">✖ not eligible</span>'}</td>
+                ? `<span class="badge yes">✔ ${t('shift.eligible')}</span>`
+                : `<span class="badge no">✖ ${t('shift.notEligible')}</span>`}</td>
         </tr>`).join('');
 
     document.getElementById('incidents').innerHTML =
-        `<tr><th>Route</th><th>Hour</th><th>Type</th><th>Count</th></tr>` +
+        `<tr><th>${t('ops.route')}</th><th>${t('ops.hour')}</th>
+             <th>${t('ops.type')}</th><th>${t('ops.count')}</th></tr>` +
         d.incidentCounts.map(r => `<tr>
             <td>${r.routeId}</td><td>${String(r.hour).padStart(2, '0')}:00</td>
             <td>${r.type}</td><td>${r.count}</td>
         </tr>`).join('');
 }
+
+// The tables are built in JavaScript, so a language switch has to rebuild them -
+// applyLang() only rewrites the markup that declares a key.
+document.addEventListener('ybs:lang', load);
+
+initLangSwitch(document.getElementById('lang-switch'));
+applyLang();
 load();
 </script>
 </body>

@@ -566,3 +566,964 @@ body {
 }
 .toast.ok  { background: var(--ok-soft); color: var(--ok-ink); border: 1px solid #86EFAC; }
 .toast.bad { background: var(--danger-soft); color: var(--danger-ink); border: 1px solid #FCA5A5; }
+
+/* ===========================================================================
+   Language switch, roles, type-and-search stops, and the driver's own screen.
+   =========================================================================== */
+
+/* --- language ----------------------------------------------------------- */
+.lang-switch { display: flex; gap: 2px; margin-left: auto; background: #1E293B; border-radius: 8px; padding: 3px; }
+.lang-switch button {
+    border: 0; background: transparent; color: #94A3B8; cursor: pointer;
+    font: inherit; font-size: 11px; padding: 4px 7px; border-radius: 6px;
+}
+.lang-switch button.on { background: var(--accent); color: #fff; }
+.lang-switch button:hover:not(.on) { color: #E2E8F0; }
+
+/* --- role switch -------------------------------------------------------- */
+.role-switch-wrap { padding: 0 16px 14px; border-bottom: 1px solid #1E293B; }
+.role-switch { display: flex; gap: 4px; background: #1E293B; border-radius: 10px; padding: 4px; }
+.role-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    border: 0; background: transparent; color: #94A3B8; cursor: pointer;
+    font: inherit; font-size: 10px; padding: 7px 2px; border-radius: 8px; line-height: 1.2;
+}
+.role-btn .ic { font-size: 15px; }
+.role-btn.on { background: var(--accent); color: #fff; }
+.role-btn:hover:not(.on) { color: #E2E8F0; }
+
+.driver-picker { margin-top: 10px; }
+.driver-picker .field-label { color: #94A3B8; font-size: 11px; margin-bottom: 4px; }
+.driver-picker select {
+    width: 100%; background: #0F172A; color: #E2E8F0; border: 1px solid #334155;
+    border-radius: 8px; padding: 7px 8px; font: inherit; font-size: 12px;
+}
+
+/* --- type-and-search stop picker ---------------------------------------- */
+.field-label { display: block; font-size: 11px; color: var(--ink-2); margin-bottom: 2px; }
+.stop-picker { position: relative; }
+.stop-input {
+    width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent;
+    font: inherit; font-size: 15px; font-weight: 600; padding: 3px 0; color: var(--ink);
+}
+.stop-input:focus { outline: none; border-bottom-color: var(--accent); }
+
+.stop-list {
+    position: absolute; z-index: 900; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px;
+    list-style: none; max-height: 300px; overflow-y: auto;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .16);
+}
+.stop-list li {
+    padding: 7px 9px; border-radius: 7px; cursor: pointer; font-size: 14px; line-height: 1.3;
+}
+.stop-list li em {
+    display: block; font-family: var(--font-en); font-style: normal;
+    font-size: 11px; color: var(--ink-2);
+}
+.stop-list li.on, .stop-list li:hover { background: var(--accent-soft); }
+.stop-list .stop-none { color: var(--ink-2); font-size: 12px; cursor: default; }
+.stop-list .stop-none:hover { background: transparent; }
+
+/* --- fare, now that the tariff has two rates ---------------------------- */
+.fare-note { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+.fare-flag {
+    display: inline-block; margin-top: 5px; padding: 2px 7px; border-radius: 999px;
+    background: #FFF7ED; color: #7C2D12; font-size: 10px; font-weight: 700;
+}
+
+/* --- driver: my shift --------------------------------------------------- */
+.shift-id .shift-who { display: flex; align-items: center; gap: 14px; }
+.shift-avatar {
+    width: 46px; height: 46px; border-radius: 12px; background: var(--accent-soft);
+    display: grid; place-items: center; font-size: 24px;
+}
+.shift-name { font-size: 19px; font-weight: 700; }
+.shift-route { display: flex; align-items: center; gap: 7px; margin-top: 3px; font-size: 13px; }
+
+.blockers { margin-top: 12px; }
+.blockers-head { font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
+.blocker {
+    padding: 7px 10px; border-radius: 8px; background: #FEF2F2; color: #7F1D1D;
+    font-size: 13px; margin-bottom: 5px;
+}
+.disruption-row.alert { background: #FFF7ED; border-color: #FDBA74; margin-bottom: 12px; }
+
+/* The lede under each view heading used to be tagged .en, which is now wrong -
+   it is whatever language the page is in. */
+.lede { color: var(--ink-2); font-size: 13px; }
+
+/* ===========================================================================
+   Sign in, and the identity strip that replaces the driver dropdown.
+   =========================================================================== */
+
+.role-btn.locked { opacity: .55; }
+.role-btn.locked .ic { font-size: 13px; }
+
+#identity { margin-top: 10px; }
+.signed-in {
+    display: flex; align-items: center; gap: 8px;
+    background: #0F172A; border: 1px solid #334155; border-radius: 8px; padding: 6px 8px;
+}
+.signed-in .who {
+    flex: 1; min-width: 0; color: #E2E8F0; font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.signed-in .alt-btn { font-size: 11px; padding: 3px 8px; }
+
+.signin-card { max-width: 420px; }
+.signin-card form { display: flex; flex-direction: column; gap: 4px; }
+.signin-card input {
+    border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
+    font: inherit; font-size: 15px; margin-bottom: 10px; background: #fff; color: var(--ink);
+}
+.signin-card input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.signin-card .btn-primary { margin-top: 4px; }
+
+.signin-error { color: #B91C1C; font-size: 13px; min-height: 18px; }
+
+.signin-hint {
+    margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line);
+    font-size: 12px; color: var(--ink-2); line-height: 1.7;
+}
+.signin-hint-head { font-weight: 600; margin-bottom: 4px; }
+.signin-hint code {
+    background: var(--accent-soft); border-radius: 4px; padding: 1px 5px; font-size: 11px;
+}
+
+/* ===========================================================================
+   A drawn journey: one colour per leg, and a pin at every change of bus.
+   =========================================================================== */
+
+.trip-pin {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700; line-height: 1;
+    border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(15, 23, 42, .45);
+}
+/* The change-of-bus pin is the one thing on the map that must not be mistaken for a
+   route colour, so it is deliberately outside the route palette. */
+.trip-pin.transfer { background: #0B1220; color: #FDE047; font-size: 15px; }
+.trip-pin.start    { background: var(--ok, #16A34A); color: #fff; font-size: 11px; }
+.trip-pin.end      { background: #B91C1C; color: #fff; font-size: 10px; }
+
+.legend .swatch.walk {
+    background: repeating-linear-gradient(90deg, #475569 0 3px, transparent 3px 7px);
+}
+.legend .leg-sep { color: var(--ink-2); margin: 0 2px; }
+.legend .change-note {
+    margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line);
+    color: var(--ink-2); font-size: 12px;
+}
+
+/* ===========================================================================
+   Interactive voice: press to talk, with a level meter so the rider can see
+   the microphone is hearing them before they trust it.
+   =========================================================================== */
+
+.mic-wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; padding: 6px 0 2px; }
+
+.mic-big {
+    display: flex; align-items: center; gap: 12px;
+    border: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600;
+    color: #fff; background: var(--accent); padding: 14px 26px; border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, .32);
+    transition: background .15s, box-shadow .15s, transform .08s;
+}
+.mic-big:hover:not(:disabled) { transform: translateY(-1px); }
+.mic-big:active:not(:disabled) { transform: translateY(0); }
+.mic-big .mic-glyph { font-size: 20px; line-height: 1; }
+
+/* Recording is red and pulsing: the one state where a rider must be in no doubt
+   that the microphone is live. */
+.mic-big.recording {
+    background: #B91C1C; box-shadow: 0 4px 14px rgba(185, 28, 28, .38);
+    animation: mic-pulse 1.4s ease-in-out infinite;
+}
+.mic-big.working { background: #475569; box-shadow: none; cursor: progress; }
+.mic-big:disabled { opacity: .9; }
+
+@keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 4px 14px rgba(185, 28, 28, .38); }
+    50%      { box-shadow: 0 4px 14px rgba(185, 28, 28, .38), 0 0 0 12px rgba(185, 28, 28, .10); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mic-big.recording { animation: none; }
+}
+
+.mic-meter {
+    width: 200px; height: 5px; border-radius: 999px; background: var(--line); overflow: hidden;
+}
+.mic-meter span {
+    display: block; height: 100%; width: 0%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--ok, #16A34A), #FACC15 70%, #DC2626);
+    transition: width .06s linear;
+}
+
+.voice-error { color: #B91C1C; }
+
+/* The canned samples are still here, but folded away - a venue with no microphone
+   permission and no recogniser still has to be able to demo. */
+.voice-fallback { margin-top: 12px; }
+.voice-fallback summary {
+    cursor: pointer; font-size: 12px; color: var(--ink-2); list-style: none;
+}
+.voice-fallback summary::-webkit-details-marker { display: none; }
+.voice-fallback summary::before { content: '▸ '; }
+.voice-fallback[open] summary::before { content: '▾ '; }
+.voice-fallback .voice-row { margin-top: 10px; }
+
+/* ===========================================================================
+   FRIENDLY THEME
+   ===========================================================================
+   The app used to wear a dark operator sidebar and dense professional cards.
+   That reads as a tool for someone who already knows the system. This is a bus
+   app for everybody's grandmother, so the whole surface is light, rounded and
+   spelled out: numbered steps instead of implied ones, one big obvious action
+   per card, and a text-size control that is not buried in a settings page.
+
+   Appended rather than merged into the rules above, because the components
+   underneath - the map, the fleet table, the Prolog console, the stop picker -
+   are unchanged and only need the new tokens to flow through them. Later rules
+   win, so this layer restyles the shell and leaves the machinery alone.
+   =========================================================================== */
+
+:root {
+    --bg:          #F4F6FC;
+    --surface:     #FFFFFF;
+    --ink:         #16233A;
+    --ink-2:       #64748B;
+    --line:        #E6EAF2;
+
+    --accent:      #2563EB;
+    --accent-soft: #EDF3FF;
+    --accent-ink:  #1D4ED8;
+
+    --ok:          #16A34A;
+    --ok-soft:     #E9F8EE;
+    --ok-ink:      #14663A;
+
+    --warn:        #D97706;
+    --warn-soft:   #FEF6E7;
+    --danger:      #DC2626;
+    --danger-soft: #FEECEC;
+    --danger-ink:  #991B1B;
+
+    --violet:      #7C3AED;
+    --violet-soft: #F3ECFE;
+
+    --radius:   18px;
+    --radius-s: 12px;
+    --shadow:   0 1px 2px rgba(22, 35, 58, .05);
+    --shadow-m: 0 6px 20px rgba(22, 35, 58, .07);
+
+    /* Every font size below is a multiple of this, so A- / A / A+ scales the
+       whole interface rather than a handful of paragraphs. */
+    --text: 15px;
+}
+
+html { font-size: var(--text); }
+body { background: var(--bg); color: var(--ink); }
+
+/* ------------------------------------------------------------ app shell --- */
+
+.shell { display: flex; gap: 14px; padding: 14px; min-height: 100vh; align-items: flex-start; }
+
+.sidebar {
+    width: 300px; flex: 0 0 300px;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 20px;
+    box-shadow: var(--shadow-m);
+    position: sticky; top: 14px; height: calc(100vh - 28px);
+    overflow-y: auto; padding-bottom: 8px;
+}
+
+.content {
+    flex: 1; min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 20px;
+    box-shadow: var(--shadow-m);
+    padding: 26px 30px 20px;
+}
+
+/* ----------------------------------------------------------------- brand --- */
+
+.brand { padding: 18px 18px 14px; gap: 12px; border-bottom: 0; }
+.brand-mark {
+    width: 48px; height: 48px; border-radius: 14px; background: var(--accent);
+    color: #fff; font-weight: 800; font-size: 1rem; letter-spacing: .02em;
+    display: grid; place-items: center; flex: 0 0 48px;
+}
+.brand-my { font-size: 1.05rem; font-weight: 800; color: var(--ink); line-height: 1.2; }
+.brand-en { font-size: .78rem; color: var(--ink-2); margin-top: 2px; }
+
+/* The language control is a pill, not a pair of dark chips. */
+.lang-switch {
+    margin-left: auto; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px; gap: 2px; box-shadow: var(--shadow);
+}
+.lang-switch button { color: var(--ink-2); font-size: .74rem; padding: 5px 9px; border-radius: 999px; }
+.lang-switch button.on { background: var(--accent); color: #fff; }
+.lang-switch button:hover:not(.on) { color: var(--ink); background: var(--accent-soft); }
+
+/* --------------------------------------------------------------- hello ----- */
+
+.hello {
+    margin: 4px 16px 16px; padding: 14px 16px; border-radius: 16px;
+    background: linear-gradient(115deg, #E8F4FF 0%, #EAFAF0 100%);
+    display: flex; gap: 12px; align-items: flex-start;
+}
+.hello-sun { font-size: 1.6rem; line-height: 1; }
+.hello-title { font-weight: 800; font-size: .98rem; }
+.hello-body { font-size: .86rem; color: #40506B; margin-top: 2px; line-height: 1.45; }
+
+/* ------------------------------------------------------------ who are you -- */
+
+.role-switch-wrap { padding: 0 16px 14px; border-bottom: 1px solid var(--line); }
+.side-label { font-size: .88rem; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+
+.role-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: none; padding: 0; }
+
+/* Each role is a card with a face on it. A three-way segmented control was
+   correct and unmemorable; people pick themselves out of a picture faster. */
+.role-btn {
+    flex: none; flex-direction: column; gap: 6px; align-items: center;
+    background: var(--accent-soft); color: var(--ink);
+    border: 2px solid transparent; border-radius: 14px; padding: 10px 4px 8px;
+    font-size: .76rem; font-weight: 700; cursor: pointer; position: relative;
+    transition: transform .12s, box-shadow .12s, border-color .12s;
+}
+.role-btn:nth-child(2) { background: var(--ok-soft); }
+.role-btn:nth-child(3) { background: var(--violet-soft); }
+.role-btn .role-art { width: 44px; height: 44px; display: block; }
+.role-btn:hover:not(.on) { transform: translateY(-2px); box-shadow: var(--shadow-m); }
+.role-btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.role-btn:nth-child(2).on { background: var(--ok-soft); border-color: var(--ok); color: var(--ok-ink); }
+.role-btn:nth-child(3).on { background: var(--violet-soft); border-color: var(--violet); color: #5B21B6; }
+
+/* A role you have not signed in for keeps its lock, but quietly. */
+.role-btn .lock { position: absolute; top: 5px; right: 6px; font-size: .66rem; opacity: .55; }
+
+/* ------------------------------------------------------------------ nav ---- */
+
+#nav { padding: 14px 12px 6px; }
+.nav-group {
+    padding: 12px 8px 8px; font-size: .88rem; font-weight: 700;
+    color: var(--ink); text-transform: none; letter-spacing: 0;
+}
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; margin-bottom: 3px; border-radius: 12px;
+    color: var(--ink); text-decoration: none; font-size: .93rem; font-weight: 600;
+    border-left: 0; transition: background .12s;
+}
+.nav-item .ic { font-size: 1.15rem; line-height: 1; }
+.nav-item em { display: none; }              /* the theme shows one language at a time */
+.nav-item:hover { background: var(--accent-soft); }
+.nav-item.on { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, .28); }
+
+/* --------------------------------------------------------- sidebar foot ---- */
+
+.sidebar-foot { padding: 12px 16px 16px; border-top: 1px solid var(--line); }
+.foot-label { font-size: .8rem; color: var(--ink-2); margin-bottom: 8px; font-weight: 600; }
+
+.pref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+
+.pref-toggle {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 8px 14px; font: inherit; font-size: .84rem; font-weight: 600;
+}
+.pref-toggle:hover { background: var(--accent-soft); }
+
+/* A- / A / A+ . Sitting in the sidebar rather than a settings page is the point:
+   the person who needs bigger text should not have to go looking for it. */
+.text-size { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.text-size button {
+    border: 0; background: var(--surface); color: var(--ink); cursor: pointer;
+    font: inherit; font-weight: 700; padding: 7px 12px; line-height: 1;
+}
+.text-size button + button { border-left: 1px solid var(--line); }
+.text-size button:hover { background: var(--accent-soft); }
+.text-size button.on { background: var(--accent); color: #fff; }
+.text-size .t-sm { font-size: .74rem; }
+.text-size .t-md { font-size: .88rem; }
+.text-size .t-lg { font-size: 1.02rem; }
+
+.speed-row { background: var(--accent-soft); border-radius: 12px; padding: 5px; gap: 4px; }
+.speed-row .speed-btn { color: var(--ink-2); font-weight: 700; }
+.speed-row .speed-btn.on { background: var(--accent); color: #fff; }
+
+.side-art { display: block; width: 100%; margin-top: 10px; }
+
+/* ------------------------------------------------------------- top bar ----- */
+
+.topbar { display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-bottom: 6px; }
+.pill-btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 9px 16px; font: inherit; font-size: .88rem; font-weight: 600;
+    text-decoration: none;
+}
+.pill-btn:hover { background: var(--accent-soft); border-color: #C9DBFF; }
+.pill-btn .ic { font-size: 1rem; line-height: 1; }
+.pill-btn.speaking { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* -------------------------------------------------------------- header ---- */
+
+.view-head { position: relative; margin-bottom: 22px; }
+.view-head h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -.01em; }
+.view-head .lede { font-size: 1rem; color: var(--ink-2); margin-top: 6px; max-width: 62ch; }
+
+/* The scene lives behind the heading on wide screens and is dropped entirely on
+   narrow ones - it is decoration, and decoration is the first thing to go. */
+.head-art { position: absolute; right: -10px; top: -14px; width: 44%; max-width: 620px; pointer-events: none; }
+@media (max-width: 1180px) { .head-art { display: none; } }
+
+/* --------------------------------------------------------------- cards ---- */
+
+.card {
+    border-radius: var(--radius); padding: 22px; box-shadow: none;
+    border: 1px solid var(--line); margin-bottom: 18px;
+}
+.card-head { gap: 12px; margin-bottom: 16px; }
+.card-head h2 { font-size: 1.08rem; font-weight: 700; }
+
+/* Numbered steps. The planner has always been "say it or pick it, then search",
+   but nothing on screen said so. */
+.step-no {
+    width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 800; font-size: .95rem;
+    display: grid; place-items: center;
+}
+.card-head .info {
+    margin-left: 6px; width: 20px; height: 20px; border-radius: 50%;
+    border: 0; background: var(--accent-soft); color: var(--accent-ink);
+    font: inherit; font-size: .7rem; font-weight: 800; cursor: help; line-height: 1;
+}
+
+/* ------------------------------------------------------- step 1: speaking -- */
+
+.speak-panel { background: var(--accent-soft); border-radius: 16px; padding: 20px; text-align: center; }
+.mic-big {
+    width: 100%; max-width: 340px; justify-content: center; padding: 16px 26px;
+    font-size: 1.02rem; border-radius: 999px;
+}
+.mic-hint { font-size: .88rem; color: #4A5C7A; margin-top: 12px; }
+.mic-meter { width: 100%; max-width: 340px; }
+
+.or-rule { display: flex; align-items: center; gap: 14px; margin: 16px 0; color: var(--ink-2); font-size: .88rem; }
+.or-rule::before, .or-rule::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* The samples are a peer of the microphone now, not a disclosure triangle. */
+.voice-fallback { border: 1px solid var(--line); border-radius: 999px; padding: 0; }
+.voice-fallback summary {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 18px; color: var(--accent-ink); font-size: .93rem; font-weight: 600;
+}
+.voice-fallback summary::before { content: '💬'; }
+.voice-fallback[open] { border-radius: 16px; }
+.voice-fallback[open] summary { border-bottom: 1px solid var(--line); }
+.voice-fallback .voice-row { padding: 14px; margin-top: 0; }
+
+/* ---------------------------------------------------- step 2: the stops ---- */
+
+.stops-stack { position: relative; }
+.trip-field {
+    border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px;
+    margin-bottom: 10px; background: var(--surface); align-items: center; gap: 14px;
+}
+.trip-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.trip-field .ic { font-size: .8rem; }
+.field-label { font-size: .8rem; color: var(--ink-2); font-weight: 600; }
+.stop-input { border-bottom: 0; font-size: 1.05rem; padding: 2px 0; }
+.stop-input:focus { border-bottom-color: transparent; }
+
+/* Swap sits on the seam between the two fields, which is the only place it can
+   sit and still read as "these two, exchanged". */
+.swap-btn {
+    position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%; z-index: 5;
+    border: 1px solid var(--line); background: var(--surface); color: var(--accent);
+    font-size: 1.05rem; cursor: pointer; box-shadow: var(--shadow-m);
+    display: grid; place-items: center; transition: transform .18s;
+}
+.swap-btn:hover { background: var(--accent-soft); }
+.swap-btn:active { transform: translateY(-50%) rotate(180deg); }
+
+/* Search is green because it is the one button on the page that goes somewhere. */
+.btn-primary {
+    background: var(--ok); border-radius: 12px; padding: 15px 20px;
+    font-size: 1.02rem; font-weight: 700; box-shadow: 0 4px 14px rgba(22, 163, 74, .26);
+    justify-content: center;
+}
+.btn-primary:hover { background: #15803D; }
+.btn-primary .en { color: #DCFCE7; }
+
+.quick-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.quick-label { font-size: .86rem; color: var(--ink-2); font-weight: 600; margin-right: 2px; }
+.quick-chip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 8px 15px; font: inherit; font-size: .86rem; font-weight: 600;
+    cursor: pointer;
+}
+.quick-chip:hover { background: var(--accent-soft); border-color: #C9DBFF; }
+.quick-chip.fav { color: var(--warn); }
+
+/* ------------------------------------------------------- rider profile ----- */
+
+.chips { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.chip {
+    border: 1px solid var(--line); border-radius: 14px; padding: 14px 10px;
+    background: var(--surface); font-size: .86rem; font-weight: 600; gap: 8px;
+}
+.chip .ic { font-size: 1.3rem; }
+.chip:hover { border-color: #C9DBFF; background: var(--accent-soft); }
+.chip.on { background: var(--accent-soft); border: 2px solid var(--accent); color: var(--accent-ink); }
+
+/* ----------------------------------------------------------------- tips ---- */
+
+.tips-card {
+    background: #FEF7E6; border: 1px solid #F6E3B4; border-radius: var(--radius);
+    padding: 20px 22px; margin-bottom: 18px; display: flex; align-items: center; gap: 16px;
+    position: relative; overflow: hidden;
+}
+.tips-card .ic { font-size: 1.5rem; }
+.tips-title { font-weight: 800; font-size: 1.02rem; }
+.tips-body { font-size: .92rem; color: #7A6320; margin-top: 3px; }
+.tips-art { margin-left: auto; width: 210px; flex: 0 0 auto; }
+@media (max-width: 900px) { .tips-art { display: none; } }
+
+/* --------------------------------------------------------- reassurance ----- */
+
+/* Four claims the interface then has to keep. They are here because a rider who
+   has never used an app before needs to be told the thing is for them. */
+.promise-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 4px; }
+.promise {
+    border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px; background: var(--surface);
+}
+.promise-ic { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: grid; place-items: center; font-size: 1.15rem; }
+.promise:nth-child(1) .promise-ic { background: var(--accent-soft); }
+.promise:nth-child(2) .promise-ic { background: var(--warn-soft); }
+.promise:nth-child(3) .promise-ic { background: var(--danger-soft); }
+.promise:nth-child(4) .promise-ic { background: var(--ok-soft); }
+.promise b { font-size: .92rem; display: block; }
+.promise span { font-size: .8rem; color: var(--ink-2); }
+@media (max-width: 1000px) { .promise-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.app-foot { text-align: center; color: var(--ink-2); font-size: .84rem; padding: 22px 0 6px; }
+
+/* ------------------------------------------------------------ need help ---- */
+
+.help-fab {
+    position: fixed; right: 22px; bottom: 22px; z-index: 900;
+    display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+    border: 0; background: var(--accent); color: #fff; border-radius: 999px;
+    padding: 13px 20px; font: inherit; font-size: .93rem; font-weight: 700;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, .38);
+}
+.help-fab:hover { background: var(--accent-ink); }
+
+/* -------------------------------------------------------------- results ---- */
+
+.results-head h2 { font-size: 1.08rem; font-weight: 700; }
+.journey { border-radius: var(--radius); border: 1px solid var(--line); }
+.fare { font-size: 2.1rem; }
+.empty-state { border-radius: var(--radius); border: 1px dashed var(--line); background: #FBFCFE; }
+
+/* --------------------------------------------------------------- dark ----- */
+
+/* One switch, and it only has to repaint tokens because everything above is
+   written in terms of them. */
+body.dark {
+    --bg: #0E1522; --surface: #16202F; --ink: #E8EDF6; --ink-2: #94A3B8;
+    --line: #253247; --accent-soft: #1B2A44; --ok-soft: #14301F; --violet-soft: #241B3A;
+    --warn-soft: #2E2312; --danger-soft: #331A1A;
+    --shadow-m: 0 6px 20px rgba(0, 0, 0, .35);
+}
+body.dark .hello { background: linear-gradient(115deg, #17293F 0%, #14301F 100%); }
+body.dark .hello-body { color: #A9BAD2; }
+body.dark .tips-card { background: #2A2313; border-color: #4A3C1B; }
+body.dark .tips-body { color: #D8C48A; }
+body.dark .empty-state { background: #131C29; }
+body.dark .stop-list { background: var(--surface); }
+
+/* ===========================================================================
+   ops.html and admin.html, brought onto the same theme.
+   ===========================================================================
+   These two are separate pages with no sidebar, so they kept a dark header slab
+   while the app around them turned light. That read as two different products.
+   They are operator screens, not rider screens, so they stay denser - but they
+   are the same product and should look it.
+   =========================================================================== */
+
+.app-header {
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 20px;
+    box-shadow: var(--shadow-m);
+    margin: 14px 14px 0; padding: 18px 24px;
+    align-items: center;
+}
+.ops-brand h1 { font-size: 1.45rem; font-weight: 800; color: var(--ink); }
+.ops-brand .sub { color: var(--ink-2); font-size: .88rem; }
+
+/* Pills, matching the app's top bar. Burmese needs the extra line-height or the
+   descenders of the back-link collide with the arrow beside it. */
+.ops-link {
+    border: 1px solid var(--line); color: var(--ink); background: var(--surface);
+    border-radius: 999px; padding: 10px 18px; font-size: .9rem; line-height: 1.6;
+}
+.ops-link:hover { background: var(--accent-soft); border-color: #C9DBFF; }
+
+.layout, .admin { padding: 14px; max-width: none; }
+.layout.ops { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 1100px) { .layout.ops { grid-template-columns: minmax(0, 1fr); } }
+
+/* A verdict must never wrap: "not" on one line and "eligible" on the next reads,
+   for a moment, as the opposite of what it says. */
+.badge { white-space: nowrap; border-radius: 999px; padding: 6px 12px; font-weight: 700; }
+
+.admin .card, .layout .card { border-radius: var(--radius); box-shadow: none; }
+.warn-card { border-radius: var(--radius); }
+.tab-row .tab { border-radius: 999px; }
+.tab-row .tab.on { box-shadow: 0 4px 12px rgba(37, 99, 235, .28); }
+.grid th {
+    font-size: .78rem; letter-spacing: .04em; color: var(--ink-2);
+    border-bottom: 1px solid var(--line);
+}
+.app-header .brand-mark { margin-right: 4px; }
+
+/* Burmese stacks diacritics above and below the baseline, so a line-height tuned for
+   Latin clips them into each other. This is the one place the two scripts genuinely
+   need different vertical room. */
+.ops-link { line-height: 2.1; padding-top: 6px; padding-bottom: 6px; }
+.header-actions { align-items: stretch; }
+
+/* ===========================================================================
+   Matching the reference layout exactly.
+   =========================================================================== */
+
+/* Steps side by side, then profile beside tips, then the promises. The earlier
+   build put both steps in a left rail with results permanently on the right,
+   which made step 2 sit below the fold and gave an empty results box the most
+   valuable real estate on the page. */
+.plan-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px; align-items: start;
+}
+.plan-grid > .card, .plan-grid > .tips-card { margin-bottom: 0; }
+@media (max-width: 1080px) { .plan-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.results-panel { margin-top: 18px; }
+.results-panel .results-head { margin-bottom: 12px; }
+
+/* Both step cards stand the same height so their tops and bottoms line up. */
+.plan-grid > .card { height: 100%; display: flex; flex-direction: column; }
+.plan-grid > .card > .stops-stack { margin-top: 2px; }
+
+.card-head .optional { font-size: .84rem; font-weight: 500; color: var(--ink-2); margin-left: -4px; }
+
+/* The chevron says "this opens something" before you touch it. */
+.trip-field { position: relative; }
+.field-chevron { color: #A9B4C6; font-size: 1.3rem; line-height: 1; margin-left: 4px; }
+
+/* Centred on the seam, the way an exchange between two things should read. */
+.swap-btn { left: 50%; right: auto; transform: translate(-50%, -50%); }
+.swap-btn:active { transform: translate(-50%, -50%) rotate(180deg); }
+
+/* One pill that shows the language you are in and opens the other. Two buttons
+   made the reader compare two words to find out which one was already true. */
+.lang-pill {
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 8px 14px; font: inherit; font-size: .86rem; font-weight: 600;
+    line-height: 1.9;
+}
+.lang-pill:hover { background: var(--accent-soft); border-color: #C9DBFF; }
+.lang-pill .caret { color: var(--ink-2); font-size: .7rem; }
+.brand .lang-pill { margin-left: auto; }
+
+/* Chips carry their own explanation, so "mobility" does not have to be guessed. */
+.chip { position: relative; padding-right: 22px; }
+.chip .chip-i {
+    position: absolute; top: 7px; right: 7px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-ink);
+    font-size: .58rem; font-weight: 800; display: grid; place-items: center; cursor: help;
+}
+.chip.on .chip-i { background: #fff; }
+
+.tips-card { align-items: flex-start; }
+.tips-copy { flex: 1; min-width: 0; }
+.tips-art { width: 100%; max-width: 250px; margin-left: 0; margin-top: 10px; }
+@media (max-width: 1400px) { .tips-card { flex-wrap: wrap; } }
+
+.quick-chip.fav { border-color: #F3D89A; background: #FEF9EC; }
+.quick-chip.fav:hover { background: #FDF3D8; }
+.role-btn .role-art { width: 50px; height: 50px; }
+.role-btn { padding: 12px 4px 9px; }
+
+/* ---- polish pass ----------------------------------------------------------
+   Everything below is the difference between "the pieces are all present" and
+   "it looks finished". */
+
+/* The sidebar has a fixed height and six nav items plus a signed-in bar; without
+   tightening, the last two entries fell below the fold on a laptop screen. */
+.hello { margin: 2px 14px 12px; padding: 12px 14px; }
+.hello-sun { font-size: 1.4rem; }
+.hello-title { font-size: .92rem; }
+.hello-body { font-size: .82rem; }
+.role-switch-wrap { padding: 0 14px 12px; }
+.side-label { margin-bottom: 8px; font-size: .85rem; }
+.role-btn { padding: 9px 4px 7px; font-size: .73rem; }
+.role-btn .role-art { width: 42px; height: 42px; }
+#nav { padding: 10px 10px 4px; }
+.nav-group { padding: 8px 8px 5px; font-size: .84rem; }
+.nav-item { padding: 9px 11px; font-size: .89rem; }
+.sidebar-foot { padding: 10px 14px 12px; }
+
+/* The illustration is the first thing to give up space, not the controls. */
+.side-art { margin-top: 6px; opacity: .95; }
+.sidebar { padding-bottom: 4px; }
+
+/* Contain the tips artwork: it was drawing its bench out past the card's corner. */
+.tips-card { overflow: hidden; }
+.tips-art { max-width: 100%; margin-left: 0; }
+.tips-art svg { display: block; width: 100%; height: auto; }
+
+/* Room for the info badge so it never sits on top of a wrapped label. */
+.chip { padding: 13px 24px 13px 10px; min-height: 74px; justify-content: center; }
+.chip > span:last-of-type { line-height: 1.25; }
+.chip .chip-i { top: 6px; right: 6px; }
+
+/* A signed-in bar in the rider view should be quiet, not a black slab. */
+#identity .identity-bar {
+    background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 12px; border: 1px solid #D8E5FF;
+}
+#identity .identity-bar .alt-btn { background: #fff; border-color: #C9DBFF; color: var(--accent-ink); }
+
+/* Burmese titles are longer than English ones and were being squeezed into a
+   102px column by the language pill. The pill keeps its size and the name takes
+   the rest, dropping to its own line rather than wrapping to four. */
+.brand { flex-wrap: wrap; align-items: center; }
+.brand > div:not(.brand-mark):not(#lang-switch) { flex: 1 1 150px; min-width: 0; }
+.brand #lang-switch { margin-left: auto; flex: 0 0 auto; }
+.brand .lang-pill { padding: 7px 11px; font-size: .82rem; }
+.brand-en { line-height: 1.35; }
+
+/* The signed-in bar: informative, not a black slab in the middle of a light page. */
+.signed-in {
+    background: var(--accent-soft); color: var(--accent-ink);
+    border: 1px solid #D8E5FF; border-radius: 12px;
+    padding: 8px 10px; margin-top: 10px;
+    display: flex; align-items: center; gap: 8px; font-size: .84rem; font-weight: 600;
+}
+.signed-in .who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.signed-in .alt-btn {
+    background: #fff; border: 1px solid #C9DBFF; color: var(--accent-ink);
+    border-radius: 999px; padding: 5px 12px; font-size: .78rem;
+}
+.signed-in .alt-btn:hover { background: var(--accent-soft); }
+
+/* The tips illustration was claiming half the card and squeezing the sentence into
+   a one-word column. Copy first; the drawing takes what is left, or nothing. */
+.tips-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; }
+.tips-copy { min-width: 0; }
+.tips-art { width: 200px; flex: none; }
+@media (max-width: 1500px) { .tips-card { grid-template-columns: auto minmax(0, 1fr); } .tips-art { display: none; } }
+
+/* The old rule painted this white for a dark sidebar that no longer exists. */
+.signed-in, .signed-in .who { color: var(--accent-ink); }
+/* 200px was too greedy for a half-width card; 150px fits alongside the sentence at
+   ordinary laptop widths, and only a genuinely narrow window drops it. */
+.tips-art { width: 150px; }
+@media (max-width: 1500px) { .tips-card { grid-template-columns: auto minmax(0, 1fr) auto; } .tips-art { display: block; } }
+@media (max-width: 1240px) { .tips-card { grid-template-columns: auto minmax(0, 1fr); } .tips-art { display: none; } }
+
+/* The painted header scene. It is a wide banner on a white ground, so it is sized to
+   the header rather than cropped, and it sits behind the heading text - decoration
+   must never be the reason a title is hard to read. */
+.head-photo { display: block; width: 100%; height: auto; }
+.head-art { right: 0; top: -18px; width: 46%; max-width: 640px; }
+@media (max-width: 1180px) { .head-art { display: none; } }
+
+/* The header scene sits behind the heading and BELOW the action pills. It was
+   overlapping Listen and Help, which are buttons - decoration must never take a
+   click that belonged to a control. */
+.topbar { position: relative; z-index: 3; }
+.view-head { z-index: 1; }
+.head-art { top: 4px; width: 42%; max-width: 560px; z-index: 0; }
+.head-art svg, .head-photo { opacity: .96; }
+
+/* The tips card, once its artwork is present. The painting has an empty left half by
+   design, so the text sits over that and the family occupies the right - no overlay
+   scrim needed, which is what keeps the illustration looking painted rather than
+   stuck behind glass. */
+.tips-card.has-art {
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover;
+    min-height: 132px;
+}
+/* With a background doing the drawing, the inline SVG would be the same family twice. */
+.tips-card.has-art .tips-art { display: none; }
+.tips-card.has-art { grid-template-columns: auto minmax(0, 1fr); }
+
+/* Text has to stay readable over the paint at every width. The card's own cream shows
+   through on the left, so this only needs to hold the copy together, not hide the art. */
+.tips-card.has-art .tips-copy { max-width: 54%; }
+@media (max-width: 1240px) { .tips-card.has-art .tips-copy { max-width: 62%; } }
+
+/* The painted artwork does not have a dark variant, so the card stays light in dark
+   mode - which means its text has to stay dark too. Without this the heading inherits
+   the dark theme's near-white ink and disappears into the cream. */
+body.dark .tips-card.has-art { background-color: #FEF7E6; border-color: #E7D3A4; }
+body.dark .tips-card.has-art .tips-title { color: #3B2F12; }
+body.dark .tips-card.has-art .tips-body { color: #7A6320; }
+
+/* The tips scene is a full-width banner with a deliberately empty left half, so it
+   fills the card and the copy sits on top of it - the same arrangement the painted
+   version used, minus the file. */
+.tips-card { position: relative; overflow: hidden; display: flex; align-items: center; }
+.tips-art {
+    position: absolute; inset: 0; width: 100%; max-width: none; margin: 0; display: block;
+    z-index: 0; pointer-events: none;
+}
+.tips-art svg { width: 100%; height: 100%; display: block; }
+.tips-card > .ic, .tips-copy { position: relative; z-index: 1; }
+.tips-copy { max-width: 56%; }
+@media (max-width: 1240px) { .tips-copy { max-width: 64%; } }
+/* The drawing carries its own cream, so the card need not paint one underneath. */
+.tips-card { background: transparent; border-color: #F0DFB4; min-height: 132px; }
+body.dark .tips-card { background: transparent; border-color: #6A5A32; }
+body.dark .tips-title { color: #3B2F12; }
+body.dark .tips-body { color: #7A6320; }
+
+/* A cream-to-clear wash under the copy. The drawing's empty half is empty by design,
+   but the card's width changes with the viewport and the crop moves with it - this
+   guarantees the sentence stays readable without putting a grey box over the art. */
+.tips-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(90deg, #FDF6E3 0%, #FDF6E3 42%, rgba(253, 246, 227, .82) 58%, rgba(253, 246, 227, 0) 76%);
+}
+.tips-copy { max-width: 52%; }
+
+/* ---- image slots ----------------------------------------------------------
+   Each slot holds either a real photo or the drawn fallback, so both have to sit
+   correctly in the same box. */
+
+.head-photo, .tips-photo, .side-photo { display: block; width: 100%; height: auto; }
+
+/* The tips photo is a banner with an empty left half, so it fills the card and the
+   copy sits on it - the same as the drawn version it replaces. */
+.tips-card #tips-art.has-photo { position: absolute; inset: 0; }
+.tips-card #tips-art.has-photo .tips-photo { height: 100%; object-fit: cover; object-position: right center; }
+
+/* The sidebar art is a plain strip at the foot of the panel. */
+#side-art { margin-top: 8px; }
+#side-art svg, .side-photo { width: 100%; height: auto; display: block; border-radius: 12px; }
+
+/* ---- the real artwork -----------------------------------------------------
+   Sized against the actual files: hero 3.13:1, tips 1.79:1, hello 3.26:1. */
+
+/* The bus banner has generous white above and below the road, so it is allowed to
+   run wider than the drawn version and sit slightly higher. */
+.head-art { top: -10px; width: 46%; max-width: 620px; }
+.head-photo { width: 100%; height: auto; }
+
+/* The family banner is nearly 16:9 with the scene in a band across the middle and a
+   deliberately empty left half. Cropping to the card's letterbox takes that band and
+   anchors it right, which is where the figures are. */
+.tips-card { min-height: 128px; }
+.tips-card #tips-art.has-photo { position: absolute; inset: 0; }
+.tips-card #tips-art.has-photo .tips-photo {
+    width: 100%; height: 100%; object-fit: cover; object-position: 78% 52%;
+}
+
+/* The greeting card's sky sits behind the text; the gradient underneath it stays as
+   the fallback for a checkout without the file. */
+.hello { position: relative; overflow: hidden; }
+.hello-art { position: absolute; inset: 0; z-index: 0; }
+.hello-photo { width: 100%; height: 100%; object-fit: cover; object-position: 30% 60%; }
+.hello-sun, .hello > div:not(.hello-art) { position: relative; z-index: 1; }
+/* The sun is in the painting now, so the emoji beside it would be a second one. */
+.hello:has(.hello-art.has-photo) .hello-sun { display: none; }
+.hello-title { color: #26374F; }
+.hello-body { color: #40506B; }
+
+/* ---- fitting the real artwork --------------------------------------------
+   The paintings are landscape banners with their subjects on the right; the copy
+   sits on the left. These rules put each one where its empty space lines up with
+   the words, and guarantee legibility where they meet. */
+
+/* Hello: show the quiet right-hand hills rather than the sun, and wash the left so
+   the greeting reads. Without the wash the text sits on painted foliage. */
+.hello-photo { object-position: 62% 62%; }
+.hello::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.86) 46%, rgba(255,255,255,.25) 78%, rgba(255,255,255,0) 100%);
+}
+.hello > div:not(.hello-art), .hello-sun { z-index: 2; }
+.hello-title { color: #1F3350; }
+.hello-body { color: #3D5170; }
+
+/* Tips: the family sits at about three-quarters across the source, so anchor there
+   and hold the copy to the emptier half. */
+.tips-card #tips-art.has-photo .tips-photo { object-position: 88% 55%; }
+.tips-copy { max-width: 46%; }
+@media (max-width: 1240px) { .tips-copy { max-width: 54%; } }
+
+/* The bus banner is 3.13:1 with sky above the road, so it needs to sit higher and
+   stop short of the card below - it was clipping the corner of step 2. */
+.head-art { top: -22px; width: 43%; max-width: 560px; }
+
+/* ---- painted role portraits ----------------------------------------------
+   The photo sits on top of the drawn avatar; when it loads, the card is marked and
+   the drawing is hidden. Doing it in that order means a slow load shows the drawing
+   rather than a gap, and a missing file simply never covers it. */
+.role-photo {
+    width: 46px; height: 46px; object-fit: cover; object-position: center 32%;
+    border-radius: 12px; display: block;
+}
+.role-btn.has-photo .role-art { display: none; }
+
+/* Their own backgrounds are already tinted, so the card's pastel would fight them. */
+.role-btn.has-photo { background: var(--surface); }
+.role-btn.has-photo.on { background: var(--accent-soft); }
+.role-btn:nth-child(2).has-photo.on { background: var(--ok-soft); }
+.role-btn:nth-child(3).has-photo.on { background: var(--violet-soft); }
+
+/* The family strip under the appearance controls. */
+#side-art.has-photo { border-radius: 12px; overflow: hidden; }
+.side-photo { width: 100%; height: auto; display: block; }
+
+/* The strip is the last thing in the panel, so it needs room to clear the rounded
+   corner rather than being sliced by it. */
+.sidebar-foot { padding-bottom: 16px; }
+#side-art.has-photo { margin-top: 10px; border: 1px solid var(--line); }
+
+/* ---- the logo -------------------------------------------------------------
+   The lettered tile stays underneath as the fallback, so a checkout without the
+   image still shows a mark rather than an empty blue square. */
+.brand-mark { position: relative; overflow: hidden; }
+.brand-mark img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* With the real logo present the blue tile would be a border around it, so it goes. */
+.brand-mark.has-logo { background: transparent; border-radius: 12px; }
+
+/* ---- the content masthead -------------------------------------------------
+   The sidebar tells the person at the keyboard what app this is; this tells the
+   page itself, which is what survives into a screenshot or onto a projector with
+   the sidebar cropped away. */
+.topbar { justify-content: space-between; margin-bottom: 10px; }
+.topbar-brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.topbar-logo {
+    width: 40px; height: 40px; flex: 0 0 40px; object-fit: cover;
+    border-radius: 11px; display: block;
+}
+.topbar-name { font-size: 1rem; font-weight: 800; color: var(--ink); line-height: 1.2; }
+.topbar-sub { font-size: .78rem; color: var(--ink-2); margin-top: 1px; }
+/* On a narrow window the pills matter and the lockup does not. */
+@media (max-width: 900px) { .topbar-brand > div { display: none; } }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.topbar-brand { align-items: center; }

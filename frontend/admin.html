@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>YBS — Admin</title>
+    <link rel="icon" href="/img/logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
 <header class="app-header">
+    <!-- The same mark the app wears, so these read as one product rather than two. -->
+    <div class="brand-mark">
+            <!-- The real logo, with the lettered tile behind it: if the file is
+                 missing the mark is still a mark rather than an empty square. -->
+            <img src="/img/logo.png" alt="YBS"
+                 onload="this.parentElement.classList.add('has-logo')">
+        </div>
     <div class="ops-brand">
         <h1>🛠️ YBS Admin</h1>
         <p class="sub">Add and edit the data every AI feature reasons over</p>
@@ -163,6 +171,7 @@
             <label>start at stop # <input id="b-index" type="number" value="0"></label>
             <label>crowding
                 <select id="b-crowd">
+                    <option value="random" selected>🎲 random</option>
                     <option value="0">0 — seats free</option>
                     <option value="1">1 — standing room</option>
                     <option value="2">2 — full</option>

@@ -1,3 +1,11 @@
+/* Admin screens. Everything here is behind a login - see SecurityConfig - so an
+   unauthenticated visitor never reaches this file at all. */
+
+function csrfToken() {
+    const hit = document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='));
+    return hit ? decodeURIComponent(hit.slice('XSRF-TOKEN='.length)) : '';
+}
+
 /* Admin screens.
 
    Every save posts to /api/admin/*, which writes to H2 and then rebuilds the
@@ -10,6 +18,18 @@ let itinerary = [];      // the itinerary being edited, before it is saved
 
 const $ = id => document.getElementById(id);
 const val = id => $(id).value;
+
+/**
+ * The crowding to save. "random" is the default because a fleet added by hand ends up
+ * uniformly empty otherwise, and a map where every bus says "seats free" makes the
+ * crowding rule in ybs.pl - the one that withdraws a journey from a rider who needs a
+ * seat - impossible to demonstrate. The explicit levels are still there for when you
+ * want to set up that exact case on purpose.
+ */
+function crowding() {
+    const chosen = val('b-crowd');
+    return chosen === 'random' ? String(Math.floor(Math.random() * 3)) : chosen;
+}
 
 function toast(message, ok = true) {
     const t = $('toast');
@@ -28,6 +48,9 @@ async function api(path, options) {
 
 const post = (path, payload) => api(path, {
     method: 'POST',
+    // CSRF is on for every write. Spring puts the token in a readable cookie; this
+    // header is how it gets back, and without it the save returns 403.
+    headers: { 'X-XSRF-TOKEN': csrfToken() },
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
 });
@@ -126,7 +149,7 @@ const SAVERS = {
     }),
     bus: () => post('/buses', {
         id: val('b-id'), routeId: val('b-route'),
-        currentSegmentIndex: val('b-index'), crowdingLevel: val('b-crowd')
+        currentSegmentIndex: val('b-index'), crowdingLevel: crowding()
     }),
     incident: () => post('/incidents', {
         type: val('n-type'), routeId: val('n-route'), stopId: val('n-stop')

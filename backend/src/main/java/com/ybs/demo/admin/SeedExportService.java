@@ -8,6 +8,8 @@ import com.ybs.demo.network.RouteStop;
 import com.ybs.demo.network.RouteStopRepository;
 import com.ybs.demo.network.Stop;
 import com.ybs.demo.network.StopRepository;
+import com.ybs.demo.auth.AppUser;
+import com.ybs.demo.auth.AppUserRepository;
 import com.ybs.demo.ops.Driver;
 import com.ybs.demo.ops.DriverMonthlyScore;
 import com.ybs.demo.ops.DriverMonthlyScoreRepository;
@@ -49,11 +51,13 @@ public class SeedExportService {
     private final DriverMonthlyScoreRepository scores;
     private final BusRepository buses;
     private final IncidentRepository incidents;
+    private final AppUserRepository users;
 
     public SeedExportService(StopRepository stops, RouteRepository routes,
                              RouteStopRepository routeStops, TrafficFactorRepository traffic,
                              DriverRepository drivers, DriverMonthlyScoreRepository scores,
-                             BusRepository buses, IncidentRepository incidents) {
+                             BusRepository buses, IncidentRepository incidents,
+                             AppUserRepository users) {
         this.stops = stops;
         this.routes = routes;
         this.routeStops = routeStops;
@@ -62,6 +66,7 @@ public class SeedExportService {
         this.scores = scores;
         this.buses = buses;
         this.incidents = incidents;
+        this.users = users;
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +81,11 @@ public class SeedExportService {
                 --
                 --  H2 runs in memory and re-runs data.sql on every startup, so the app always
                 --  starts from this file and never from leftover state.
+                --
+                --  This file ends with the app_user table, BCrypt hashes included. That is
+                --  deliberate - without them a reseed from this export would lock every driver
+                --  and admin out - but it means the export is a credential file. Treat it as
+                --  one: do not paste it into a chat or attach it to an issue.
                 -- ============================================================================
 
                 """);
@@ -88,6 +98,7 @@ public class SeedExportService {
         appendDrivers(sb);
         appendScores(sb);
         appendIncidents(sb);
+        appendUsers(sb);
         return sb.toString();
     }
 
@@ -197,6 +208,28 @@ public class SeedExportService {
                     i.getId(), q(i.getType().name()), i.getRouteId(),
                     i.getStop() == null ? "null" : String.valueOf(i.getStop().getId()),
                     q(i.getTimestamp().format(TS))));
+        }
+        sb.append(j).append(";\n");
+    }
+
+    /**
+     * The accounts, hashes and all.
+     *
+     * <p>Omitting this table would be the tidier-looking choice and the wrong one: an admin
+     * who exported, replaced {@code data.sql} and restarted would find the app rebuilt with
+     * no accounts at all, and no way back in. Exporting the hashes is what makes the export
+     * a complete seed - and is why the header calls the file a credential file.
+     */
+    private void appendUsers(StringBuilder sb) {
+        List<AppUser> all = users.findAll();
+        if (all.isEmpty()) return;
+        sb.append("\n-- Accounts. BCrypt hashes, not passwords - see the warning at the top.\n");
+        sb.append("INSERT INTO app_user (id, username, password_hash, role, driver_id) VALUES\n");
+        StringJoiner j = new StringJoiner(",\n");
+        for (AppUser u : all) {
+            j.add("  (%d, %s, %s, %s, %s)".formatted(
+                    u.getId(), q(u.getUsername()), q(u.getPasswordHash()), q(u.getRole().name()),
+                    u.getDriver() == null ? "null" : String.valueOf(u.getDriver().getId())));
         }
         sb.append(j).append(";\n");
     }

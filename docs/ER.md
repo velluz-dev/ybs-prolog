@@ -1,6 +1,6 @@
 # Database — ER diagram
 
-Eight tables in H2, created by Hibernate from the JPA entities (`ddl-auto=create-drop`) and
+Nine tables in H2, created by Hibernate from the JPA entities (`ddl-auto=create-drop`) and
 seeded from `data.sql` on every startup. There are no migrations: the schema is whatever the
 entities say, and the data is whatever `data.sql` says.
 
@@ -17,8 +17,17 @@ erDiagram
     ROUTE ||--o{ BUS        : "is run by"
     ROUTE ||--o{ DRIVER     : "is assigned"
     DRIVER ||--o{ DRIVER_MONTHLY_SCORE : "is scored each month"
+    DRIVER ||--o| APP_USER  : "signs in as"
     STOP  ||--o{ INCIDENT   : "is the site of"
     ROUTE ..o{ INCIDENT     : "route_id, no FK"
+
+    APP_USER {
+        bigint  id PK
+        varchar username      "UNIQUE, NOT NULL"
+        varchar password_hash "BCrypt, NOT NULL - never the password"
+        varchar role          "ADMIN or DRIVER. Riders have no row at all"
+        bigint  driver_id     FK "set for DRIVER, null for ADMIN"
+    }
 
     ROUTE {
         bigint  id PK

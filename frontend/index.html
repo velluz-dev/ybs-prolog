@@ -8,6 +8,7 @@
          network cable unplugged. Map TILES still need the internet; if they fail
          the routes and buses stay visible on a plain background. -->
     <link rel="stylesheet" href="/vendor/leaflet.css">
+    <link rel="icon" href="/img/logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,136 +16,253 @@
 <div class="shell">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────────
-     One feature per view. The previous build stacked everything on a single
-     page, so you scrolled past four things to reach the one you wanted. -->
+     One feature per view. The nav itself is built by app.js from the role that
+     is selected, so a rider is never shown the admin screens and a driver is
+     never shown someone else's numbers. -->
 <aside class="sidebar">
     <div class="brand">
-        <div class="brand-mark">YBS</div>
+        <div class="brand-mark">
+            <!-- The real logo, with the lettered tile behind it: if the file is
+                 missing the mark is still a mark rather than an empty square. -->
+            <img src="/img/logo.png" alt="YBS"
+                 onload="this.parentElement.classList.add('has-logo')">
+        </div>
         <div>
-            <div class="brand-my">ခရီးစဉ်ရှာဖွေမှု</div>
-            <div class="brand-en">AI journey planner</div>
+            <div class="brand-my" data-i18n="brand.name"></div>
+            <div class="brand-en" data-i18n="brand.sub"></div>
+        </div>
+        <div id="lang-switch"></div>
+    </div>
+
+    <!-- A greeting, because the first thing a nervous user should meet is a sentence
+         and not a control panel. -->
+    <div class="hello">
+        <div id="hello-art" class="hello-art" aria-hidden="true"></div>
+        <span class="hello-sun" aria-hidden="true">🌞</span>
+        <div>
+            <div class="hello-title" data-i18n="hello.title"></div>
+            <div class="hello-body" data-i18n="hello.body"></div>
         </div>
     </div>
 
-    <nav id="nav">
-        <div class="nav-group">ခရီးသည် <span class="en">Rider</span></div>
-        <a class="nav-item" href="#plan" data-view="plan"><span class="ic">🚏</span><span>ခရီးစဉ်ရှာရန်<em>Plan a trip</em></span></a>
-        <a class="nav-item" href="#map" data-view="map"><span class="ic">🗺️</span><span>မြေပုံ<em>Live map</em></span></a>
-        <a class="nav-item" href="#arrivals" data-view="arrivals"><span class="ic">⏱️</span><span>ကားချိန်ဇယား<em>Arrivals board</em></span></a>
+    <div class="role-switch-wrap">
+        <div class="side-label" data-i18n="role.switch"></div>
+        <div id="role-switch" class="role-switch"></div>
+        <!-- Who is signed in, and the way out. Empty for a rider, who never signed in. -->
+        <div id="identity"></div>
+    </div>
 
-        <div class="nav-group">AI သက်သေ <span class="en">Evidence</span></div>
-        <a class="nav-item" href="#trace" data-view="trace"><span class="ic">🔍</span><span>A* ရှာဖွေမှု<em>Search trace</em></span></a>
-        <a class="nav-item" href="#prolog" data-view="prolog"><span class="ic">🧠</span><span>Prolog<em>Live rule console</em></span></a>
-
-        <div class="nav-group">လုပ်ငန်း <span class="en">Operations</span></div>
-        <a class="nav-item" href="#fleet" data-view="fleet"><span class="ic">🚌</span><span>ကားစုစည်းမှု<em>Fleet</em></span></a>
-        <a class="nav-item" href="/admin.html"><span class="ic">🛠️</span><span>Admin<em>Add / edit data</em></span></a>
-        <a class="nav-item" href="/ops.html"><span class="ic">📊</span><span>Ops dashboard<em>Driver bonuses</em></span></a>
-        <a class="nav-item" href="#about" data-view="about"><span class="ic">ℹ️</span><span>AI အကြောင်း<em>How it works</em></span></a>
-    </nav>
+    <nav id="nav"></nav>
 
     <div class="sidebar-foot">
-        <div class="foot-label">အရှိန် <span class="en">Simulation speed</span></div>
+        <!-- Appearance first, simulation second: one of these is for the rider and the
+             other is for whoever is demonstrating. -->
+        <div class="pref-row">
+            <button type="button" id="theme-toggle" class="pref-toggle">
+                <span class="ic" id="theme-glyph" aria-hidden="true">☀️</span>
+                <span id="theme-label" data-i18n="pref.light"></span>
+            </button>
+            <div class="text-size" id="text-size" role="group" data-i18n-aria="pref.textSize"></div>
+        </div>
+
+        <div class="foot-label" data-i18n="sim.speed"></div>
         <div id="sim-controls"></div>
+        <div id="side-art"></div>
     </div>
 </aside>
 
 <!-- ── Views ──────────────────────────────────────────────────────────────── -->
 <main class="content">
 
+<!-- Read aloud, language, help. Fixed to the top of every view because the person
+     who needs them needs them everywhere, not only on the planner. -->
+<div class="topbar">
+    <!-- The content panel gets its own masthead. The sidebar identifies the app to
+         someone sitting in front of it; this identifies the page itself, which is what
+         ends up in a screenshot or on a projector where the sidebar is cropped off. -->
+    <div class="topbar-brand">
+        <img class="topbar-logo" src="/img/logo.png" alt=""
+             onerror="this.remove()" onload="this.parentElement.classList.add('has-logo')">
+        <div>
+            <div class="topbar-name" data-i18n="brand.name"></div>
+        </div>
+    </div>
+
+    <div class="topbar-actions">
+        <button type="button" id="listen-btn" class="pill-btn">
+            <span class="ic" aria-hidden="true">🔊</span><span data-i18n="a11y.listen"></span>
+        </button>
+        <div id="lang-switch-top"></div>
+        <button type="button" id="help-btn" class="pill-btn">
+            <span class="ic" aria-hidden="true">❓</span><span data-i18n="a11y.help"></span>
+        </button>
+    </div>
+</div>
+
 <!-- PLAN ------------------------------------------------------------------->
 <section class="view" data-view="plan">
     <header class="view-head">
-        <h1>🚏 ခရီးစဉ် ရှာရန်</h1>
-        <p class="en">Ask by voice or pick two stops. A* proposes; the Prolog rule base decides what suits you.</p>
+        <div id="head-art" class="head-art" aria-hidden="true"></div>
+        <h1>🗺️ <span data-i18n="plan.h1"></span></h1>
+        <p class="lede" data-i18n="plan.lede"></p>
     </header>
 
-    <div class="two-col">
-        <div class="col">
+    <div class="plan-grid">
             <section class="card">
-                <div class="card-head"><span class="ic">🎤</span><h2>အသံဖြင့် <span class="en">By voice</span></h2></div>
-                <div class="voice-row">
-                    <button type="button" id="voice-btn" class="mic-btn">🎤 ပြောပါ</button>
-                    <select id="voice-sample" title="Sample Burmese query" aria-label="Sample Burmese query"></select>
+                <div class="card-head">
+                    <span class="step-no">1</span>
+                    <h2 data-i18n="step.how"></h2>
+                    <button type="button" class="info" data-i18n-title="step.how.info">i</button>
                 </div>
-                <div id="voice-status" class="muted">ဥပမာ ရွေးပြီး ခလုတ်ကို နှိပ်ပါ။ <span class="en">Pick a sample and press speak.</span></div>
+                <!-- Press to talk. The old control was a dropdown of three canned
+                     sentences and a button that "played" one of them; this listens. The
+                     samples survive underneath, because a venue with no microphone
+                     permission - or no recogniser running - still has to demo. -->
+                <div class="speak-panel">
+                    <div class="mic-wrap">
+                        <button type="button" id="mic-btn" class="mic-big" aria-live="polite">
+                            <span class="mic-glyph">🎤</span>
+                            <span class="mic-label" data-i18n="voice.hold"></span>
+                        </button>
+                        <div class="mic-meter" id="mic-meter" aria-hidden="true"><span></span></div>
+                    </div>
+                    <div class="mic-hint" data-i18n="voice.tapHint"></div>
+                </div>
+
+                <div id="voice-status" class="muted"></div>
                 <div id="voice-entities"></div>
+
+                <div class="or-rule" data-i18n="voice.or"></div>
+
+                <details class="voice-fallback">
+                    <summary data-i18n="voice.orSample"></summary>
+                    <div class="voice-row">
+                        <button type="button" id="voice-btn" class="alt-btn">▶ <span data-i18n="voice.play"></span></button>
+                        <select id="voice-sample" data-i18n-title="voice.sampleLabel"
+                                data-i18n-aria="voice.sampleLabel"></select>
+                    </div>
+                </details>
             </section>
 
             <section class="card">
-                <div class="card-head"><span class="ic">📍</span><h2>မှတ်တိုင် ရွေးရန် <span class="en">Choose stops</span></h2></div>
+                <div class="card-head">
+                    <span class="step-no">2</span>
+                    <h2 data-i18n="step.stops"></h2>
+                    <button type="button" class="info" data-i18n-title="step.stops.info">i</button>
+                </div>
+                <div class="stops-stack">
+
+                <!-- Type-and-search, not a 2,080-option <select>. The chosen stop id
+                     lives in the hidden input, so everything downstream still reads
+                     document.getElementById('from-stop').value exactly as before. -->
                 <div class="trip-field">
                     <span class="ic">🔵</span>
-                    <div class="grow"><label class="en" for="from-stop">မှ · from</label><select id="from-stop"></select></div>
+                    <div class="grow stop-picker" data-picker="from-stop">
+                        <label class="field-label" for="from-stop-input" data-i18n="stops.from"></label>
+                        <input type="text" class="stop-input" id="from-stop-input" autocomplete="off"
+                               role="combobox" aria-expanded="false" aria-autocomplete="list"
+                               aria-controls="from-stop-list" data-i18n-ph="stops.placeholder">
+                        <input type="hidden" id="from-stop">
+                        <ul class="stop-list" id="from-stop-list" role="listbox" hidden></ul>
+                    </div>
+                    <span class="field-chevron" aria-hidden="true">›</span>
                 </div>
+
                 <div class="trip-field">
                     <span class="ic">📍</span>
-                    <div class="grow"><label class="en" for="to-stop">ကို · to</label><select id="to-stop"></select></div>
+                    <div class="grow stop-picker" data-picker="to-stop">
+                        <label class="field-label" for="to-stop-input" data-i18n="stops.to"></label>
+                        <input type="text" class="stop-input" id="to-stop-input" autocomplete="off"
+                               role="combobox" aria-expanded="false" aria-autocomplete="list"
+                               aria-controls="to-stop-list" data-i18n-ph="stops.placeholder">
+                        <input type="hidden" id="to-stop">
+                        <ul class="stop-list" id="to-stop-list" role="listbox" hidden></ul>
+                    </div>
+                    <span class="field-chevron" aria-hidden="true">›</span>
                 </div>
-                <button type="button" id="search-btn" class="btn-primary">🔍 ရှာမည် <span class="en">Search</span></button>
+
+                <!-- Swap sits between the two fields because that is what it means. -->
+                <button type="button" id="swap-btn" class="swap-btn"
+                        data-i18n-aria="stops.swap" data-i18n-title="stops.swap">⇅</button>
+                </div>
+
+                <button type="button" id="search-btn" class="btn-primary">🔍 <span data-i18n="stops.searchRoute"></span></button>
+
+                <!-- Somewhere to start for a rider who does not know a stop name yet. -->
+                <div class="quick-row" id="quick-picks"></div>
             </section>
 
             <section class="card">
-                <div class="card-head"><span class="ic">👤</span><h2>ခရီးသည်အချက်အလက် <span class="en">Rider profile</span></h2></div>
-                <p class="hint">တစ်ခုခု ရွေးလိုက်တာနဲ့ ရလဒ်တွေကို Prolog က ပြန်စစ်ပေးပါတယ်။
-                   <span class="en">Toggling any of these re-filters the results through the rule base.</span></p>
+                <div class="card-head">
+                    <span class="ic">👤</span>
+                    <h2 data-i18n="profile.h2"></h2>
+                    <span class="optional" data-i18n="profile.optional"></span>
+                    <button type="button" class="info" data-i18n-title="profile.hint">i</button>
+                </div>
+                <p class="hint" data-i18n="profile.hint"></p>
                 <div id="profile" class="chips"></div>
                 <div class="disruption-row">
                     <span class="ic">🌊</span>
                     <div class="grow">
-                        <div class="my">တာမွေ ရေကြီးမှု</div>
-                        <div class="en">Assert flooded(s15) into the rule base</div>
+                        <div class="my" data-i18n="flood.title"></div>
+                        <div class="en" data-i18n="flood.sub"></div>
                     </div>
-                    <button type="button" id="flood-btn" class="alt-btn">ရေကြီး</button>
+                    <button type="button" id="flood-btn" class="alt-btn" data-i18n="flood.btn"></button>
                     <button type="button" id="clear-btn" class="alt-btn">✖</button>
                 </div>
             </section>
-        </div>
 
-        <div class="col">
-            <div class="results-head">
-                <h2>ခရီးစဉ် ရွေးချယ်မှု <span class="en">Journey options</span></h2>
-                <span class="pareto-badge" id="pareto-badge"></span>
-            </div>
-            <div id="results" class="muted empty-state">
-                ခရီးစဉ် ရွေးပြီး ရှာမည် ကို နှိပ်ပါ။<br>
-                <span class="en">Choose two stops and press Search.</span>
-            </div>
-        </div>
+            <section class="tips-card">
+                <span class="ic" aria-hidden="true">💡</span>
+                <div class="tips-copy">
+                    <div class="tips-title" data-i18n="tips.title"></div>
+                    <div class="tips-body" data-i18n="tips.body"></div>
+                </div>
+                <div class="tips-art" id="tips-art" aria-hidden="true"></div>
+            </section>
     </div>
+
+    <!-- Results appear only once there are some. An empty panel captioned "nothing
+         here yet" is a box a first-time user has to work out the purpose of before
+         they can ignore it. -->
+    <div id="results-panel" class="results-panel hidden">
+        <div class="results-head">
+            <h2 data-i18n="results.h2"></h2>
+            <span class="pareto-badge" id="pareto-badge"></span>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <div class="promise-row" id="promises"></div>
+    <div class="app-foot" data-i18n="foot.tagline"></div>
 </section>
 
 <!-- MAP -------------------------------------------------------------------->
 <section class="view" data-view="map">
     <header class="view-head">
-        <h1>🗺️ လမ်းကြောင်းမြေပုံ</h1>
-        <p class="en">236 buses across the real YBS network, updating every second and coloured by route. The map starts clean — switch a route on below to draw its road-following line and its stops.</p>
+        <h1>🗺️ <span id="map-title" data-i18n="map.h1"></span></h1>
+        <p class="lede" id="map-lede" data-i18n="map.lede"></p>
     </header>
-    <section class="card route-picker">
-        <div class="card-head"><span class="ic">🚌</span><h2>လမ်းကြောင်း ရွေးရန်
-            <span class="en">Which routes to draw — search runs over all 118 regardless</span></h2></div>
+    <section class="card route-picker" id="route-picker-card">
+        <div class="card-head"><span class="ic">🚌</span><h2 data-i18n="map.pick.h2"></h2></div>
+        <p class="hint" data-i18n="map.pick.sub"></p>
         <div class="picker-top">
-            <input type="text" id="route-search" placeholder="ရှာရန် / search route code or name"
-                   aria-label="Search routes">
+            <input type="text" id="route-search" data-i18n-ph="map.pick.placeholder"
+                   data-i18n-aria="map.pick.placeholder">
             <span id="route-count" class="en"></span>
             <label class="inline-check">
                 <input type="checkbox" id="buses-selected-only">
-                <span>ရွေးထားသော လမ်းများသာ <span class="en">buses: selected routes only</span></span>
+                <span data-i18n="map.pick.selectedOnly"></span>
             </label>
-            <button type="button" id="route-clear" class="alt-btn">ရှင်း / clear</button>
+            <button type="button" id="route-clear" class="alt-btn" data-i18n="map.pick.clear"></button>
         </div>
         <div id="route-filter" class="route-filter"></div>
     </section>
 
     <section class="card">
         <div id="map"></div>
-        <div id="map-note" class="muted hidden">
-            ⚠️ မြေပုံအကြောင်းအရာ မရနိုင်ပါ (offline) — လမ်းကြောင်းများသာ ပြသည်။
-            <span class="en">Map tiles unavailable — routes, stops and buses still shown.</span>
-        </div>
-        <div id="trip-countdown" class="countdown muted">
-            ခရီးစဉ်တစ်ခု ရွေးပါ။ <span class="en">Start a trip from Plan a trip to watch the countdown here.</span>
-        </div>
+        <div id="map-note" class="muted hidden">⚠️ <span data-i18n="map.offline"></span></div>
+        <div id="trip-countdown" class="countdown muted" data-i18n="map.tripEmpty"></div>
         <div id="legend" class="legend"></div>
     </section>
 </section>
@@ -152,80 +270,116 @@
 <!-- ARRIVALS --------------------------------------------------------------->
 <section class="view" data-view="arrivals">
     <header class="view-head">
-        <h1>⏱️ ကား ဘယ်အချိန် ရောက်မလဲ</h1>
-        <p class="en">Predicted from the same model that moves the buses, so the board and the map
-           can never disagree.</p>
+        <h1>⏱️ <span data-i18n="arrivals.h1"></span></h1>
+        <p class="lede" data-i18n="arrivals.lede"></p>
     </header>
     <section class="card">
         <div class="trip-field">
             <span class="ic">🚏</span>
-            <div class="grow"><label class="en" for="arrivals-stop">မှတ်တိုင် · stop</label><select id="arrivals-stop"></select></div>
+            <div class="grow stop-picker" data-picker="arrivals-stop">
+                <label class="field-label" for="arrivals-stop-input" data-i18n="stops.stop"></label>
+                <input type="text" class="stop-input" id="arrivals-stop-input" autocomplete="off"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       aria-controls="arrivals-stop-list" data-i18n-ph="stops.placeholder">
+                <input type="hidden" id="arrivals-stop">
+                <ul class="stop-list" id="arrivals-stop-list" role="listbox" hidden></ul>
+            </div>
         </div>
-        <div id="arrivals-board" class="empty-state muted">မှတ်တိုင် ရွေးပါ။ <span class="en">Pick a stop.</span></div>
-        <p class="hint">အချိန်တိုင်းကို အပိုင်းအခြားနဲ့ ပြပါတယ်။
-           <span class="en">Every figure is a range, never a single number — the model does not know better than ±25%,
-           and a point estimate would claim confidence it has not earned.</span></p>
+        <div id="arrivals-board" class="empty-state muted" data-i18n="arrivals.empty"></div>
+        <p class="hint" data-i18n="arrivals.hint"></p>
     </section>
 </section>
 
 <!-- TRACE ------------------------------------------------------------------>
 <section class="view" data-view="trace">
     <header class="view-head">
-        <h1>🔍 A* ရှာဖွေမှု အခြေအနေ</h1>
-        <p class="en">Every node the search expanded with its g, h and f — and what the heuristic bought.</p>
+        <h1>🔍 <span data-i18n="trace.h1"></span></h1>
+        <p class="lede" data-i18n="trace.lede"></p>
     </header>
     <section class="card">
         <div id="search-stats" class="stats"></div>
-        <div id="trace-panel" class="trace muted">ရှာဖွေမှုတစ်ခု လုပ်ပါ။ Run a search to watch the frontier expand.</div>
-        <p class="hint">Dijkstra ဆိုတာ h = 0 ထားတဲ့ A* ပါပဲ။
-           <span class="en">Dijkstra is literally this same search with h = 0 — which is what makes the comparison fair
-           rather than a comparison of two different implementations.</span></p>
+        <div id="trace-panel" class="trace muted" data-i18n="trace.empty"></div>
+        <p class="hint" data-i18n="trace.hint"></p>
     </section>
 </section>
 
 <!-- PROLOG ----------------------------------------------------------------->
 <section class="view" data-view="prolog">
     <header class="view-head">
-        <h1>🧠 Prolog rule console</h1>
-        <p class="en">Type a goal; the engine solves it live. This is the proof the answers are derived, not looked up.</p>
+        <h1>🧠 <span data-i18n="prolog.h1"></span></h1>
+        <p class="lede" data-i18n="prolog.lede"></p>
     </header>
     <section class="card">
         <div class="console-row">
             <span class="prompt">?-</span>
             <input type="text" id="goal-input" spellcheck="false" aria-label="Prolog goal">
-            <button type="button" id="goal-run" class="btn-run">Solve</button>
+            <button type="button" id="goal-run" class="btn-run" data-i18n="prolog.solve"></button>
         </div>
         <div class="preset-row" id="goal-presets"></div>
-        <div id="goal-output" class="console-out muted">Solve a goal to see its bindings.</div>
-        <p class="hint">
-            <b>The moment to land in a viva.</b> Run the first preset: one solution, <code>F = 400</code>,
-            because nothing is known about <code>m1</code> so it falls through to the general clause.
-            Now run the second: <b>two</b> solutions, <code>0</code> then <code>400</code>. The monk clause
-            matches first because it is written first, then Prolog backtracks and finds the general clause
-            still applies. Clause ordering and backtracking, on a fact invented one second earlier.
-        </p>
+        <div id="goal-output" class="console-out muted" data-i18n="prolog.empty"></div>
+        <p class="hint" data-i18n="prolog.hint"></p>
     </section>
 </section>
 
 <!-- FLEET ------------------------------------------------------------------>
 <section class="view" data-view="fleet">
     <header class="view-head">
-        <h1>🚌 ကား စုစည်းမှု</h1>
-        <p class="en">Every simulated bus: what it is doing right now, and where it goes next.</p>
+        <h1>🚌 <span data-i18n="fleet.h1"></span></h1>
+        <p class="lede" data-i18n="fleet.lede"></p>
     </header>
     <section class="card">
         <div id="fleet-table"></div>
-        <p class="hint">တစ်စက္ကန့်တိုင်း update လုပ်ပါတယ်။
-           <span class="en">Updates once a second. Buses alternate between DRIVING a segment and DWELLING at the
-           stop they reach — the waiting is real, not a fudge factor folded into driving time.</span></p>
+        <p class="hint" data-i18n="fleet.hint"></p>
+    </section>
+</section>
+
+<!-- SHIFT — the driver's own screen ---------------------------------------->
+<section class="view" data-view="shift">
+    <header class="view-head">
+        <h1>🎫 <span data-i18n="shift.h1"></span></h1>
+        <p class="lede" data-i18n="shift.lede"></p>
+    </header>
+    <div id="shift-body"></div>
+</section>
+
+<!-- SIGN IN ---------------------------------------------------------------
+     Not in any role's nav: it is reached by clicking a locked role, never chosen.
+     A rider must be able to use the whole planner without ever seeing this. -->
+<section class="view" data-view="signin">
+    <header class="view-head">
+        <h1>🔒 <span data-i18n="auth.h1"></span></h1>
+        <p class="lede" data-i18n="auth.lede"></p>
+    </header>
+    <section class="card signin-card">
+        <form id="signin-form" autocomplete="on">
+            <label class="field-label" for="signin-user" data-i18n="auth.username"></label>
+            <input type="text" id="signin-user" name="username" autocomplete="username"
+                   autocapitalize="none" spellcheck="false" required>
+
+            <label class="field-label" for="signin-pass" data-i18n="auth.password"></label>
+            <input type="password" id="signin-pass" name="password"
+                   autocomplete="current-password" required>
+
+            <div id="signin-error" class="signin-error" role="alert"></div>
+            <button type="submit" class="btn-primary" data-i18n="auth.signIn"></button>
+        </form>
+
+        <!-- These are demo credentials on a throwaway in-memory database, and an
+             examiner has to be able to get in. Delete this block the moment any of
+             it stops being true. -->
+        <div class="signin-hint">
+            <div class="signin-hint-head" data-i18n="auth.demoAccounts"></div>
+            <div><code>admin</code> / <code>admin123</code> — <span data-i18n="role.admin"></span></div>
+            <div><code>umyintswe</code> / <code>driver123</code> — <span data-i18n="role.driver"></span></div>
+        </div>
     </section>
 </section>
 
 <!-- ABOUT ------------------------------------------------------------------>
 <section class="view" data-view="about">
     <header class="view-head">
-        <h1>ℹ️ How this demo works</h1>
-        <p class="en">Each feature maps to one AI topic. This page is the map between them.</p>
+        <h1>ℹ️ <span data-i18n="about.h1"></span></h1>
+        <p class="lede" data-i18n="about.lede"></p>
     </header>
     <div id="about-grid" class="about-grid"></div>
 </section>
@@ -238,15 +392,19 @@
     <div class="arrival-inner">
         <div class="arrival-icon">🔔</div>
         <div>
-            <div class="arrival-my">ဆင်းရန် အဆင်သင့်ဖြစ်ပါ</div>
+            <div class="arrival-my" data-i18n="alert.ready"></div>
             <div class="arrival-stop" id="arrival-stop"></div>
-            <div class="en">Get ready to alight</div>
         </div>
         <button type="button" id="arrival-close" class="alt-btn">✖</button>
     </div>
 </div>
 
+<button type="button" id="help-fab" class="help-fab">
+    <span aria-hidden="true">🙂</span><span data-i18n="a11y.needHelp"></span>
+</button>
+
 <script src="/vendor/leaflet.js"></script>
+<script src="/i18n.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>
