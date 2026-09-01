@@ -36,10 +36,11 @@ public class AppUser {
     private String username;
 
     /**
-     * BCrypt, never the password. {@code create-drop} rebuilds this table from
-     * {@code data.sql} on every start, so the hashes are committed - which is fine for
-     * BCrypt and for demo passwords, and is called out in the seed file so nobody mistakes
-     * that file for something publishable.
+     * BCrypt, never the password. The hashes are committed in {@code data.sql} so a fresh
+     * database comes up with working accounts - fine for BCrypt and for demo passwords, and
+     * called out in the seed file so nobody mistakes that file for something publishable.
+     * The seed is {@code INSERT IGNORE}, so a restart against an existing database leaves
+     * any password changed since then alone.
      */
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;

@@ -41,11 +41,10 @@ import java.util.Map;
 /**
  * Data entry for every table the demo reasons over.
  *
- * <p>Writes go to the in-memory H2, which is reseeded from {@code data.sql} on every
- * startup - so a change made here is live immediately but gone on restart. That is the
- * point of {@link SeedExportService}: fill data in, export a regenerated {@code data.sql},
- * and drop it into {@code backend/src/main/resources/} to make it permanent and shareable.
- * The alternative, a file-backed database, would stop the demo resetting clean between runs.
+ * <p>Writes go to MySQL and persist across restarts. The app seeds {@code data.sql} on
+ * startup with {@code INSERT IGNORE}, so on a fresh database the network is loaded once and
+ * admin edits simply override it. {@link SeedExportService} can re-export the current state
+ * as a {@code data.sql} to share it with teammates or reproduce it on a clean machine.
  *
  * <p>Every write calls {@link NetworkReloader}, because the map, the planner and the
  * simulation all read from caches built at startup and would otherwise ignore the change.
@@ -322,7 +321,8 @@ public class AdminController {
         Incident i = id(body) == null ? new Incident() : incidents.findById(id(body)).orElse(new Incident());
         if (id(body) != null) i.setId(id(body));
         i.setType(IncidentType.valueOf(str(body, "type")));
-        i.setRouteId(lng(body, "routeId"));
+        Long routeId = lng(body, "routeId");
+        i.setRoute(routeId == null ? null : routes.findById(routeId).orElse(null));
         Long stopId = lng(body, "stopId");
         i.setStop(stopId == null ? null : stops.findById(stopId).orElse(null));
         String ts = str(body, "timestamp");

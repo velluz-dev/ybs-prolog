@@ -17,7 +17,7 @@
 -- ============================================================================
 
 
-INSERT INTO stop (id, name_my, name_en, lat, lon, landmark_photo_url) VALUES
+INSERT IGNORE INTO stop (id, name_my, name_en, lat, lon, landmark_photo_url) VALUES
   (1, 'နတ်စင်', 'Nat Sin (South Dagon)', 16.868886, 96.222571, null),
   (2, 'နတ်စင်', 'Nat Sin (South Dagon)', 16.869143, 96.222410, null),
   (3, 'ဂိတ်ဟောင်း', 'Gate Haung (North Dagon)', 16.902381, 96.200097, null),
@@ -2099,7 +2099,7 @@ INSERT INTO stop (id, name_my, name_en, lat, lon, landmark_photo_url) VALUES
   (2514, 'ရန်ကုန်ဘူတာကြီး', 'Yangon Central Railway Station (Mingala Taungnyunt)', 16.784881, 96.162024, null),
   (2515, 'ရန်ကုန်ဘူတာကြီး', 'Yangon Central Railway Station (Mingala Taungnyunt)', 16.784855, 96.162190, null);
 
-INSERT INTO route (id, code, name_my, base_fare_kyats) VALUES
+INSERT IGNORE INTO route (id, code, name_my, base_fare_kyats) VALUES
   (1, '1', 'လှည်းကူးဈေး - လှည်းကူးဈေး', 200),
   (2, '10', 'လယ်ယာ (ဂိတ်ရင်း) - ဆောက်လုပ်ရေး', 200),
   (3, '100', 'သိမ်ကျောင်း - သိမ်ကျောင်း', 200),
@@ -2221,7 +2221,7 @@ INSERT INTO route (id, code, name_my, base_fare_kyats) VALUES
 
 -- route_stop is keyed by (route, sequence): a stop may repeat on a route
 -- (loop services return to their terminus). 23 such repeats exist here.
-INSERT INTO route_stop (route_id, stop_id, sequence_no, cumulative_minutes) VALUES
+INSERT IGNORE INTO route_stop (route_id, stop_id, sequence_no, cumulative_minutes) VALUES
   (1, 2011, 0, 0),
   (1, 2013, 1, 2),
   (1, 2342, 2, 3),
@@ -14506,7 +14506,7 @@ INSERT INTO route_stop (route_id, stop_id, sequence_no, cumulative_minutes) VALU
 -- Hand-authored traffic prior. DEFAULT rows only: the per-segment rows in the old
 -- 3-route seed named stop ids that no longer mean the same thing, and inventing
 -- 12,000 segment-specific factors would be fabrication rather than data.
-INSERT INTO traffic_factor (segment_id, bucket, factor) VALUES
+INSERT IGNORE INTO traffic_factor (segment_id, bucket, factor) VALUES
   ('DEFAULT', 'morning_peak', 1.35),
   ('DEFAULT', 'midday',       1.10),
   ('DEFAULT', 'evening_peak', 1.30),
@@ -14515,7 +14515,7 @@ INSERT INTO traffic_factor (segment_id, bucket, factor) VALUES
 -- ------------------------------------------------------------------ buses ----
 -- Two buses per route, started at different points so the map is alive at t=0.
 -- crowding_level: 0 = seats free, 1 = standing room, 2 = full.
-INSERT INTO bus (id, route_id, current_lat, current_lon, current_segment_index, progress_along_segment, crowding_level) VALUES
+INSERT IGNORE INTO bus (id, route_id, current_lat, current_lon, current_segment_index, progress_along_segment, crowding_level) VALUES
   (1, 1, 17.096672, 96.219097, 0, 0.00, 1),
   (2, 1, 16.835304, 96.186638, 39, 0.00, 1),
   (3, 2, 16.804733, 96.225606, 0, 0.00, 2),
@@ -14754,7 +14754,7 @@ INSERT INTO bus (id, route_id, current_lat, current_lon, current_segment_index, 
   (236, 118, 16.775754, 96.158879, 10, 0.00, 1);
 
 -- ---------------------------------------------------------------- drivers ----
-INSERT INTO driver (id, name, route_id) VALUES
+INSERT IGNORE INTO driver (id, name, route_id) VALUES
   (1, 'ဦးမြင့်ဆွေ', 1),
   (2, 'ဦးကျော်ဝင်း', 2),
   (3, 'ဒေါ်ခင်မာလာ', 3),
@@ -14764,7 +14764,7 @@ INSERT INTO driver (id, name, route_id) VALUES
 
 -- bonus_eligible seeded false everywhere: the dashboard overwrites it by actually
 -- calling Prolog, so a dead rule engine would be visible rather than silently stale.
-INSERT INTO driver_monthly_score (driver_id, month_key, headway_score, harsh_events, upheld_complaints, bonus_eligible) VALUES
+INSERT IGNORE INTO driver_monthly_score (driver_id, month_key, headway_score, harsh_events, upheld_complaints, bonus_eligible) VALUES
   (1, '2026-08', 91, 2, 0, false),
   (2, '2026-08', 74, 3, 0, false),
   (3, '2026-08', 88, 9, 0, false),
@@ -14773,7 +14773,7 @@ INSERT INTO driver_monthly_score (driver_id, month_key, headway_score, harsh_eve
   (6, '2026-08', 68, 7, 1, false);
 
 -- -------------------------------------------------------------- incidents ----
-INSERT INTO incident (id, type, route_id, stop_id, timestamp) VALUES
+INSERT IGNORE INTO incident (id, type, route_id, stop_id, timestamp) VALUES
   (1, 'BREAKDOWN', 1, 1016, '2026-08-26 07:15:00'),
   (2, 'CROWDING', 8, 35, '2026-08-26 08:20:00'),
   (3, 'CROWDING', 15, 1089, '2026-08-26 09:25:00'),
@@ -14798,7 +14798,7 @@ INSERT INTO incident (id, type, route_id, stop_id, timestamp) VALUES
 --
 -- driver_id is the whole point of the table: it is what makes "my shift" mean one
 -- person's shift. The screen it feeds reads that id from the session, never from the URL.
-INSERT INTO app_user (id, username, password_hash, role, driver_id) VALUES
+INSERT IGNORE INTO app_user (id, username, password_hash, role, driver_id) VALUES
   (1, 'admin',        '$2a$10$NMK8J7R3SAqkFCpM.5xPkO4gLl2KgR66BcZ.gTRy79qdtc0sRMoma', 'ADMIN',  null),
   (2, 'umyintswe',    '$2a$10$kAHf6KhMqGWA7YU2IVk/KOCrlHXCb61agUXWJZYKvCr.z0oncHyeq', 'DRIVER', 1),
   (3, 'ukyawwin',     '$2a$10$aFh7kUMAmGa4DTEC7MFK/.YW90yxiUctYL3GtxGTlJPb.NkdEPMd2', 'DRIVER', 2),

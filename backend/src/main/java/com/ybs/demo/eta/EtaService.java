@@ -37,7 +37,9 @@ public class EtaService {
     private final TrafficFactorRepository trafficFactorRepository;
 
     /**
-     * Priors change only when data.sql is reseeded, so a simple cache is safe.
+     * Priors change only through the admin screens (or a data.sql reseed), and
+     * {@link com.ybs.demo.admin.NetworkReloader} calls {@link #clearCache()} after any edit,
+     * so this simple cache is safe.
      * ConcurrentHashMap, not HashMap: the 1 Hz simulation tick fills this from the
      * scheduler thread while HTTP request threads read and fill it concurrently.
      */

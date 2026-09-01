@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 /**
  * A hand-collected traffic prior, NOT a learned model.
@@ -20,7 +21,10 @@ import jakarta.persistence.Table;
  * {@code "DEFAULT"} for the fallback row used by any segment without a specific entry.
  */
 @Entity
-@Table(name = "traffic_factor")
+@Table(name = "traffic_factor",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"segment_id", "bucket"},
+                name = "uk_traffic_segment_bucket"))
 public class TrafficFactor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,12 @@
 # Database — ER diagram
 
-Nine tables in H2, created by Hibernate from the JPA entities (`ddl-auto=create-drop`) and
-seeded from `data.sql` on every startup. There are no migrations: the schema is whatever the
-entities say, and the data is whatever `data.sql` says.
+Nine tables in MySQL, created and kept up to date by Hibernate from the JPA entities
+(`ddl-auto=update`) and seeded from `data.sql` on startup (`INSERT IGNORE`, so the network
+loads on first run and admin edits survive restarts). Schema changes come from the entities,
+and the baseline data comes from `data.sql`.
+
+The ninth is `app_user`, added with sign-in: it holds the account, its role, and for a driver
+the `driver_id` that makes "my shift" mean one person's shift.
 
 Everything below was read off the entity classes rather than written from memory.
 
@@ -19,7 +23,7 @@ erDiagram
     DRIVER ||--o{ DRIVER_MONTHLY_SCORE : "is scored each month"
     DRIVER ||--o| APP_USER  : "signs in as"
     STOP  ||--o{ INCIDENT   : "is the site of"
-    ROUTE ..o{ INCIDENT     : "route_id, no FK"
+    ROUTE ||--o{ INCIDENT     : "is the subject of"
 
     APP_USER {
         bigint  id PK
@@ -31,7 +35,7 @@ erDiagram
 
     ROUTE {
         bigint  id PK
-        varchar code          "e.g. 43, 37-Okekan. Looked up by name, NOT unique"
+        varchar code          "e.g. 43, 37-Okekan. Looked up by name, UNIQUE"
         varchar name_my       "Burmese, NOT NULL"
         int     base_fare_kyats "flat fare per boarding, NOT NULL"
     }
@@ -80,13 +84,13 @@ erDiagram
     INCIDENT {
         bigint    id PK
         varchar   type      "enum as STRING: BREAKDOWN, CROWDING, FLOOD, ..."
-        bigint    route_id  "plain column - NOT a foreign key"
+        bigint    route_id  FK "NOT NULL"
         bigint    stop_id   FK "nullable"
         timestamp timestamp
     }
 
     TRAFFIC_FACTOR {
-        bigint  id PK        "surrogate; the natural key is (segment_id, bucket)"
+        bigint  id PK        "surrogate; UNIQUE on (segment_id, bucket)"
         varchar segment_id   "DEFAULT, or routeCode:fromStopId-toStopId"
         varchar bucket       "morning_peak, midday, evening_peak, night"
         double  factor       "1.0 = free flow, >1 slower, <1 faster"
@@ -126,33 +130,28 @@ visible failure rather than stale data quietly passing as a correct answer.
 ### `id` values are explicit in the seed
 
 Every table uses `GenerationType.IDENTITY`, but `data.sql` supplies ids anyway, because
-`route_stop`, `bus`, `driver_monthly_score` and `incident` all reference them. H2 accepts
+`route_stop`, `bus`, `driver_monthly_score` and `incident` all reference them. MySQL accepts
 explicit ids into an identity column, which is what makes the seed reproducible.
 
 ---
 
-## Two gaps you should know about
+## Constraint hygiene
 
-These are real, and worth being able to answer rather than being caught by.
+Two integrity gaps were closed when the app moved to a persistent database:
 
-**No unique constraints anywhere.** There is not one `unique = true` or `@UniqueConstraint`
-in the schema. Two cases matter:
+- **`route.code` is unique.** It is used as a lookup key — `NetworkService.routeByCode` and
+  the URL `/api/routes/{code}` — so a duplicate code would silently shadow one of the routes.
+  It is declared `unique = true` on the entity.
+- **`traffic_factor` is unique on `(segment_id, bucket)`**. A surrogate `id` alone would let a
+  hand-written `data.sql` insert two priors for the same segment/bucket, and
+  `findBySegmentIdAndBucket` would silently use whichever came first. There is now a
+  `UNIQUE` constraint (`uk_traffic_segment_bucket`).
+- **`incident.route_id` is now a real `@ManyToOne` FK** to `route` (it was a plain `bigint`).
+  Incidents on nonexistent routes are now rejected by the database. `stop_id` remains nullable
+  because a corridor-level incident may not map to a specific stop.
 
-- `route.code` is used as a lookup key — `NetworkService.routeByCode`, and the URL
-  `/api/routes/{code}`. Two routes sharing a code would make that lookup silently return
-  whichever came first.
-- `traffic_factor` has a surrogate `id`, so nothing stops two rows for the same
-  `(segment_id, bucket)`. The admin screen upserts by reading first, so it will not create
-  duplicates itself, but a hand-written `data.sql` could, and the second row would simply be
-  ignored by `findBySegmentIdAndBucket`.
-
-**`incident.route_id` is a plain `bigint`, not a foreign key.** Every other route reference
-(`route_stop`, `bus`, `driver`) is a real `@ManyToOne`. `Incident` declares
-`private Long routeId`, so the database will happily accept an incident on a route that does
-not exist. It is drawn as a dashed line above for that reason.
-
-Both are safe as the demo stands — the data is generated and validated before it is seeded —
-and both would need fixing before anything real wrote to this database.
+With a persistent MySQL database behind the app these are constraints, not aspirations: they
+are enforced by the schema, not just by whichever code happened to write the data carefully.
 
 ---
 
@@ -162,8 +161,8 @@ and both would need fixing before anything real wrote to this database.
 |---|---|
 | Table definitions | the JPA entities, one per feature package |
 | Seed data | `backend/src/main/resources/data.sql` |
-| Schema creation | Hibernate `ddl-auto=create-drop`, every startup |
-| Editing data | `/admin.html`, then export a new `data.sql` |
+| Schema creation | Hibernate `ddl-auto=update` against MySQL (`ybs_db`) |
+| Editing data | `/admin.html`; edits persist, and `/admin.html` can export the current state as `data.sql` |
 
 There is no migration tool and no schema file to edit by hand. Change an entity and the table
-changes with it on the next run.
+is altered on the next run against MySQL.

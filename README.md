@@ -2,8 +2,9 @@
 # YBS AI transit demo
 
 A university AI-course demo: an AI-assisted journey planner over the **real Yangon Bus
-Service network** - 118 routes, 2,080 stops, 236 simulated buses. One Spring Boot process,
-H2 in memory, reseeded from `data.sql` on every startup.
+Service network** - 118 routes, 2,080 stops, 236 simulated buses. One Spring Boot process
+backed by a MySQL database that is seeded from `data.sql` on every startup (`INSERT IGNORE`,
+so edits made through the admin screens survive restarts).
 
 Each component maps to a recognisable AI topic:
 
@@ -70,7 +71,7 @@ resource directory, so it is packaged into the jar at build time.
 |---|---|---|
 | UI, layout, Burmese copy, map | `frontend/` | **just refresh the browser** — no rebuild, no restart |
 | Search, Prolog, simulation, APIs | `backend/src/main/java/` | restart `./mvnw spring-boot:run` |
-| Stops, routes, fares, traffic prior | `data.sql`, **or** `/admin.html` | admin edits are live at once; export to keep them |
+| Stops, routes, fares, traffic prior | `data.sql`, **or** `/admin.html` | admin edits are live at once and persist in MySQL; export `data.sql` from `/admin.html` to share the current state |
 | Reasoning rules | `backend/src/main/resources/rules/ybs.pl` | restart |
 
 Frontend edits are live because `application.properties` serves `file:../frontend/` ahead of
@@ -120,8 +121,11 @@ Two consequences worth stating in a viva:
 > **New to the project?** [`docs/SETUP.md`](docs/SETUP.md) is the full install guide —
 > prerequisites, first run, IDE setup and troubleshooting.
 
-**Prerequisites: a JDK 17 or newer, and Git. That is all.** No Maven (the wrapper handles
-it), no Node or npm (the frontend has no build step), no database (H2 runs in memory).
+**Prerequisites: a JDK 17 or newer, Git, and a running MySQL server.** No Maven (the wrapper
+handles it), no Node or npm (the frontend has no build step). The app connects to MySQL and
+creates/updates the schema itself (`ddl-auto=update`), so it expects an empty `ybs_db`
+existing but needs no manual setup beyond the credential defaults `root`/`root` (override
+with `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`).
 
 ```bash
 git clone https://github.com/velluzHTA-dev/ybs-prolog.git

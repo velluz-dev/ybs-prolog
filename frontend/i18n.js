@@ -243,7 +243,7 @@ const STRINGS = {
         'about.nlp.title': 'NLP / စကားသံ',
         'about.nlp.body': 'ဗမာအသံမှ စာသား၊ စာသားမှ entity — မှ နှင့် ကို ဝိဘတ်နှစ်ခုကို အခြေခံသည်။ ဘာသာစကား မော်ဒယ် မဟုတ်ဘဲ စာလုံး ကိုက်ညီမှုသာ ဖြစ်ပြီး၊ ယုံကြည်စွာ လက်မခံမိစေရန် parse ရလဒ်ကို UI တွင် ပြသည်။',
         'about.oneProcess.title': 'ရည်ရွယ်ချက်ရှိရှိ process တစ်ခုတည်း',
-        'about.oneProcess.body': 'Docker မရှိ၊ microservice မရှိ၊ build step မရှိ၊ database server မရှိ။ demo တစ်ခုလုံးသည် H2 memory နှင့် Spring Boot process တစ်ခုတည်းဖြစ်၍ command တစ်ကြောင်းနှင့် စတင်ကာ wifi မရှိသော နေရာတွင်လည်း အလုပ်လုပ်သည်။ Leaflet ကို ထည့်သွင်းထားပြီး မြေပုံ tile သာ အင်တာနက် လိုသည်။',
+        'about.oneProcess.body': 'Docker မရှိ၊ microservice မရှိ၊ build step မရှိ။ demo တစ်ခုလုံးသည် စက်တွင်းရှိ MySQL နှင့် ချိတ်ဆက်ထားသော Spring Boot process တစ်ခုတည်းဖြစ်၍ command တစ်ကြောင်းနှင့် စတင်နိုင်သည်။ Leaflet ကို ထည့်သွင်းထားပြီး မြေပုံ tile သာ အင်တာနက် လိုသည်။',
 
         'shift.h1': 'ကျွန်ုပ်၏ တာဝန်ချိန်',
         'shift.lede': 'သင့်လမ်းကြောင်း၊ သင့်ကားများ၊ သင့်လစဉ် အမှတ် — နှင့် ဆုကြေးကို ဘယ်စည်းမျဉ်းက ဆုံးဖြတ်ခဲ့လဲ။',
@@ -521,7 +521,7 @@ const STRINGS = {
         'about.nlp.title': 'NLP / speech',
         'about.nlp.body': 'Burmese audio to transcript to entities, keyed off the postpositions မှ (from) and ကို (to). String matching, not a language model — and the UI shows the parse so nobody takes it on trust.',
         'about.oneProcess.title': 'One process, on purpose',
-        'about.oneProcess.body': 'No Docker, no microservices, no build step, no database server. The whole demo is one Spring Boot process with H2 in memory, so it starts with a single command and survives a venue with no wifi. Leaflet is vendored; only map tiles need the internet.',
+        'about.oneProcess.body': 'No Docker, no microservices, no build step. The whole demo is one Spring Boot process backed by a local MySQL database, so it starts with a single command and needs no separate servers. Leaflet is vendored; only map tiles need the internet.',
 
         'shift.h1': 'My shift',
         'shift.lede': 'Your route, your buses, your month — and which rule decided the bonus.',

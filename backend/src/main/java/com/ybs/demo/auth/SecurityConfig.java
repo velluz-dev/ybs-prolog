@@ -100,7 +100,6 @@ public class SecurityConfig {
                     .requestMatchers(PUBLIC_PAGES).permitAll()
                     .requestMatchers(PUBLIC_API).permitAll()
                     .requestMatchers("/api/auth/me").permitAll()   // "am I signed in?" must be askable
-                    .requestMatchers("/h2-console/**").permitAll()
 
                     // A driver's own shift. Which driver is read from the session, never
                     // from the request - see OpsController.myShift.
@@ -133,8 +132,9 @@ public class SecurityConfig {
                         res.getWriter().write("{\"error\":\"forbidden\"}");
                     }))
 
-            // H2's console is a set of frames; without this it renders blank behind the
-            // default X-Frame-Options. It is same-origin only.
+            // Frames stay same-origin. This was relaxed for the H2 console, which went with
+            // the move to MySQL; it is kept because nothing here is meant to be embedded
+            // cross-origin either way.
             .headers(h -> h.frameOptions(f -> f.sameOrigin()));
 
         return http.build();
