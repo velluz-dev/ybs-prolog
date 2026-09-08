@@ -1,0 +1,12 @@
+# The build only needs backend/ and frontend/. Everything else just slows the context copy.
+.git
+backend/target
+backend/.mvn/cacerts
+backend/.mvn/jvm.config
+tools
+docs
+.github
+.vscode
+.claude
+*.md
+.env

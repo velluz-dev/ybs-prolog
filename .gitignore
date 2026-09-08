@@ -18,3 +18,6 @@ backend/target/
 # OS cruft
 Thumbs.db
 .DS_Store
+
+# Real secrets for docker compose. .env.example is the committed template.
+.env

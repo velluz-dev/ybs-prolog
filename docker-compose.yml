@@ -1,0 +1,58 @@
+# The whole demo: the app and the database it now needs.
+#
+#   docker compose up --build        first run builds the jar and seeds the schema
+#   open http://localhost:8081
+#
+# The recogniser (tools/voice/) is not here on purpose. It wants ~4 GB of model weights and
+# a GPU to be tolerable, and demo.voice.mode=recorded needs none of it - so the default
+# stack stays something you can run on a laptop.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ybs_db
+      MYSQL_USER: ybs
+      # Compose reads these from a .env file beside this one. There is no default: a
+      # database that comes up with a guessable password because nobody set one is the
+      # failure this is avoiding.
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    # utf8mb4 is not optional here - the stop names are Burmese, and MySQL's older utf8 is
+    # three bytes and cannot store every codepoint they use.
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ybs-data:/var/lib/mysql
+    healthcheck:
+      # The app fails to start against a database that is listening but not ready, so the
+      # dependency below waits for this rather than for the port.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://db:3306/ybs_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Yangon
+      DB_USERNAME: ybs
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      # The prod profile refuses to start while the seeded demo passwords still work. Set
+      # this only if the instance is meant to be open - see DemoCredentialGuard.
+      YBS_ALLOW_DEMO_LOGINS: ${YBS_ALLOW_DEMO_LOGINS:-false}
+    ports:
+      - "8081:8081"
+
+volumes:
+  ybs-data:
