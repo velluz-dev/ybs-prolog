@@ -2022,12 +2022,10 @@ function renderPromises() {
 
 /* ------------------------------------------------------------------ help --- */
 
+/** The floating button is the only way in now; the top-bar pill was removed. */
 function initHelp() {
-    const go = () => { location.hash = '#about'; showView('about'); };
-    ['help-btn', 'help-fab'].forEach(id => {
-        const b = document.getElementById(id);
-        if (b) b.addEventListener('click', go);
-    });
+    const fab = document.getElementById('help-fab');
+    if (fab) fab.addEventListener('click', () => { location.hash = '#about'; showView('about'); });
 }
 
 /** Swaps the two stops, so a return trip is one tap rather than two searches. */

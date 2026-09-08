@@ -26,8 +26,8 @@ const LANG_KEY = 'ybs.lang';
 
 const STRINGS = {
     my: {
-        'app.title': 'YBS — ခရီးစဉ်ရှာဖွေမှု (AI Demo)',
-        'brand.name': 'ခရီးစဉ်ရှာဖွေမှု',
+        'app.title': 'YBS',
+        'brand.name': 'YBS',
         'hello.title': 'မင်္ဂလာပါ!',
         'hello.body': 'ဒီနေ့ ဘာများ ကူညီပေးရမလဲ။',
         'step.how': 'ဘယ်လို ရှာမလဲ ရွေးပါ',
@@ -62,11 +62,10 @@ const STRINGS = {
         'promise.safe.s': 'လူတိုင်းအတွက် ဒီဇိုင်း',
         'promise.trust.t': 'ယုံကြည်ရ',
         'promise.trust.s': 'YBS စည်းမျဉ်းအတိုင်း',
-        'foot.tagline': '© YBS ခရီးစဉ်ရှာဖွေမှု · အားလုံးအတွက် ခရီးလွယ်ကူစေရန်',
+        'foot.tagline': '© YBS · အားလုံးအတွက် ခရီးလွယ်ကူစေရန်',
         'pref.light': 'အလင်း အပြင်အဆင်',
         'pref.dark': 'အမှောင် အပြင်အဆင်',
         'pref.textSize': 'စာလုံး အရွယ်အစား',
-        'a11y.help': 'အကူအညီ',
         'a11y.needHelp': 'အကူအညီ လိုပါသလား။',
         'brand.sub': 'သင့်ရဲ့ ဖော်ရွေသော ခရီးလမ်းညွှန်',
         'lang.switch': 'ဘာသာစကား ပြောင်းရန်',
@@ -284,7 +283,7 @@ const STRINGS = {
         'alert.until': 'အထိ',
         'alert.away': 'မီတာ ကျန်သည်',
 
-        'ops.title': 'YBS လုပ်ငန်း ဒက်ရှ်ဘုတ်',
+        'ops.title': 'YBS · လုပ်ငန်း',
         'ops.sub': 'ဆုကြေး ရထိုက်မှုကို Prolog အင်ဂျင်က တိုက်ရိုက် တွက်ချက်သည်',
         'ops.bunching': 'ကား စုပုံနေမှု သတိပေးချက်',
         'ops.bunching.sub': 'လမ်းကြောင်းတစ်ခုတွင် ကားချိန်ကွာဟမှု ပြိုကျသွားသည်',
@@ -304,8 +303,8 @@ const STRINGS = {
     },
 
     en: {
-        'app.title': 'YBS — AI Journey Planner (Demo)',
-        'brand.name': 'YBS Journey Planner',
+        'app.title': 'YBS',
+        'brand.name': 'YBS',
         'hello.title': 'Hello!',
         'hello.body': 'How can we help you today?',
         'step.how': 'Choose how you want to plan',
@@ -340,11 +339,10 @@ const STRINGS = {
         'promise.safe.s': 'Designed for everyone',
         'promise.trust.t': 'Trusted',
         'promise.trust.s': 'Based on YBS rules',
-        'foot.tagline': '© YBS Journey Planner · Making travel easy for everyone',
+        'foot.tagline': '© YBS · Making travel easy for everyone',
         'pref.light': 'Light mode',
         'pref.dark': 'Dark mode',
         'pref.textSize': 'Text size',
-        'a11y.help': 'Help',
         'a11y.needHelp': 'Need help?',
         'brand.sub': 'Your friendly AI travel helper',
         'lang.switch': 'Change language',
@@ -562,7 +560,7 @@ const STRINGS = {
         'alert.until': 'until',
         'alert.away': 'm away',
 
-        'ops.title': 'YBS Ops Dashboard',
+        'ops.title': 'YBS · Ops',
         'ops.sub': 'Bonus eligibility is computed live by the Prolog engine — watch the server console',
         'ops.bunching': 'Bunching alert',
         'ops.bunching.sub': 'Headway has collapsed on one route',
