@@ -50,6 +50,18 @@
         </dependency>
 
         <!--
+          Postgres too, because the free hosting tiers offer it and not MySQL. Both drivers
+          ship in the jar and Spring picks by URL, so one artifact runs against either - the
+          alternative is a second build profile and a second thing to get wrong on deploy day.
+          The seed is the only place the two genuinely differ: see data-postgres.sql.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
           Classic tuProlog: a pure-Java Prolog engine running in-JVM, so there is no
           native SWI-Prolog install and nothing to configure at demo time. Chosen over
           the newer 2p-kt because its Java API (new Prolog(); setTheory(); solve())

@@ -1,0 +1,78 @@
+# Render blueprint: one web service and one Postgres, both on the free plan.
+#
+# In the Render dashboard: New -> Blueprint -> point it at this repository. It reads this
+# file, creates both services, and wires the database credentials into the app itself - so
+# the only thing left to set by hand is the one secret at the bottom.
+#
+# Free plan, honestly:
+#   * The web service sleeps after ~15 minutes with no traffic and takes roughly 50 seconds
+#     to wake. First request after a quiet spell is slow. Do not demo cold.
+#   * 512 MB of RAM. This app holds 2,080 stops and 118 route shapes in memory, so it fits,
+#     but not with much to spare - hence the heap settings below.
+#   * Free Postgres instances expire and are deleted after a period Render sets. Treat the
+#     data as disposable; data.sql reseeds everything on the next start anyway.
+
+databases:
+  - name: ybs-db
+    databaseName: ybs_db
+    user: ybs
+    plan: free
+
+services:
+  - type: web
+    name: ybs
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      # postgres alongside prod: prod hardens cookies and caching, postgres swaps the seed
+      # file for the ON CONFLICT DO NOTHING variant.
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,postgres
+
+      # Host, port and name separately - NOT connectionString. Render publishes that as
+      # postgres://user:pass@host/db, which JDBC cannot parse, and render.yaml has no way to
+      # interpolate it into a jdbc: URL. application-postgres.properties joins these instead.
+      - key: DB_HOST
+        fromDatabase:
+          name: ybs-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ybs-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ybs-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ybs-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ybs-db
+          property: password
+
+      # 512 MB total, and the JVM is not the only thing in the container. 70% leaves room
+      # for the stack, metaspace and the OS without the kernel killing the process - an OOM
+      # kill on Render looks like a deploy that simply stops, with nothing useful in the log.
+      - key: JAVA_OPTS
+        value: -XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k
+
+      # The recogniser is a separate ~4 GB process that is not deployed here, so the voice
+      # step answers from the packaged transcripts. Setting mms without a server just buys
+      # every voice query a timeout before it falls back anyway.
+      - key: VOICE_MODE
+        value: recorded
+
+      # The seeded logins are admin/admin123 and driver123, published in data.sql in a
+      # public repository. The prod profile refuses to start while they still work.
+      #
+      # If this instance is a demo you are happy for anyone to sign into, set this to true
+      # in the Render dashboard. If it is not, change the hashes in data.sql instead and
+      # leave this alone. It is sync: false so Render asks rather than assuming.
+      - key: YBS_ALLOW_DEMO_LOGINS
+        sync: false
